@@ -1,0 +1,98 @@
+.topbar {
+  min-height: 4.875rem;
+  background: var(--shell-topbar-bg);
+  border-bottom: 1px solid var(--shell-topbar-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0 var(--space-7);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shell-topbar-shadow);
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.notifyWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.profileWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.notifyDot {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.3rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-error);
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg-surface) 82%, transparent);
+}
+
+.iconButton {
+  background: var(--shell-icon-button-bg);
+  border-color: var(--shell-icon-button-border);
+  color: var(--shell-icon-button-fg);
+  box-shadow: var(--shadow-sm);
+}
+
+.profileButton {
+  background: var(--shell-profile-button-bg);
+  border-color: var(--shell-profile-button-border);
+  color: var(--shell-profile-button-fg);
+  box-shadow: var(--shadow-sm);
+}
+
+.iconButtonOpen {
+  border-color: var(--shell-search-border-focus);
+  box-shadow: var(--shell-focus-halo);
+}
+
+@keyframes bellJiggle {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(11deg); }
+  40% { transform: rotate(-10deg); }
+  60% { transform: rotate(8deg); }
+  80% { transform: rotate(-6deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.iconButtonJiggle {
+  transform-origin: 50% 10%;
+  animation: bellJiggle 620ms ease-out;
+}
+
+.profileButton:focus-visible,
+.iconButton:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 48rem) {
+  .topbar {
+    padding-inline: var(--space-5);
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iconButtonJiggle {
+    animation: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .topbar {
+    padding-inline: var(--space-4);
+    padding-block: var(--space-3);
+  }
+}

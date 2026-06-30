@@ -1,0 +1,34 @@
+name: feature_profile
+description: User profile, points history, and weekly rankings for Chisto mobile.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  cached_network_image: ^3.4.1
+  chisto_core:
+  chisto_infrastructure:
+  chisto_networking:
+  crop_your_image: ^2.0.0
+  design_system:
+  feature_auth:
+  feature_reports:
+  feature_safety:
+  flutter:
+    sdk: flutter
+  flutter_image_compress: ^2.3.0
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+  image_picker: ^1.2.1
+  intl: any
+  package_info_plus: ^9.0.1
+  path_provider: ^2.1.5
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

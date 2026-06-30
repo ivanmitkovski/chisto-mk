@@ -1,0 +1,76 @@
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) min(20rem, 100%);
+  gap: 1rem;
+  align-items: start;
+}
+
+.shellWithPreview {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) min(18rem, 100%);
+}
+
+.documentColumn {
+  min-width: 0;
+}
+
+.documentInner {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0.5rem 0.75rem 3rem;
+}
+
+.previewColumn {
+  min-width: 0;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 6rem);
+  overflow: auto;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg, 0.5rem);
+  background: var(--surface-default);
+}
+
+.inspectorColumn {
+  min-width: 0;
+}
+
+@media (max-width: 64rem) {
+  .shell,
+  .shellWithPreview {
+    grid-template-columns: 1fr;
+  }
+
+  .previewColumn {
+    position: static;
+    max-height: none;
+    order: 3;
+  }
+
+  .inspectorColumn {
+    order: 2;
+  }
+}
+
+@media (min-width: 90rem) {
+  .documentInner {
+    max-width: 48rem;
+  }
+}
+
+.proseDocument {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+.proseDocument :global(.ProseMirror) {
+  min-height: 1.5rem;
+  outline: none;
+}
+
+.proseDocument :global(.ProseMirror:focus),
+.proseDocument :global(.ProseMirror:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}

@@ -1,0 +1,40 @@
+.wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-md);
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(8, 54, 39, 0.06);
+}
+
+.table th {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.link {
+  color: var(--color-green-700);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.meta {
+  margin: var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}

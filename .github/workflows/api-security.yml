@@ -1,0 +1,44 @@
+name: API security
+
+on:
+  pull_request:
+    paths:
+      - 'apps/api/**'
+  schedule:
+    - cron: '0 4 * * 1'
+
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+      - uses: github/codeql-action/analyze@v3
+
+  trivy-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f apps/api/Dockerfile.prod -t chisto-api:scan .
+      - uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          image-ref: chisto-api:scan
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true
+
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f apps/api/Dockerfile.prod -t chisto-api:sbom .
+      - uses: anchore/sbom-action@v0
+        with:
+          image: chisto-api:sbom
+          output-file: sbom.spdx.json

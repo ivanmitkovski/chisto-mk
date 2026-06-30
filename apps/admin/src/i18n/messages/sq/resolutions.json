@@ -1,0 +1,23 @@
+{
+  "pageTitle": "Rezolucione vendesh",
+  "pageDescription": "Shqyrtoni propozimet e qytetarëve për të shënuar vendet si të pastruara ose të zgjidhura.",
+  "approve": "Aprovo",
+  "reject": "Refuzo",
+  "filters": {
+    "status": "Statusi",
+    "all": "Të gjitha",
+    "pending": "Në shqyrtim",
+    "approved": "Aprovuar",
+    "rejected": "Refuzuar"
+  },
+  "table": {
+    "submitted": "Dërguar",
+    "site": "Vendi",
+    "submitter": "Dorëzuesi",
+    "status": "Statusi",
+    "photos": "Foto",
+    "actions": "Veprime",
+    "empty": "Asnjë dorëzim nuk përputhet me filtrat.",
+    "resolutionsCount": "{count} rezolucione · faqja {page}"
+  }
+}

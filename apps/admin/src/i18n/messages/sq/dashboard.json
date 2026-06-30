@@ -1,0 +1,120 @@
+{
+  "pageTitle": "Përmbledhja",
+  "statsEmpty": "Ende nuk ka statistika të disponueshme për panelin.",
+  "statGroups": {
+    "reports": "Raportet",
+    "platform": "Platforma",
+    "cleanups": "Pastrimet"
+  },
+  "stats": {
+    "newReports": "Raporte të reja",
+    "inReview": "Në shqyrtim",
+    "approved": "Të miratuara",
+    "deleted": "Të fshira",
+    "duplicateGroups": "Grupe të dyfishta",
+    "sites": "Vendet",
+    "upcoming": "Në vijim",
+    "completed": "Të përfunduara",
+    "users": "Përdoruesit",
+    "activeSessions": "Sesione aktive",
+    "usersTrend": "+{count} 7 ditët e fundit"
+  },
+  "reportsTrend": {
+    "sectionLabel": "Analitika",
+    "title": "Tendenca e raporteve",
+    "timeRangeAria": "Intervali kohor",
+    "viewReports": "Shiko raportet",
+    "emptyNoData": "Nuk u parashtuan raporte në {range} ditët e fundit.",
+    "emptyNeedMore": "Parashtroni më shumë raporte për të parë tendencën.",
+    "chartAria": "Tendenca e raporteve në {range} ditët e fundit",
+    "tableCaption": "Tendenca e raporteve në {range} ditët e fundit",
+    "dateColumn": "Data",
+    "reportsColumn": "Raportet"
+  },
+  "sections": {
+    "statistics": "Statistikat",
+    "reportsTable": "Tabela e raporteve",
+    "reportsTrend": "Tendenca e raporteve",
+    "recentActivity": "Aktiviteti i fundit",
+    "cleanupEvents": "Ngjarjet e pastrimit",
+    "feedDiagnostics": "Diagnostika e feed-it",
+    "insights": "Njohuri",
+    "dashboard": "Paneli"
+  },
+  "errors": {
+    "sessionExpired": "Sesioni skadoi ose qasja u refuzua. Tokeni mund të ketë skaduar (parazgjedhja 15 min). Hyni përsëri.",
+    "apiServerError": "Gabim i serverit API. Provo përsëri më vonë.",
+    "statisticsFailed": "Statistikat nuk u ngarkuan.",
+    "reportsTableFailed": "Tabela e raporteve nuk u ngarkua.",
+    "insightsFailed": "Njohuritë nuk u ngarkuan.",
+    "dashboardFailed": "Paneli nuk u ngarkua.",
+    "tryAgain": "Provo përsëri",
+    "signInAgain": "Hyni përsëri"
+  },
+  "reportsSection": {
+    "queue": "Radha",
+    "title": "Raportet",
+    "needAttention": "{count} raport(e) kërkojnë vëmendje",
+    "viewAllReports": "Shiko të gjitha raportet",
+    "refreshReportsAria": "Rifresko raportet"
+  },
+  "insights": {
+    "title": "Njohuri",
+    "feedOps": "Operacionet e feed-it",
+    "feedDiagnosticsTitle": "Diagnostika e feed-it",
+    "integrityDemotions": "Degradimet e integritetit (7d): {count}"
+  },
+  "activity": {
+    "sectionLabel": "Aktiviteti",
+    "title": "Aktiviteti i fundit",
+    "empty": "Ende pa aktivitet të fundit. Veprimet do të shfaqen këtu ndërsa ndodhin.",
+    "viewAllAuditLog": "Shiko të gjithë regjistrin e auditimit"
+  },
+  "events": {
+    "sectionLabel": "Ngjarjet",
+    "upcoming": "{count} në vijim",
+    "completed": "{count} të përfunduara",
+    "viewAll": "Shiko të gjitha"
+  },
+  "sse": {
+    "connected": "Përditësimet në kohë reale u lidhën",
+    "reconnecting": "Rilidhja me përditësimet në kohë reale",
+    "live": "Live",
+    "disconnected": "Shkëputur",
+    "reconnect": "Rilidhu",
+    "liveConnectedAria": "Përditësimet live u lidhën",
+    "reconnectingLabel": "Duke u rilidhur",
+    "disconnectedAria": "Përditësimet live u shkëputën",
+    "newUserRegistered": "U regjistrua përdorues i ri",
+    "userUpdated": "Përdoruesi u përditësua",
+    "cleanupEventPending": "Ngjarja e pastrimit pret shqyrtim",
+    "cleanupEventCreated": "Ngjarje e re pastrimi",
+    "cleanupEventUpdated": "Ngjarja e pastrimit u përditësua",
+    "newCheckInRiskSignal": "Sinjal i ri rreziku në check-in"
+  },
+  "errorBoundary": {
+    "retry": "Provo përsëri",
+    "sectionFailed": "{sectionName} nuk u ngarkua."
+  },
+  "pollingFallback": {
+    "message": "Përditësimet live u ndalën. Të dhënat rifreskohen periodikisht."
+  },
+  "timeAgo": {
+    "justNow": "tani",
+    "minuteAgo": "1 minutë më parë",
+    "minutesAgo": "{count} minuta më parë",
+    "hourAgo": "1 orë më parë",
+    "hoursAgo": "{count} orë më parë"
+  },
+  "quickActions": {
+    "menuAria": "Menyja e veprimeve të shpejta",
+    "title": "Veprime të shpejta",
+    "panelAria": "Veprime të shpejta",
+    "newReports": "Raporte të reja",
+    "inReview": "Në shqyrtim",
+    "users": "Përdoruesit",
+    "sites": "Vendet",
+    "events": "Ngjarjet",
+    "auditLog": "Regjistri i auditimit"
+  }
+}

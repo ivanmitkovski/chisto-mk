@@ -1,0 +1,85 @@
+lib/src/presentation/utils/event_calendar_date_format.dart:7:MMM d, y
+lib/src/presentation/utils/event_recurrence_rrule_summary.dart:12:RRULE:
+lib/src/presentation/utils/profile_level_tier.dart:125:River Watcher
+lib/src/presentation/utils/profile_level_tier.dart:126:Valley Keeper
+lib/src/presentation/utils/profile_level_tier.dart:127:Field Guardian
+lib/src/presentation/utils/profile_level_tier.dart:128:Grove Sentinel
+lib/src/presentation/utils/profile_level_tier.dart:129:Sky Steward
+lib/src/presentation/utils/profile_level_tier.dart:130:Trail Blazer
+lib/src/presentation/utils/profile_level_tier.dart:131:Spring Voice
+lib/src/presentation/utils/profile_level_tier.dart:132:Stone Warden
+lib/src/presentation/utils/profile_level_tier.dart:133:Meadow Herald
+lib/src/presentation/utils/profile_level_tier.dart:134:Ridge Runner
+lib/src/presentation/utils/profile_level_tier.dart:135:Creek Protector
+lib/src/presentation/utils/profile_level_tier.dart:136:Hill Watcher
+lib/src/presentation/utils/profile_level_tier.dart:137:Canopy Ally
+lib/src/presentation/utils/profile_level_tier.dart:138:Soil Advocate
+lib/src/presentation/utils/profile_level_tier.dart:139:Wind Listener
+lib/src/presentation/utils/profile_level_tier.dart:140:Dawn Patroller
+lib/src/presentation/utils/profile_level_tier.dart:141:Dusk Ranger
+lib/src/presentation/utils/profile_level_tier.dart:142:Wild Path Guide
+lib/src/presentation/utils/profile_level_tier.dart:143:Clear Water Knight
+lib/src/presentation/utils/profile_level_tier.dart:144:Green Belt Champion
+lib/src/presentation/utils/profile_level_tier.dart:145:Urban Roots Ally
+lib/src/presentation/utils/profile_level_tier.dart:146:Park Keeper
+lib/src/presentation/utils/profile_level_tier.dart:147:Riverbank Defender
+lib/src/presentation/utils/profile_level_tier.dart:148:Summit Scout
+lib/src/presentation/utils/profile_level_tier.dart:149:Valley Voice
+lib/src/presentation/utils/profile_level_tier.dart:150:Eco Cartographer
+lib/src/presentation/utils/profile_level_tier.dart:151:Cleanup Captain
+lib/src/presentation/utils/profile_level_tier.dart:152:Circle Steward
+lib/src/presentation/utils/profile_level_tier.dart:153:Harbor Helper
+lib/src/presentation/utils/profile_level_tier.dart:154:Plains Protector
+lib/src/presentation/utils/profile_level_tier.dart:155:Forest Friend
+lib/src/presentation/utils/profile_level_tier.dart:156:Lake Lookout
+lib/src/presentation/utils/profile_level_tier.dart:157:Mountain Mate
+lib/src/presentation/utils/profile_level_tier.dart:158:City Green Lead
+lib/src/presentation/utils/profile_level_tier.dart:159:Neighborhood Naturalist
+lib/src/presentation/utils/profile_level_tier.dart:160:Citizen Scientist
+lib/src/presentation/utils/profile_level_tier.dart:161:Climate Courier
+lib/src/presentation/utils/profile_level_tier.dart:162:Zero-Waste Warrior
+lib/src/presentation/utils/profile_level_tier.dart:163:Circular Economy Sage
+lib/src/presentation/utils/profile_level_tier.dart:164:Planet Partner
+lib/src/presentation/utils/profile_level_tier.dart:211:Vrojtues i lumenjve
+lib/src/presentation/utils/profile_level_tier.dart:212:Ruajtës i luginës
+lib/src/presentation/utils/profile_level_tier.dart:213:Kujdestar i fushës
+lib/src/presentation/utils/profile_level_tier.dart:214:Rojtar i pyllit
+lib/src/presentation/utils/profile_level_tier.dart:215:Përgjegjës i qiellit
+lib/src/presentation/utils/profile_level_tier.dart:216:Hapës shtigjesh
+lib/src/presentation/utils/profile_level_tier.dart:217:Zëri i burimit
+lib/src/presentation/utils/profile_level_tier.dart:218:Rojtar i gurit
+lib/src/presentation/utils/profile_level_tier.dart:219:Lajmëtues i livadhit
+lib/src/presentation/utils/profile_level_tier.dart:220:Vrapues i kreshtës
+lib/src/presentation/utils/profile_level_tier.dart:221:Mbrojtës i përroit
+lib/src/presentation/utils/profile_level_tier.dart:222:Vrojtues i kodrës
+lib/src/presentation/utils/profile_level_tier.dart:223:Aleat i kurorës së pemëve
+lib/src/presentation/utils/profile_level_tier.dart:224:Avokat i tokës
+lib/src/presentation/utils/profile_level_tier.dart:225:Dëgjues i erës
+lib/src/presentation/utils/profile_level_tier.dart:226:Patrullues i agimit
+lib/src/presentation/utils/profile_level_tier.dart:227:Rojtar i muzgut
+lib/src/presentation/utils/profile_level_tier.dart:228:Udhërrëfyes i shtegut të egër
+lib/src/presentation/utils/profile_level_tier.dart:229:Kalorës i ujit të pastër
+lib/src/presentation/utils/profile_level_tier.dart:230:Kampion i brezit të gjelbër
+lib/src/presentation/utils/profile_level_tier.dart:231:Aleat i rrënjëve urbane
+lib/src/presentation/utils/profile_level_tier.dart:232:Ruajtës i parkut
+lib/src/presentation/utils/profile_level_tier.dart:233:Mbrojtës i bregut të lumit
+lib/src/presentation/utils/profile_level_tier.dart:234:Skaut i majës
+lib/src/presentation/utils/profile_level_tier.dart:235:Zëri i luginës
+lib/src/presentation/utils/profile_level_tier.dart:236:Eko-kartograf
+lib/src/presentation/utils/profile_level_tier.dart:237:Kapiten pastrimi
+lib/src/presentation/utils/profile_level_tier.dart:238:Steward i rrethit
+lib/src/presentation/utils/profile_level_tier.dart:239:Ndihmës në port
+lib/src/presentation/utils/profile_level_tier.dart:240:Mbrojtës i fushës së hapur
+lib/src/presentation/utils/profile_level_tier.dart:241:Mik i pyllit
+lib/src/presentation/utils/profile_level_tier.dart:242:Vrojtues i liqenit
+lib/src/presentation/utils/profile_level_tier.dart:243:Shok i malit
+lib/src/presentation/utils/profile_level_tier.dart:244:Udhëheqës i gjelbërit urban
+lib/src/presentation/utils/profile_level_tier.dart:245:Naturalist i fqinjësisë
+lib/src/presentation/utils/profile_level_tier.dart:246:Shkencëtar qytetar
+lib/src/presentation/utils/profile_level_tier.dart:247:Korrier klimatik
+lib/src/presentation/utils/profile_level_tier.dart:248:Luftëtar zero-mbeturina
+lib/src/presentation/utils/profile_level_tier.dart:249:Menç i ekonomisë qarkulluese
+lib/src/presentation/utils/profile_level_tier.dart:250:Partner i planetit
+lib/src/presentation/widgets/chat/chat_linkified_text.dart:25:(https?://[^\s]+)|(www\.[^\s]+)
+lib/src/presentation/widgets/map/map_status_codes.dart:87:CLEANUP SCHEDULED
+lib/src/presentation/widgets/map/map_status_codes.dart:90:IN PROGRESS

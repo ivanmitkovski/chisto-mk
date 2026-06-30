@@ -1,0 +1,121 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 12rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.filter,
+.filterActive {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-2);
+  font-size: var(--font-size-xs);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.filterActive {
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-green-900);
+  font-weight: 600;
+}
+
+.listWrap {
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.item {
+  display: grid;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.itemTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.name:hover {
+  text-decoration: underline;
+}
+
+.typePill {
+  display: inline-flex;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.message {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.screen {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.time {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.empty,
+.footer,
+.footerMuted {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.loadMoreBtn {
+  align-self: flex-start;
+}

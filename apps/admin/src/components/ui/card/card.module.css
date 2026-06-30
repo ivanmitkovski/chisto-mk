@@ -1,0 +1,15 @@
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.paddingMd {
+  padding: var(--space-5);
+}
+
+.paddingSm {
+  padding: var(--space-4);
+}

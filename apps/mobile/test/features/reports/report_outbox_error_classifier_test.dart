@@ -1,0 +1,197 @@
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_error_classifier.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('classifyReportSubmitError', () {
+    test('cooldown', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(code: 'REPORTING_COOLDOWN', message: 'x'),
+        ),
+        ReportOutboxErrorKind.cooldown,
+      );
+    });
+
+    test('DUPLICATE_SUBMIT_INFLIGHT', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(
+            code: 'DUPLICATE_SUBMIT_INFLIGHT',
+            message: 'busy',
+            retryable: true,
+          ),
+        ),
+        ReportOutboxErrorKind.cooldown,
+      );
+    });
+
+    test('retryable CONFLICT', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(
+            code: 'CONFLICT',
+            message: 'conflict',
+            retryable: true,
+            details: <String, dynamic>{'retryAfterSeconds': 5},
+          ),
+        ),
+        ReportOutboxErrorKind.cooldown,
+      );
+    });
+
+    test('retryable by code', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(code: 'NETWORK_ERROR', message: 'x'),
+        ),
+        ReportOutboxErrorKind.retryable,
+      );
+    });
+
+    test(
+      'UNKNOWN treated as retryable so the same idempotency key replays',
+      () {
+        expect(
+          classifyReportSubmitError(AppError.unknown()),
+          ReportOutboxErrorKind.retryable,
+        );
+      },
+    );
+
+    test('terminal default', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(
+            code: 'VALIDATION_ERROR',
+            message: 'x',
+            retryable: false,
+          ),
+        ),
+        ReportOutboxErrorKind.terminal,
+      );
+    });
+  });
+
+  group('backoffMsForAttempt', () {
+    test('increases with attempt', () {
+      expect(backoffMsForAttempt(1), lessThan(backoffMsForAttempt(3)));
+    });
+
+    test('clamps to attempt 8 tier (256s base before 5m cap)', () {
+      const int tier8BaseMs = 2000 * (1 << 7);
+      final int high = backoffMsForAttempt(99);
+      final int jitter = (tier8BaseMs * 0.15).round();
+      expect(high, lessThanOrEqualTo(tier8BaseMs + jitter));
+      expect(high, greaterThanOrEqualTo(tier8BaseMs - jitter));
+    });
+
+    test('attempt 0 is clamped to tier 1 like attempt 1 (jittered range)', () {
+      const int ms = 2000;
+      final int jitter = (ms * 0.15).round();
+      final int lo = ms - jitter;
+      final int hi = ms + jitter;
+      expect(backoffMsForAttempt(0), inInclusiveRange(lo, hi));
+      expect(backoffMsForAttempt(1), inInclusiveRange(lo, hi));
+    });
+  });
+
+  group('retryable codes', () {
+    test('TIMEOUT', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(code: 'TIMEOUT', message: 'x', retryable: true),
+        ),
+        ReportOutboxErrorKind.retryable,
+      );
+    });
+
+    test('SERVER_ERROR', () {
+      expect(
+        classifyReportSubmitError(AppError.server()),
+        ReportOutboxErrorKind.retryable,
+      );
+    });
+
+    test('TOO_MANY_REQUESTS', () {
+      expect(
+        classifyReportSubmitError(AppError.tooManyRequests()),
+        ReportOutboxErrorKind.retryable,
+      );
+    });
+
+    test('generic retryable flag', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(code: 'CUSTOM', message: 'x', retryable: true),
+        ),
+        ReportOutboxErrorKind.retryable,
+      );
+    });
+  });
+
+  group('cooldownUntilMsFromAppError', () {
+    test('null when not cooldown', () {
+      expect(cooldownUntilMsFromAppError(AppError.server()), isNull);
+    });
+
+    test('malformed details defaults to ~60s ahead', () {
+      final int? until = cooldownUntilMsFromAppError(
+        const AppError(
+          code: 'REPORTING_COOLDOWN',
+          message: 'x',
+          details: 'not-a-map',
+        ),
+      );
+      expect(until, isNotNull);
+      expect(
+        until! - DateTime.now().millisecondsSinceEpoch,
+        inInclusiveRange(59 * 1000, 61 * 1000),
+      );
+    });
+
+    test('DUPLICATE_SUBMIT_INFLIGHT retryAfterSeconds', () {
+      final int? until = cooldownUntilMsFromAppError(
+        const AppError(
+          code: 'DUPLICATE_SUBMIT_INFLIGHT',
+          message: 'busy',
+          details: <String, dynamic>{'retryAfterSeconds': 5},
+        ),
+      );
+      expect(until, isNotNull);
+      expect(
+        until! - DateTime.now().millisecondsSinceEpoch,
+        inInclusiveRange(4 * 1000, 6 * 1000),
+      );
+    });
+
+    test('retryAfterSeconds', () {
+      final int? until = cooldownUntilMsFromAppError(
+        const AppError(
+          code: 'REPORTING_COOLDOWN',
+          message: 'x',
+          details: <String, dynamic>{'retryAfterSeconds': 42},
+        ),
+      );
+      expect(until, isNotNull);
+      expect(
+        until! - DateTime.now().millisecondsSinceEpoch,
+        inInclusiveRange(41 * 1000, 43 * 1000),
+      );
+    });
+
+    test('nextEmergencyReportAvailableAt', () {
+      final DateTime t = DateTime.now().toUtc().add(const Duration(minutes: 5));
+      final int? until = cooldownUntilMsFromAppError(
+        AppError(
+          code: 'REPORTING_COOLDOWN',
+          message: 'x',
+          details: <String, dynamic>{
+            'nextEmergencyReportAvailableAt': t.toIso8601String(),
+          },
+        ),
+      );
+      expect(until, t.millisecondsSinceEpoch);
+    });
+  });
+}

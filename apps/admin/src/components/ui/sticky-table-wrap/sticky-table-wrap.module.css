@@ -1,0 +1,42 @@
+.wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(8, 54, 39, 0.06);
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  min-width: 0;
+}
+
+.wrap :global(thead th) {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 1px 0 var(--border-default);
+}
+
+/* Below desktop: keep row identity visible while scrolling wide tables (matches admin-ui-conventions). */
+@media (max-width: 64rem) {
+  .wrap :global(thead th:first-child),
+  .wrap :global(tbody td:first-child) {
+    position: sticky;
+    left: 0;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 4px 0 10px -6px rgba(8, 54, 39, 0.14);
+  }
+
+  .wrap :global(thead th:first-child) {
+    z-index: 4;
+    box-shadow:
+      4px 0 10px -6px rgba(8, 54, 39, 0.14),
+      0 1px 0 var(--border-default);
+  }
+
+  .wrap :global(thead th:not(:first-child)) {
+    z-index: 3;
+  }
+
+  .wrap :global(tbody td:first-child) {
+    z-index: 1;
+  }
+}

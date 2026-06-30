@@ -1,0 +1,254 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SiteStatus } from '../../prisma-client';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../../audit/services/audit.service';
+import { reportMergePrimaryCopy, reportMergeChildCopy, reportCoReporterCreditCopy } from '../../notifications/util/notification-templates';
+import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
+import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
+import { ReportsUploadService } from '../services/reports-upload.service';
+import { ReportEventsService } from '../../admin-realtime/services/report-events.service';
+import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
+import { ReportsOwnerEventsService } from '../services/reports-owner-events.service';
+import { getReportNumber } from '../util/report-copy.helpers';
+import { SiteHistoryWriterService } from '../../sites/history/site-history-writer.service';
+import { SiteHistoryReportRecorderService } from '../../sites/history/site-history-report-recorder.service';
+
+export type DuplicateMergeSiteStatusEvent = {
+  id: string;
+  status: SiteStatus;
+  latitude: number;
+  longitude: number;
+  updatedAt: Date;
+};
+
+export type DuplicateMergePostTxInput = {
+  moderator: AuthenticatedUser;
+  primaryReport: {
+    id: string;
+    siteId: string;
+    reporterId: string | null;
+    reportNumber: string | null;
+    createdAt: Date;
+    mediaUrls: string[];
+  };
+  selectedChildIds: string[];
+  selectedChildren: { id: string; reporterId: string | null }[];
+  plannedNewCoReporterIds: string[];
+  duplicateMediaUrls: string[];
+  siteStatusEvent: DuplicateMergeSiteStatusEvent | null;
+};
+
+@Injectable()
+export class DuplicateMergeSideEffectsService {
+  private readonly logger = new Logger(DuplicateMergeSideEffectsService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+    private readonly reportsUploadService: ReportsUploadService,
+    private readonly reportEventsService: ReportEventsService,
+    private readonly siteEventsService: SiteEventsService,
+    private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly siteHistoryWriter: SiteHistoryWriterService,
+    private readonly siteHistoryReportRecorder: SiteHistoryReportRecorderService,
+  ) {}
+
+  async runPostMergeEffects(input: DuplicateMergePostTxInput): Promise<number> {
+    const {
+      moderator,
+      primaryReport,
+      selectedChildIds,
+      selectedChildren,
+      plannedNewCoReporterIds,
+      duplicateMediaUrls,
+      siteStatusEvent,
+    } = input;
+
+    if (siteStatusEvent != null) {
+      this.siteEventsService.emitSiteUpdated(siteStatusEvent.id, {
+        kind: 'status_changed',
+        status: siteStatusEvent.status,
+        latitude: siteStatusEvent.latitude,
+        longitude: siteStatusEvent.longitude,
+        updatedAt: siteStatusEvent.updatedAt,
+      });
+      await this.siteHistoryWriter.recordStatusChanged({
+        siteId: siteStatusEvent.id,
+        fromStatus: SiteStatus.REPORTED,
+        toStatus: siteStatusEvent.status,
+        occurredAt: siteStatusEvent.updatedAt,
+        reportId: primaryReport.id,
+        actor: { userId: moderator.userId, role: moderator.role },
+        metadata: { trigger: 'REPORT_MERGE' },
+      });
+    }
+
+    await this.siteHistoryReportRecorder.recordReportMerged({
+      siteId: primaryReport.siteId,
+      reportId: primaryReport.id,
+      occurredAt: new Date(),
+      actor: { userId: moderator.userId, role: moderator.role },
+      metadata: {
+        mergedChildCount: selectedChildren.length,
+        childReportIds: selectedChildIds,
+      },
+    });
+    this.siteHistoryWriter.emitHistoryAppended(primaryReport.siteId, primaryReport.id);
+
+    const mergedMediaDeletedCount =
+      await this.reportsUploadService.deleteReportMediaUrls(duplicateMediaUrls);
+
+    await this.audit.log({
+      actorId: moderator.userId,
+      action: 'REPORT_MERGE',
+      resourceType: 'Report',
+      resourceId: primaryReport.id,
+      metadata: {
+        mergedChildCount: selectedChildren.length,
+        childReportIds: selectedChildIds,
+        duplicateMediaUrlsAttempted: duplicateMediaUrls.length,
+        duplicateMediaObjectsDeleted: mergedMediaDeletedCount,
+      },
+    });
+
+    this.reportEventsService.emitReportStatusUpdated(primaryReport.id);
+    for (const childId of selectedChildIds) {
+      this.reportEventsService.emitReportStatusUpdated(childId);
+    }
+
+    const primaryParties = await this.prisma.report.findUnique({
+      where: { id: primaryReport.id },
+      select: {
+        reporterId: true,
+        coReporters: { select: { userId: true } },
+      },
+    });
+    if (primaryParties) {
+      this.reportsOwnerEventsService.emitToReportInterestedParties(
+        primaryReport.id,
+        primaryParties.reporterId,
+        primaryParties.coReporters
+          .map((c) => c.userId)
+          .filter((id): id is string => id != null),
+        'report_updated',
+        { kind: 'merged', status: 'APPROVED' },
+      );
+    }
+    for (const child of selectedChildren) {
+      if (child.reporterId) {
+        this.reportsOwnerEventsService.emit(
+          child.reporterId,
+          child.id,
+          'report_updated',
+          { kind: 'merged', status: 'DELETED' },
+        );
+      }
+    }
+
+    const primaryReportNumberLabel = getReportNumber(primaryReport);
+    void this.emitDuplicateMergeNotifications({
+      primaryReportId: primaryReport.id,
+      siteId: primaryReport.siteId,
+      primaryReporterId: primaryReport.reporterId,
+      primaryReportNumberLabel,
+      selectedChildren: selectedChildren.map((c) => ({ id: c.id, reporterId: c.reporterId })),
+      plannedNewCoReporterIds,
+    }).catch((err: unknown) => {
+      this.logger.warn({ msg: 'duplicate_merge_notifications_failed', error: String(err) });
+    });
+
+    return mergedMediaDeletedCount;
+  }
+
+  private async emitDuplicateMergeNotifications(params: {
+    primaryReportId: string;
+    siteId: string;
+    primaryReporterId: string | null;
+    primaryReportNumberLabel: string;
+    selectedChildren: { id: string; reporterId: string | null }[];
+    plannedNewCoReporterIds: string[];
+  }): Promise<void> {
+    const {
+      primaryReportId,
+      siteId,
+      primaryReporterId,
+      primaryReportNumberLabel,
+      selectedChildren,
+      plannedNewCoReporterIds,
+    } = params;
+
+    const childReporterIds = new Set<string>();
+    for (const child of selectedChildren) {
+      if (child.reporterId) {
+        childReporterIds.add(child.reporterId);
+      }
+    }
+
+    const baseData = {
+      reportId: primaryReportId,
+      siteId,
+      status: 'APPROVED' as const,
+      reportNumber: primaryReportNumberLabel,
+    };
+
+    const allNotifyUserIds = [
+      ...(primaryReporterId != null ? [primaryReporterId] : []),
+      ...childReporterIds,
+      ...plannedNewCoReporterIds,
+    ];
+    const localeBy = await notificationLocalesByUserId(
+      this.prisma,
+      [...new Set(allNotifyUserIds)],
+    );
+
+    if (primaryReporterId != null && selectedChildren.length > 0) {
+      const locale = localeBy.get(primaryReporterId)!;
+      const primaryCopy = reportMergePrimaryCopy(locale, primaryReportNumberLabel);
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [primaryReporterId],
+        title: primaryCopy.title,
+        body: primaryCopy.body,
+        type: 'REPORT_STATUS',
+        threadKey: `report:${primaryReportId}`,
+        groupKey: `REPORT_STATUS:site:${siteId}`,
+        data: { ...baseData, mergeRole: 'primary' },
+      });
+    }
+
+    for (const userId of childReporterIds) {
+      if (userId === primaryReporterId) {
+        continue;
+      }
+      const locale = localeBy.get(userId)!;
+      const childCopy = reportMergeChildCopy(locale, primaryReportNumberLabel);
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [userId],
+        title: childCopy.title,
+        body: childCopy.body,
+        type: 'REPORT_STATUS',
+        threadKey: `report:${primaryReportId}`,
+        groupKey: `REPORT_STATUS:site:${siteId}`,
+        data: { ...baseData, mergeRole: 'merged_child' },
+      });
+    }
+
+    for (const userId of plannedNewCoReporterIds) {
+      if (userId === primaryReporterId || childReporterIds.has(userId)) {
+        continue;
+      }
+      const locale = localeBy.get(userId)!;
+      const coCopy = reportCoReporterCreditCopy(locale, primaryReportNumberLabel);
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [userId],
+        title: coCopy.title,
+        body: coCopy.body,
+        type: 'REPORT_STATUS',
+        threadKey: `report:${primaryReportId}`,
+        groupKey: `REPORT_STATUS:site:${siteId}`,
+        data: { ...baseData, mergeRole: 'co_reporter_credited' },
+      });
+    }
+  }
+}

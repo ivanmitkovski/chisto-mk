@@ -1,0 +1,209 @@
+import 'dart:math' as math;
+
+import 'package:feature_home/src/domain/models/cleaning_event.dart';
+import 'package:feature_home/src/domain/models/co_reporter_profile.dart';
+import 'package:feature_home/src/domain/models/comment.dart';
+import 'package:feature_home/src/domain/models/site_report.dart';
+import 'package:feature_home/src/domain/models/site_resolution_viewer_status.dart';
+import 'package:flutter/material.dart';
+
+class PollutionSite {
+  const PollutionSite({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.statusLabel,
+    this.statusCode,
+    required this.statusColor,
+    required this.distanceKm,
+    required this.score,
+    this.shareCount = 0,
+    this.isUpvotedByMe = false,
+    this.isSavedByMe = false,
+    this.viewerResolutionStatus = SiteResolutionViewerStatus.none,
+    required this.participantCount,
+    this.mediaUrls = const <String>[],
+    this.comments = const [],
+    this.commentsCount = 0,
+    this.urgencyLabel,
+    this.cleaningEvents = const <CleaningEvent>[],
+    this.pollutionType,
+    this.firstReport,
+    List<String>? coReporterNames,
+    List<CoReporterProfile>? coReporterProfiles,
+    this.mergedDuplicateChildCountTotal = 0,
+    this.latitude,
+    this.longitude,
+    this.address,
+    this.feedReasons = const <String>[],
+    this.rankingScore,
+    this.rankingComponents,
+    this.latestReporterName,
+    this.latestReporterAvatarUrl,
+    this.latestReportAt,
+    this.latestReporterUserId,
+  }) : coReporterNames = coReporterNames ?? const [],
+       coReporterProfiles = coReporterProfiles ?? const [];
+
+  final String id;
+  final String title;
+  final String description;
+  final String statusLabel;
+  final String? statusCode;
+  final Color statusColor;
+  final double distanceKm;
+  final int score;
+  final int shareCount;
+  final bool isUpvotedByMe;
+  final bool isSavedByMe;
+  final SiteResolutionViewerStatus viewerResolutionStatus;
+  final int participantCount;
+
+  /// Ordered site media URLs (feed: `latestReportMediaUrls`; detail: aggregated report URLs).
+  final List<String> mediaUrls;
+
+  /// First gallery URL when present (map pins, share flows, event prefill).
+  String? get primaryImageUrl => mediaUrls.isNotEmpty ? mediaUrls.first : null;
+
+  final List<Comment> comments;
+  final int commentsCount;
+  final List<CleaningEvent> cleaningEvents;
+
+  final String? urgencyLabel;
+  final String? pollutionType;
+  final SiteReport? firstReport;
+  final List<String> coReporterNames;
+
+  /// Richer co-reporter rows when the API returns avatars (GET /sites/:id `coReporterSummaries`).
+  final List<CoReporterProfile> coReporterProfiles;
+
+  /// Duplicate child reports merged into site reports (same or other reporters); from GET /sites/:id.
+  final int mergedDuplicateChildCountTotal;
+
+  final double? latitude;
+  final double? longitude;
+
+  /// Reverse-geocoded location label from the API (map list rows).
+  final String? address;
+
+  final List<String> feedReasons;
+  final double? rankingScore;
+  final Map<String, double>? rankingComponents;
+
+  /// Latest report author (feed list API).
+  final String? latestReporterName;
+  final String? latestReporterAvatarUrl;
+  final DateTime? latestReportAt;
+
+  /// When non-null, matches [User.id] of [latestReporterName] (feed: `latestReportReporterId`).
+  final String? latestReporterUserId;
+
+  /// Total comments for UI: uses [commentsCount] when no embedded tree; otherwise counts
+  /// all nodes in [comments] (replies included) and uses `max` with [commentsCount] so
+  /// feed previews that only embed top-level roots never under-report the API total.
+  int get commentCount {
+    if (comments.isEmpty) return commentsCount;
+    return math.max(_commentForestTotalCount(comments), commentsCount);
+  }
+
+  /// Stats chip (groups icon): co-reporter count, or merged duplicate count when there are no other reporters.
+  int get siteParticipantStatsBadgeValue => coReporterNames.isNotEmpty
+      ? coReporterNames.length
+      : mergedDuplicateChildCountTotal;
+
+  /// Chronologically first report (detail GET). Drives the "Reported by" row on site detail.
+  SiteReport? get displayFirstReport => firstReport;
+
+  /// Modal / list: prefer [coReporterProfiles] when it carries avatars; otherwise fall back to [coReporterNames].
+  List<CoReporterProfile> get displayCoReporterProfiles {
+    if (coReporterProfiles.isNotEmpty) {
+      return coReporterProfiles;
+    }
+    return coReporterNames
+        .map((String n) => CoReporterProfile(displayName: n))
+        .toList();
+  }
+
+  PollutionSite copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? statusLabel,
+    String? statusCode,
+    Color? statusColor,
+    double? distanceKm,
+    int? score,
+    int? shareCount,
+    bool? isUpvotedByMe,
+    bool? isSavedByMe,
+    SiteResolutionViewerStatus? viewerResolutionStatus,
+    int? participantCount,
+    List<String>? mediaUrls,
+    List<Comment>? comments,
+    int? commentsCount,
+    String? urgencyLabel,
+    List<CleaningEvent>? cleaningEvents,
+    String? pollutionType,
+    SiteReport? firstReport,
+    List<String>? coReporterNames,
+    List<CoReporterProfile>? coReporterProfiles,
+    int? mergedDuplicateChildCountTotal,
+    double? latitude,
+    double? longitude,
+    String? address,
+    List<String>? feedReasons,
+    double? rankingScore,
+    Map<String, double>? rankingComponents,
+    String? latestReporterName,
+    String? latestReporterAvatarUrl,
+    DateTime? latestReportAt,
+    String? latestReporterUserId,
+  }) {
+    return PollutionSite(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      statusLabel: statusLabel ?? this.statusLabel,
+      statusCode: statusCode ?? this.statusCode,
+      statusColor: statusColor ?? this.statusColor,
+      distanceKm: distanceKm ?? this.distanceKm,
+      score: score ?? this.score,
+      shareCount: shareCount ?? this.shareCount,
+      isUpvotedByMe: isUpvotedByMe ?? this.isUpvotedByMe,
+      isSavedByMe: isSavedByMe ?? this.isSavedByMe,
+      viewerResolutionStatus:
+          viewerResolutionStatus ?? this.viewerResolutionStatus,
+      participantCount: participantCount ?? this.participantCount,
+      mediaUrls: mediaUrls ?? this.mediaUrls,
+      comments: comments ?? this.comments,
+      commentsCount: commentsCount ?? this.commentsCount,
+      urgencyLabel: urgencyLabel ?? this.urgencyLabel,
+      cleaningEvents: cleaningEvents ?? this.cleaningEvents,
+      pollutionType: pollutionType ?? this.pollutionType,
+      firstReport: firstReport ?? this.firstReport,
+      coReporterNames: coReporterNames ?? this.coReporterNames,
+      coReporterProfiles: coReporterProfiles ?? this.coReporterProfiles,
+      mergedDuplicateChildCountTotal:
+          mergedDuplicateChildCountTotal ?? this.mergedDuplicateChildCountTotal,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      address: address ?? this.address,
+      feedReasons: feedReasons ?? this.feedReasons,
+      rankingScore: rankingScore ?? this.rankingScore,
+      rankingComponents: rankingComponents ?? this.rankingComponents,
+      latestReporterName: latestReporterName ?? this.latestReporterName,
+      latestReporterAvatarUrl:
+          latestReporterAvatarUrl ?? this.latestReporterAvatarUrl,
+      latestReportAt: latestReportAt ?? this.latestReportAt,
+      latestReporterUserId: latestReporterUserId ?? this.latestReporterUserId,
+    );
+  }
+}
+
+int _commentForestTotalCount(List<Comment> roots) {
+  int n = 0;
+  for (final Comment c in roots) {
+    n += 1 + _commentForestTotalCount(c.replies);
+  }
+  return n;
+}

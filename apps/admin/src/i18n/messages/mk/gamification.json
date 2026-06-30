@@ -1,0 +1,50 @@
+{
+  "pageTitle": "Гејмификација",
+  "description": "Конфигурирајте нивоа, вредности на поени и прегледајте неделни рангирања.",
+  "tabs": {
+    "config": "Конфигурација",
+    "weeklyRankings": "Неделни рангирања"
+  },
+  "config": {
+    "levelThresholds": "Прагови на нивоа (одделени со запирка)",
+    "pointValues": "Вредности на поени",
+    "action": "Акција",
+    "points": "Поени",
+    "remove": "Отстрани",
+    "addAction": "Додај акција",
+    "saveConfig": "Зачувај конфигурација",
+    "saving": "Зачувување…"
+  },
+  "validation": {
+    "thresholdRequired": "Додајте барем еден праг на ниво.",
+    "thresholdNonNegative": "Праговите мора да се не-негативни цели броеви.",
+    "thresholdIncreasing": "Праговите мора строго да растат.",
+    "actionRequired": "Додајте барем една акција за поени.",
+    "actionKeyFormat": "Клучевите на акции мора да се UPPER_SNAKE_CASE.",
+    "pointsNonNegative": "Вредностите на поени мора да се не-негативни броеви."
+  },
+  "rankings": {
+    "previousWeek": "Претходна недела",
+    "nextWeek": "Следна недела",
+    "currentWeek": "Тековна недела",
+    "weekRange": "Недела {start} - {end}",
+    "empty": "Сè уште нема рангирања за оваа недела.",
+    "columns": {
+      "rank": "Ранг",
+      "user": "Корисник",
+      "email": "Е-пошта",
+      "points": "Поени",
+      "leaderboard": "Табела со ранги"
+    },
+    "showOnLeaderboardYes": "Да",
+    "showOnLeaderboardNo": "Не"
+  },
+  "toast": {
+    "invalidConfigTitle": "Невалидна конфигурација",
+    "savedMessage": "Конфигурацијата за гејмификација е ажурирана.",
+    "saveFailedTitle": "Зачувувањето не успеа",
+    "saveFailedMessage": "Не може да се зачува конфигурацијата.",
+    "loadFailedMessage": "Не може да се вчитаат рангирањата."
+  },
+  "tabsAria": "Делови за гејмификација"
+}

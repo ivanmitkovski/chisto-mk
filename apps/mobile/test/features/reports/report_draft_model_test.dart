@@ -1,0 +1,282 @@
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:image_picker/image_picker.dart';
+
+void main() {
+  group('ReportGeoFence', () {
+    test('contains returns true for coordinates in Macedonia', () {
+      expect(ReportGeoFence.contains(41.6, 21.7), isTrue);
+      expect(ReportGeoFence.contains(40.8, 20.4), isTrue);
+      expect(ReportGeoFence.contains(42.4, 23.1), isTrue);
+    });
+
+    test('contains returns false for coordinates outside Macedonia', () {
+      expect(ReportGeoFence.contains(40, 21), isFalse);
+      expect(ReportGeoFence.contains(43, 21), isFalse);
+      expect(ReportGeoFence.contains(41, 19), isFalse);
+      expect(ReportGeoFence.contains(41, 24), isFalse);
+    });
+
+    test('clampToInsetBounds clamps out-of-bounds coordinates', () {
+      final (double lat, double lng) = ReportGeoFence.clampToInsetBounds(
+        40,
+        19,
+      );
+      expect(lat, greaterThanOrEqualTo(ReportGeoFence.insetMinLat));
+      expect(lat, lessThanOrEqualTo(ReportGeoFence.insetMaxLat));
+      expect(lng, greaterThanOrEqualTo(ReportGeoFence.insetMinLng));
+      expect(lng, lessThanOrEqualTo(ReportGeoFence.insetMaxLng));
+    });
+
+    test('inset bounds are within main bounds', () {
+      expect(ReportGeoFence.insetMinLat, greaterThan(ReportGeoFence.minLat));
+      expect(ReportGeoFence.insetMaxLat, lessThan(ReportGeoFence.maxLat));
+      expect(ReportGeoFence.insetMinLng, greaterThan(ReportGeoFence.minLng));
+      expect(ReportGeoFence.insetMaxLng, lessThan(ReportGeoFence.maxLng));
+    });
+  });
+
+  group('ReportDraft.hasPersistableWizardBody', () {
+    test('is true when category is set without title or photos', () {
+      final ReportDraft d = ReportDraft(category: ReportCategory.other);
+      expect(d.hasPersistableWizardBody, isTrue);
+    });
+
+    test('is false for default empty draft', () {
+      expect(ReportDraft().hasPersistableWizardBody, isFalse);
+    });
+  });
+
+  group('ReportCategory', () {
+    test('has expected values', () {
+      expect(ReportCategory.values.length, 5);
+      expect(ReportCategory.values, contains(ReportCategory.illegalLandfill));
+      expect(ReportCategory.values, contains(ReportCategory.waterPollution));
+      expect(ReportCategory.values, contains(ReportCategory.airPollution));
+      expect(ReportCategory.values, contains(ReportCategory.industrialWaste));
+      expect(ReportCategory.values, contains(ReportCategory.other));
+    });
+
+    test('each category has stable API pollution label for map filters', () {
+      for (final ReportCategory cat in ReportCategory.values) {
+        expect(cat.apiPollutionTypeLabel, isNotEmpty);
+      }
+    });
+  });
+
+  group('ReportRequirement', () {
+    test('has expected enum names', () {
+      expect(ReportRequirement.photos.name, 'photos');
+      expect(ReportRequirement.category.name, 'category');
+      expect(ReportRequirement.title.name, 'title');
+      expect(ReportRequirement.location.name, 'location');
+    });
+  });
+
+  group('CleanupEffort', () {
+    test('has expected api keys', () {
+      expect(CleanupEffort.oneToTwo.apiKey, 'ONE_TO_TWO');
+      expect(CleanupEffort.threeToFive.apiKey, 'THREE_TO_FIVE');
+      expect(CleanupEffort.sixToTen.apiKey, 'SIX_TO_TEN');
+      expect(CleanupEffort.tenPlus.apiKey, 'TEN_PLUS');
+      expect(CleanupEffort.notSure.apiKey, 'NOT_SURE');
+    });
+
+    test('apiKey round-trips with fromApiString', () {
+      for (final CleanupEffort e in CleanupEffort.values) {
+        expect(CleanupEffort.fromApiString(e.apiKey), e);
+      }
+      expect(CleanupEffort.fromApiString(null), isNull);
+      expect(CleanupEffort.fromApiString(''), isNull);
+      expect(CleanupEffort.fromApiString('INVALID'), isNull);
+    });
+  });
+
+  group('ReportDraft', () {
+    test('constructs with defaults', () {
+      final ReportDraft draft = ReportDraft();
+
+      expect(draft.photos, isEmpty);
+      expect(draft.category, isNull);
+      expect(draft.title, '');
+      expect(draft.description, '');
+      expect(draft.latitude, isNull);
+      expect(draft.longitude, isNull);
+      expect(draft.address, isNull);
+      expect(draft.cleanupEffort, isNull);
+    });
+
+    test('constructs with all fields', () {
+      final List<XFile> photos = <XFile>[XFile('/tmp/photo.jpg')];
+      final ReportDraft draft = ReportDraft(
+        photos: photos,
+        category: ReportCategory.illegalLandfill,
+        title: 'Dump site',
+        description: 'Test description',
+        latitude: 41.6,
+        longitude: 21.7,
+        address: 'Skopje',
+        cleanupEffort: CleanupEffort.threeToFive,
+      );
+
+      expect(draft.photos, photos);
+      expect(draft.category, ReportCategory.illegalLandfill);
+      expect(draft.title, 'Dump site');
+      expect(draft.description, 'Test description');
+      expect(draft.latitude, 41.6);
+      expect(draft.longitude, 21.7);
+      expect(draft.address, 'Skopje');
+      expect(draft.cleanupEffort, CleanupEffort.threeToFive);
+    });
+
+    test('hasPhotos returns true when photos non-empty', () {
+      final ReportDraft empty = ReportDraft();
+      final ReportDraft withPhotos = ReportDraft(
+        photos: <XFile>[XFile('/tmp/photo.jpg')],
+      );
+
+      expect(empty.hasPhotos, isFalse);
+      expect(withPhotos.hasPhotos, isTrue);
+    });
+
+    test('hasCategory returns true when category set', () {
+      final ReportDraft without = ReportDraft();
+      final ReportDraft withCat = ReportDraft(category: ReportCategory.other);
+
+      expect(without.hasCategory, isFalse);
+      expect(withCat.hasCategory, isTrue);
+    });
+
+    test('hasTitle returns true when non-empty trimmed', () {
+      expect(ReportDraft().hasTitle, isFalse);
+      expect(ReportDraft(title: '   ').hasTitle, isFalse);
+      expect(ReportDraft(title: ' Issue ').hasTitle, isTrue);
+    });
+
+    test('hasLocation returns true when lat/lng set', () {
+      final ReportDraft without = ReportDraft();
+      final ReportDraft withLoc = ReportDraft(latitude: 41.6, longitude: 21.7);
+
+      expect(without.hasLocation, isFalse);
+      expect(withLoc.hasLocation, isTrue);
+    });
+
+    test('hasDescription returns true when non-empty trimmed', () {
+      final ReportDraft empty = ReportDraft();
+      final ReportDraft whitespace = ReportDraft(description: '   ');
+      final ReportDraft withDesc = ReportDraft(description: ' Some text ');
+
+      expect(empty.hasDescription, isFalse);
+      expect(whitespace.hasDescription, isFalse);
+      expect(withDesc.hasDescription, isTrue);
+    });
+
+    test('isValid requires photos, category, title, and location', () {
+      final ReportDraft incomplete = ReportDraft(
+        photos: <XFile>[XFile('/tmp/p.jpg')],
+        category: ReportCategory.other,
+      );
+      expect(incomplete.isValid, isFalse);
+
+      final ReportDraft valid = ReportDraft(
+        photos: <XFile>[XFile('/tmp/p.jpg')],
+        category: ReportCategory.other,
+        title: 'Issue title',
+        latitude: 41.6,
+        longitude: 21.7,
+      );
+      expect(valid.isValid, isTrue);
+    });
+
+    test('completedRequiredSteps and totalRequiredSteps', () {
+      final ReportDraft empty = ReportDraft();
+      expect(empty.completedRequiredSteps, 0);
+      expect(empty.totalRequiredSteps, 4);
+
+      final ReportDraft twoOfFour = ReportDraft(
+        photos: <XFile>[XFile('/tmp/p.jpg')],
+        category: ReportCategory.other,
+      );
+      expect(twoOfFour.completedRequiredSteps, 2);
+      expect(twoOfFour.totalRequiredSteps, 4);
+    });
+
+    test('missingRequirements returns correct list', () {
+      final ReportDraft empty = ReportDraft();
+      final List<ReportRequirement> missing = empty.missingRequirements(
+        hasLocationInMacedonia: false,
+      );
+
+      expect(missing, contains(ReportRequirement.photos));
+      expect(missing, contains(ReportRequirement.category));
+      expect(missing, contains(ReportRequirement.title));
+      expect(missing, contains(ReportRequirement.location));
+      expect(missing.length, 4);
+    });
+
+    test('missingRequirements only title when geo done', () {
+      final ReportDraft withLoc = ReportDraft(
+        photos: <XFile>[XFile('/tmp/p.jpg')],
+        category: ReportCategory.other,
+        latitude: 41.6,
+        longitude: 21.7,
+      );
+      final List<ReportRequirement> missing = withLoc.missingRequirements(
+        hasLocationInMacedonia: true,
+      );
+
+      expect(missing, <ReportRequirement>[ReportRequirement.title]);
+    });
+
+    test('copyWith updates fields', () {
+      final ReportDraft original = ReportDraft(
+        description: 'Original',
+        latitude: 41,
+        longitude: 21,
+      );
+
+      final ReportDraft updated = original.copyWith(
+        description: 'Updated',
+        latitude: 42,
+      );
+
+      expect(updated.description, 'Updated');
+      expect(updated.latitude, 42.0);
+      expect(updated.longitude, 21.0);
+    });
+
+    test('copyWith clearLocation clears location fields', () {
+      final ReportDraft withLoc = ReportDraft(
+        latitude: 41.6,
+        longitude: 21.7,
+        address: 'Skopje',
+      );
+
+      final ReportDraft cleared = withLoc.copyWith(clearLocation: true);
+
+      expect(cleared.latitude, isNull);
+      expect(cleared.longitude, isNull);
+      expect(cleared.address, isNull);
+    });
+
+    test('copyWith clearLocation preserves other fields', () {
+      final ReportDraft original = ReportDraft(
+        photos: <XFile>[XFile('/tmp/p.jpg')],
+        category: ReportCategory.waterPollution,
+        title: 'T',
+        description: 'Desc',
+        latitude: 41.6,
+        longitude: 21.7,
+        cleanupEffort: CleanupEffort.sixToTen,
+      );
+
+      final ReportDraft cleared = original.copyWith(clearLocation: true);
+
+      expect(cleared.photos.length, 1);
+      expect(cleared.category, ReportCategory.waterPollution);
+      expect(cleared.title, 'T');
+      expect(cleared.description, 'Desc');
+      expect(cleared.cleanupEffort, CleanupEffort.sixToTen);
+    });
+  });
+}

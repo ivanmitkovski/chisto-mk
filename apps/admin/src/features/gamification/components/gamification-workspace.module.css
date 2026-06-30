@@ -1,0 +1,88 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.tab,
+.tabActive {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.tabActive {
+  background: var(--color-mint-100);
+  border-color: var(--color-mint-300);
+}
+
+.pointGrid {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.pointRow {
+  display: grid;
+  grid-template-columns: 1fr minmax(6rem, 8rem) auto;
+  gap: var(--space-2);
+  align-items: end;
+}
+
+.rankingsTableWrap {
+  margin-top: var(--space-4);
+  min-width: 0;
+}
+
+.rankingsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rankingsTable th,
+.rankingsTable td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-default);
+  text-align: left;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.weekPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.validationError {
+  margin: var(--space-2) 0 0;
+  color: var(--color-status-danger-fg);
+  font-size: var(--font-size-sm);
+}
+
+.userLink {
+  color: var(--color-mint-700);
+  text-decoration: underline;
+}
+
+@media (max-width: 48rem) {
+  .pointRow {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}

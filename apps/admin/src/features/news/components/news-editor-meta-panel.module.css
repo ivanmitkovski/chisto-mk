@@ -1,0 +1,80 @@
+.root {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.list {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.list div {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.list dt {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.list dd {
+  margin: 0;
+}
+
+.previewLink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.previewLink:hover {
+  text-decoration: underline;
+}
+
+.previewHint {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.canonicalHint {
+  margin: 0.5rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.canonicalUrl {
+  display: block;
+  margin-top: 0.125rem;
+  word-break: break-all;
+  color: var(--text-primary);
+}
+
+.pendingHint {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  color: var(--color-status-warning-fg);
+}
+
+.shortcuts {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.tzHint {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+}

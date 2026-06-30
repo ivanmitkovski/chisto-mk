@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - develop
 
 permissions:
   contents: read
@@ -12,6 +13,9 @@ permissions:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   secret-scan:
@@ -32,8 +36,36 @@ jobs:
   validate:
     name: Build and Validate
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_DB: chisto_ci
+          POSTGRES_USER: chisto
+          POSTGRES_PASSWORD: chisto
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chisto"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
       DATABASE_URL: postgresql://chisto:chisto@localhost:5432/chisto_ci
+      JWT_SECRET: ci_jwt_secret_must_be_at_least_thirty_two_chars
+      NODE_ENV: test
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - name: Checkout
@@ -41,17 +73,29 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.14.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20.19'
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: API dependency audit (critical on API tree)
+        run: pnpm --filter @chisto/api run audit:high
+        env:
+          AUDIT_SEVERITY: critical
+
+      - name: API dependency audit (high, zero waivers)
+        run: pnpm --filter @chisto/api run audit:high
+        env:
+          AUDIT_SEVERITY: high
+
+      - name: API production license policy (GPL family)
+        working-directory: apps/api
+        run: npx --yes license-checker@25.0.1 --production --failOn 'GPL;GPL-2.0;GPL-3.0;AGPL-3.0;LGPL;LGPL-2.1;LGPL-3.0;SSPL-1.0'
 
       - name: Generate Prisma client
         run: pnpm --filter @chisto/api exec prisma generate
@@ -59,5 +103,293 @@ jobs:
       - name: Validate Prisma schema
         run: pnpm --filter @chisto/api exec prisma validate
 
+      - name: Apply database migrations (CI parity with e2e)
+        run: pnpm --filter @chisto/api exec prisma migrate deploy
+
+      - name: Migration index lint (CONCURRENTLY)
+        run: bash apps/api/scripts/check-migration-indexes.sh
+
+      - name: API typecheck
+        run: pnpm --filter @chisto/api run typecheck
+
+      - name: API service size guard (repo-wide *.service.ts)
+        run: pnpm --filter @chisto/api run check:god-services
+
+      - name: API circular dependency check (madge)
+        run: pnpm --filter @chisto/api run check:cycles
+
+      - name: API module structure check
+        run: pnpm --filter @chisto/api run check:structure
+
       - name: Build workspace
         run: pnpm build
+
+      - name: Landing unit tests
+        run: pnpm --filter @chisto/landing test
+
+      - name: Landing help content lint
+        run: pnpm --filter @chisto/landing run lint:help-content
+
+      - name: Lint landing legal content
+        run: pnpm --filter @chisto/landing run lint:legal-content
+
+      - name: Lint landing marketing copy
+        run: pnpm --filter @chisto/landing run lint:marketing-copy
+
+      - name: Landing ESLint
+        run: pnpm --filter @chisto/landing lint
+
+      - name: Build landing (Playwright E2E)
+        run: pnpm --filter @chisto/landing build
+
+      - name: Landing launch check
+        run: pnpm --filter @chisto/landing launch:check
+        env:
+          NEXT_PUBLIC_APP_STORE_URL: https://apps.apple.com/mk/app/chisto-mk/id6771892086
+
+      - name: Install Playwright Chromium (landing)
+        run: pnpm --filter @chisto/landing exec playwright install chromium
+
+      - name: Landing Playwright E2E
+        run: pnpm --filter @chisto/landing test:e2e
+
+      - name: API OpenAPI snapshot check
+        run: pnpm --filter @chisto/api run snapshot:openapi:check
+
+      - name: API OpenAPI PII allowlist
+        run: pnpm --filter @chisto/api run openapi:pii
+
+      - name: Regenerate api-client types from OpenAPI snapshot
+        run: pnpm --filter @chisto/api-client run generate
+
+      - name: API contract verify
+        run: pnpm verify:contract
+
+      - name: Mutating routes idempotency audit
+        run: node apps/api/scripts/audit-mutating-routes.mjs
+
+      - name: API ESLint
+        run: pnpm --filter @chisto/api run lint
+
+      - name: Flutter static checks (reports)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.44.0'
+      - name: Melos workspace (pub get)
+        run: |
+          cd apps/mobile
+          flutter pub get
+      - name: Reports UI guards (mobile)
+        run: |
+          cd apps/mobile
+          dart analyze packages/feature_reports/lib
+          dart run tool/check_no_hex_in_reports.dart
+          dart run tool/check_reports_max_lines.dart
+          dart run tool/check_reports_import_boundaries.dart
+          dart run tool/check_reports_invariants.dart
+
+      - name: Flutter analyze (mobile workspace)
+        run: |
+          cd apps/mobile
+          dart analyze packages/chisto_core
+          flutter analyze --no-fatal-infos lib packages/design_system/lib
+
+      - name: Flutter toolchain (mobile)
+        run: |
+          cd apps/mobile
+          flutter --version
+
+      - name: Flutter mobile tests
+        run: |
+          cd apps/mobile
+          flutter test packages/design_system/test/
+          dart run tool/check_haptics_usage.dart
+          dart run tool/check_app_bootstrap_reads.dart
+          dart run tool/check_screen_size.dart
+          dart run tool/check_no_service_locator.dart
+          dart run tool/check_no_hex_in_reports.dart
+          dart run tool/check_no_hex_in_features.dart
+          dart run tool/check_no_textstyle_in_features.dart
+          dart run tool/check_no_material_colors_in_features.dart
+          dart run tool/check_shared_widgets_layering.dart
+          dart run tool/check_no_raw_button_in_features.dart
+          dart run tool/check_no_raw_snackbar_in_features.dart
+          dart run tool/check_no_raw_radius_in_features.dart
+          dart run tool/check_no_raw_shadow_in_features.dart
+          dart run tool/check_no_raw_progress_indicator_in_features.dart
+          dart run tool/check_no_raw_textfield_in_features.dart
+          dart run tool/check_no_unowned_firebase_listeners.dart
+          dart run tool/check_no_direct_set_unauthenticated_in_features.dart
+          dart run tool/check_arb_key_parity.dart
+          dart run tool/check_no_em_dash_in_arb.dart
+          dart run tool/check_no_inline_textstyle_overrides.dart
+          dart run tool/check_hardcoded_strings.dart
+          dart run tool/check_release_env.dart
+          dart run tool/check_pii_in_logs.dart
+          dart run tool/check_realtime_client_shape.dart
+          dart run tool/check_no_raw_json_cast.dart
+          dart run tool/check_buildcontext_after_await.dart
+          dart run tool/check_no_flutter_in_chisto_core.dart
+          dart run tool/check_no_flutter_in_domain.dart
+          dart run tool/check_no_api_client_in_presentation.dart
+          dart run tool/check_cross_feature_imports.dart
+          dart run tool/check_no_empty_catch.dart
+          dart run tool/check_no_readasbytes_in_upload_paths.dart
+          dart run tool/check_loading_empty_error_triple.dart
+          flutter test test/
+
+      - name: API unit tests (Jest) with coverage thresholds
+        run: pnpm --filter @chisto/api run test:cov
+
+      - name: API unit tests (open handles, main only)
+        if: github.ref == 'refs/heads/main'
+        run: pnpm --filter @chisto/api run test:cov:leaks
+
+      - name: API per-area coverage gates
+        run: pnpm --filter @chisto/api run test:cov:areas
+
+      - name: Admin unit tests (Vitest)
+        run: pnpm --filter @chisto/admin test
+
+      - name: Admin structure and i18n guardrails
+        run: pnpm --filter @chisto/admin run test:structure
+
+      - name: Admin ESLint
+        run: pnpm --filter @chisto/admin run lint
+
+      - name: Build admin (Playwright a11y)
+        run: pnpm --filter @chisto/admin build
+
+      - name: Admin bundle budget
+        run: pnpm --filter @chisto/admin run test:bundle-budget
+
+      - name: Install Playwright (Chromium)
+        run: pnpm --filter @chisto/admin exec playwright install chromium
+
+      - name: Admin Playwright E2E (smoke, perf, a11y)
+        env:
+          SMS_PROVIDER: none
+          EMAIL_ENABLED: 'false'
+        run: bash apps/admin/scripts/run-playwright-ci-stack.sh
+
+  e2e:
+    name: API E2E Tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    runs-on: ubuntu-latest
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_DB: chisto_e2e
+          POSTGRES_USER: chisto
+          POSTGRES_PASSWORD: chisto_e2e_pw
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chisto"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://chisto:chisto_e2e_pw@localhost:5432/chisto_e2e
+      JWT_SECRET: e2e_jwt_secret_must_be_at_least_thirty_two_chars
+      NODE_ENV: test
+      REDIS_URL: redis://localhost:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start MinIO (S3-compatible for readiness)
+        run: |
+          docker run -d --name minio-ci -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin \
+            -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio:latest server /data --console-address ":9001"
+          for i in $(seq 1 45); do
+            if curl -sf http://127.0.0.1:9000/minio/health/live; then
+              echo "minio ready"
+              break
+            fi
+            sleep 1
+          done
+          docker run --rm --network host --entrypoint /bin/sh minio/mc:latest -c \
+            "mc alias set ci http://127.0.0.1:9000 minioadmin minioadmin && mc mb --ignore-existing ci/chisto-e2e"
+
+      - name: Generate Prisma client
+        run: pnpm --filter @chisto/api exec prisma generate
+
+      - name: Apply database migrations
+        run: pnpm --filter @chisto/api exec prisma migrate deploy
+
+      - name: Build workspace packages required by API e2e
+        run: pnpm --filter @chisto/news-content build
+
+      - name: Run e2e tests
+        env:
+          NODE_OPTIONS: '--experimental-vm-modules --max-old-space-size=6144'
+          S3_BUCKET_NAME: chisto-e2e
+          S3_ENDPOINT_URL: http://127.0.0.1:9000
+          S3_FORCE_PATH_STYLE: 'true'
+          AWS_ACCESS_KEY_ID: minioadmin
+          AWS_SECRET_ACCESS_KEY: minioadmin
+          AWS_REGION: us-east-1
+          SMS_PROVIDER: none
+          OTP_DEV_RETURN_CODE: 'true'
+          EMAIL_ENABLED: 'true'
+          POSTMARK_SERVER_TOKEN: ci-placeholder-not-used-in-e2e
+        run: >-
+          pnpm --filter @chisto/api exec jest
+          --config test/e2e/jest-e2e.config.js
+          --runInBand
+          --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+
+  docker-build:
+    name: Docker Build (API)
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -f apps/api/Dockerfile.prod -t chisto-api:ci .
+
+      - name: Trivy filesystem scan (API)
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: apps/api
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true

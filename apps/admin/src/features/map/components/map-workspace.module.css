@@ -1,0 +1,13 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  flex: 1;
+}
+
+.mapFrame {
+  position: relative;
+  flex: 1;
+  min-height: 24rem;
+}

@@ -1,0 +1,11 @@
+name: chisto_core
+description: Pure Dart core utilities for Chisto mobile.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+
+dev_dependencies:
+  test: ^1.26.2

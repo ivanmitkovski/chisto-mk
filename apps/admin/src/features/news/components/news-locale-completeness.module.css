@@ -1,0 +1,57 @@
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.incompleteCount {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-status-warning-fg);
+}
+
+.allReady {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-status-success-fg);
+}
+
+.list {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.complete,
+.incomplete {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.6875rem;
+}
+
+.complete {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-status-success-fg);
+}
+
+.incomplete {
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-status-warning-fg);
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-secondary);
+}

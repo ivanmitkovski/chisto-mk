@@ -1,0 +1,4 @@
+# Documented exemption: an ephemeral in-widget audio-playback scope
+# (InheritedNotifier-style) that intentionally lives in the presentation layer
+# because it coordinates transient UI playback state, not domain state.
+packages/feature_events/lib/src/presentation/widgets/chat/event_chat_audio_playback_scope.dart:7

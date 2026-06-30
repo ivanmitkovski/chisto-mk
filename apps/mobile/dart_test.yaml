@@ -1,0 +1,8 @@
+# Wave 20 / Track B3 — tag slow suites for optional CI runs.
+tags:
+  golden:
+    timeout: 2m
+  perf:
+    timeout: 5m
+  integration:
+    timeout: 10m

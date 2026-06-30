@@ -3,11 +3,11 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -27,24 +27,476 @@ model User {
   pointsBalance     Int @default(0)
   totalPointsEarned Int @default(0)
   totalPointsSpent  Int @default(0)
+  reportCreditsAvailable Int @default(10)
+  reportCreditsSpentTotal Int @default(0)
+  reportEmergencyWindowDays Int @default(7)
+  reportEmergencyUsedAt DateTime?
   lastActiveAt      DateTime?
+  avatarObjectKey   String?
+  avatarUpdatedAt   DateTime?
 
-  reports      Report[]
-  pointTransactions PointTransaction[]
+  totpSecret       String?   // Base32-encoded TOTP secret when 2FA enabled
+  mfaBackupCodes   String[]  @default([]) // Hashed backup codes
+
+  organizerCertifiedAt DateTime? // Set on organizer toolkit quiz pass; gates event creation
+
+  homeLatitude       Float?
+  homeLongitude      Float?
+  homeLocationLabel  String?
+  homeLocationSetAt  DateTime?
+
+  termsAcceptedAt   DateTime?
+  termsVersion      String?
+  privacyAcceptedAt DateTime?
+  deletedAt         DateTime?
+  showOnLeaderboard Boolean @default(true)
+  /// Authoritative app UI locale for notifications (en | mk | sq).
+  locale            String?
+
+  reports              Report[]             @relation("ReporterReports")
+  moderatedReports     Report[]             @relation("ModeratorReports")
+  adminNotifications   AdminNotification[]
+  pointTransactions    PointTransaction[]
+  coReportedReports    ReportCoReporter[]
+  sessions             UserSession[]
+  auditLogs            AuditLog[]
+  adminTempTokens      AdminTempToken[]
+  adminPendingMfa      AdminPendingMfa?
+  adminInvitesSent     AdminInvite[] @relation("AdminInviteInviter")
+  adminInviteAccepted  AdminInvite?  @relation("AdminInviteAcceptedUser")
+  adminEmailPreferences AdminEmailPreference[]
+  adminEmailOutboxRows   AdminEmailOutbox[]     @relation("AdminEmailOutboxRecipient")
+  broadcastCampaignsCreated BroadcastCampaign[]   @relation("BroadcastCampaignCreator")
+  siteVotes            SiteVote[]
+  siteSaves            SiteSave[]
+  siteComments         SiteComment[]
+  siteShareEvents      SiteShareEvent[]
+  siteShareLinks       SiteShareLink[]
+  siteCommentLikes     SiteCommentLike[]
+  feedState            UserFeedState?
+  feedImpressions      FeedImpression[]
+  feedExperimentAssignments FeedExperimentAssignment[]
+  deviceTokens         UserDeviceToken[]
+  userNotifications    UserNotification[]
+  notificationPreferences UserNotificationPreference[]
+  organizedCleanupEvents CleanupEvent[] @relation("CleanupEventOrganizer")
+  moderatedCleanupEvents CleanupEvent[] @relation("CleanupEventModerator")
+  cleanupEventModerationNotes CleanupEventModerationNote[]
+  eventParticipations    EventParticipant[]
+  eventCheckIns          EventCheckIn[]
+  eventChatMessages      EventChatMessage[] @relation("EventChatMessages")
+  eventChatReadCursors   EventChatReadCursor[] @relation("EventChatReadCursors")
+  eventChatPinnedMessages EventChatMessage[] @relation("EventChatPinnedBy")
+  eventChatMutes         EventChatMute[] @relation("EventChatMutes")
+  reportSubmitIdempotencyKeys ReportSubmitIdempotency[]
+  eventEvidencePhotosUploaded EventEvidencePhoto[]
+  routeSegmentsClaimed        EventRouteSegment[] @relation("RouteSegmentClaims")
+  checkInRiskSignals          CheckInRiskSignal[]
+  resolvedCheckInRiskSignals  CheckInRiskSignal[] @relation("CheckInRiskSignalResolvedBy")
+  archivedSites               Site[] @relation("SiteArchivedBy")
+  siteResolutionsSubmitted    SiteResolution[] @relation("SiteResolutionSubmitter")
+  siteResolutionsModerated    SiteResolution[] @relation("SiteResolutionModerator")
+  passwordResetEmailCode      PasswordResetEmailCode?
+  blocksInitiated             UserBlock[]              @relation("BlockBlocker")
+  blocksReceived              UserBlock[]              @relation("BlockBlocked")
+  ugcReportsFiled             UgcContentReport[]       @relation("UgcReporter")
+  activityEvents              UserActivityEvent[]
+  adminAlertRulesCreated      AdminAlertRule[]         @relation("AdminAlertRuleCreator")
+  moderationNotes             UserModerationNote[]     @relation("UserModerationNotes")
+  moderationNotesAuthored     UserModerationNote[]     @relation("UserModerationNoteAuthor")
+  statusActions               UserStatusAction[]       @relation("UserStatusActions")
+  statusActionsPerformed      UserStatusAction[]       @relation("UserStatusActionActor")
 
   @@index([role])
   @@index([status])
 }
 
+/// Per-user block list (App Store UGC requirement).
+model UserBlock {
+  id            String   @id @default(cuid())
+  blockerId     String
+  blockedUserId String
+  createdAt     DateTime @default(now())
+
+  blocker User @relation("BlockBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlockBlocked", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedUserId])
+  @@index([blockerId])
+  @@index([blockedUserId])
+}
+
+model UserModerationNote {
+  id        String   @id @default(cuid())
+  userId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  user   User @relation("UserModerationNotes", fields: [userId], references: [id], onDelete: Cascade)
+  author User @relation("UserModerationNoteAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model UserStatusAction {
+  id         String     @id @default(cuid())
+  userId     String
+  actorId    String
+  fromStatus UserStatus
+  toStatus   UserStatus
+  reasonCode String
+  note       String?
+  createdAt  DateTime   @default(now())
+
+  user  User @relation("UserStatusActions", fields: [userId], references: [id], onDelete: Cascade)
+  actor User @relation("UserStatusActionActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// Citizen-reported UGC (comments, chat, profiles) for admin moderation queue.
+model UgcContentReport {
+  id          String   @id @default(cuid())
+  reporterId  String
+  subjectType String
+  subjectId   String
+  reason      String
+  details     String?
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reporter User @relation("UgcReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([subjectType, subjectId])
+  @@index([reporterId])
+}
+
+model PasswordResetEmailCode {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  codeHash            String
+  expiresAt           DateTime
+  attemptCount        Int       @default(0)
+  lastSentAt          DateTime?
+  sendCountInWindow   Int       @default(0)
+  sendWindowStartedAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenId          String   @unique
+  refreshTokenHash String
+  previousTokenHash String?
+  rotatedAt       DateTime?
+  deviceId        String?
+  deviceInfo       String?
+  ipAddress        String?
+  lastSeenAt       DateTime?
+  platform         DevicePlatform?
+  appVersion       String?
+  deviceModel      String?
+  osVersion        String?
+  country          String?
+  city             String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  rememberMe       Boolean  @default(true)
+
+  activityEvents   UserActivityEvent[]
+
+  @@index([userId, revokedAt])
+  @@index([userId, deviceId])
+  @@index([expiresAt])
+  @@index([lastSeenAt])
+}
+
+enum UserActivityEventType {
+  LOGIN
+  LOGOUT
+  APP_OPENED
+  SCREEN_VIEW
+  REPORT_CREATED
+  REPORT_SUBMITTED
+  EVENT_JOINED
+  CHECK_IN
+}
+
+model UserActivityEvent {
+  id         String                @id @default(cuid())
+  userId     String
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId  String?
+  session    UserSession?          @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  deviceId   String?
+  type       UserActivityEventType
+  screen     String?
+  metadata   Json?
+  platform   DevicePlatform?
+  appVersion String?
+  occurredAt DateTime              @default(now())
+  createdAt  DateTime              @default(now())
+
+  @@index([userId, occurredAt(sort: Desc)])
+  @@index([occurredAt(sort: Desc)])
+  @@index([type, occurredAt(sort: Desc)])
+}
+
+model DailyActiveStat {
+  id                 String   @id @default(cuid())
+  date               DateTime @unique @db.Date
+  dau                Int      @default(0)
+  wau                Int      @default(0)
+  mau                Int      @default(0)
+  peakConcurrent     Int      @default(0)
+  avgConcurrent      Float    @default(0)
+  sessionsStarted    Int      @default(0)
+  reportsSubmitted   Int      @default(0)
+  newRegistrations   Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+enum AdminAlertMetric {
+  CONCURRENT
+  TRAFFIC_SPIKE
+  ERROR_RATE
+  REPORT_ACTIVITY
+  API_DEGRADATION
+}
+
+enum AdminAlertComparator {
+  GT
+  GTE
+}
+
+model AdminAlertRule {
+  id              String               @id @default(cuid())
+  metric          AdminAlertMetric
+  comparator      AdminAlertComparator @default(GT)
+  threshold       Float
+  windowSeconds   Int                  @default(300)
+  enabled         Boolean              @default(true)
+  lastTriggeredAt DateTime?
+  createdById     String?
+  createdBy       User?                @relation("AdminAlertRuleCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@index([enabled])
+  @@index([metric])
+}
+
+model PhoneOtp {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  phoneNumber  String
+  /// Legacy plaintext code; new rows use codeHash only.
+  code         String   @default("")
+  codeHash     String?
+  expiresAt    DateTime
+  attemptCount Int      @default(0)
+  lastSentAt   DateTime?
+  sendCountInWindow Int      @default(0)
+  sendWindowStartedAt DateTime?
+
+  @@unique([phoneNumber])
+  @@index([expiresAt])
+}
+
+model LoginFailure {
+  id             String   @id @default(cuid())
+  phoneNumber    String   @unique
+  firstFailedAt  DateTime
+  attemptCount   Int
+
+  @@index([phoneNumber])
+}
+
+model AdminLoginFailure {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  firstFailedAt  DateTime
+  attemptCount   Int
+
+  @@index([email])
+}
+
+model AdminTempToken {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  tokenHash    String   @unique // bcrypt hash of the temp token
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email        String
+  expiresAt    DateTime
+
+  @@index([expiresAt])
+  @@index([userId])
+}
+
+enum AdminInviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+model AdminInvite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email          String
+  firstName      String
+  lastName       String
+  role           Role
+  tokenHash      String            @unique
+  mfaSecret      String?
+  status         AdminInviteStatus @default(PENDING)
+  invitedById    String
+  invitedBy      User              @relation("AdminInviteInviter", fields: [invitedById], references: [id], onDelete: Cascade)
+  acceptedUserId String?           @unique
+  acceptedUser   User?             @relation("AdminInviteAcceptedUser", fields: [acceptedUserId], references: [id], onDelete: SetNull)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+  attemptCount   Int               @default(0)
+
+  @@index([email])
+  @@index([status])
+}
+
+enum AdminModerationCategory {
+  NEW_REPORT
+  EVENT_PENDING
+  UGC_REPORT
+  CHECKIN_RISK
+  SITE_RESOLUTION
+}
+
+model AdminEmailPreference {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId   String
+  user     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category AdminModerationCategory
+  enabled  Boolean
+
+  @@unique([userId, category])
+  @@index([userId])
+}
+
+enum AdminEmailOutboxStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model AdminEmailOutbox {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipientUserId String
+  recipientUser   User   @relation("AdminEmailOutboxRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
+  recipientEmail  String
+  category        AdminModerationCategory
+  templateId      String
+  payload         Json
+  status          AdminEmailOutboxStatus @default(PENDING)
+  attempts        Int                    @default(0)
+  maxAttempts     Int                    @default(5)
+  nextAttemptAt   DateTime?
+  processingAt    DateTime?
+  leaseOwner      String?
+  lastAttemptAt   DateTime?
+  lastError       String?
+  idempotencyKey  String                 @unique
+
+  @@index([status, nextAttemptAt, processingAt])
+  @@index([createdAt])
+}
+
+model AdminPendingMfa {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  secret    String
+  expiresAt DateTime
+
+  @@unique([userId])
+  @@index([expiresAt])
+}
+
 enum Role {
   USER
+  SUPPORT
   ADMIN
+  SUPER_ADMIN
 }
 
 enum UserStatus {
   ACTIVE
   SUSPENDED
   DELETED
+}
+
+// Admin notifications for console activity
+model AdminNotification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  title     String
+  message   String
+  timeLabel String
+  tone      AdminNotificationTone
+  category  AdminNotificationCategory
+  isUnread  Boolean @default(true)
+  href      String?
+
+  /// Stable key for localized templates (e.g. `reports.submitted.new_site`). Title/message remain populated for legacy clients.
+  messageTemplateKey    String?
+  messageTemplateParams Json?
+
+  @@index([userId, createdAt])
+  @@index([category, createdAt])
+}
+
+enum AdminNotificationTone {
+  success
+  warning
+  info
+  neutral
+}
+
+enum AdminNotificationCategory {
+  reports
+  system
+  analytics
 }
 
 model PointTransaction {
@@ -57,12 +509,22 @@ model PointTransaction {
   delta       Int
   balanceAfter Int
   reasonCode  String
-  referenceType String?
-  referenceId   String?
+  referenceType String @default("")
+  referenceId   String @default("")
   metadata    Json?
 
+  @@unique([userId, referenceType, referenceId, reasonCode], map: "point_transaction_user_ref_reason_key")
   @@index([userId, createdAt])
   @@index([reasonCode])
+  @@index([referenceType, referenceId])
+}
+
+enum ReportCleanupEffort {
+  ONE_TO_TWO
+  THREE_TO_FIVE
+  SIX_TO_TEN
+  TEN_PLUS
+  NOT_SURE
 }
 
 // Canonical pollution/report site
@@ -73,14 +535,51 @@ model Site {
 
   latitude    Float
   longitude   Float
+  /// Reverse-geocoded or user-confirmed place line from mobile (not the report narrative).
+  address     String?
   description String?
+  searchVector Unsupported("tsvector")?
+  geo          Unsupported("geography(Point,4326)")?
   status      SiteStatus @default(REPORTED)
+  isArchivedByAdmin Boolean @default(false)
+  archivedAt DateTime?
+  archivedById String?
+  archivedBy User? @relation("SiteArchivedBy", fields: [archivedById], references: [id], onDelete: SetNull)
+  archiveReason String?
+  upvotesCount Int       @default(0)
+  commentsCount Int      @default(0)
+  savesCount    Int      @default(0)
+  sharesCount   Int      @default(0)
 
   reports     Report[]
   events      CleanupEvent[]
+  votes       SiteVote[]
+  saves       SiteSave[]
+  comments    SiteComment[]
+  shareEvents SiteShareEvent[]
+  shareLinks  SiteShareLink[]
+  featureSnapshot SiteFeatureSnapshot?
+  feedImpressions FeedImpression[]
+  mapProjection   MapSiteProjection?
+  historyEntries  SiteHistoryEntry[]
+  resolutions     SiteResolution[]
+
+  /// Earliest APPROVED report with media — canonical image for feed, map, and detail.
+  heroReportId String? @unique
+  heroReport   Report? @relation("SiteHeroReport", fields: [heroReportId], references: [id], onDelete: SetNull)
 
   @@index([status])
+  @@index([isArchivedByAdmin])
+  @@index([status, isArchivedByAdmin, updatedAt])
   @@index([latitude, longitude])
+  /// Map queries often filter by status plus lat/lng bounding box.
+  @@index([status, latitude, longitude])
+  @@index([createdAt])
+  /// Feed retrievers commonly filter by status and order by createdAt.
+  @@index([status, createdAt])
+  /// Engagement retriever ordering support.
+  @@index([status, sharesCount, upvotesCount, commentsCount, createdAt])
+  @@index([archivedById])
 }
 
 enum SiteStatus {
@@ -92,31 +591,323 @@ enum SiteStatus {
   DISPUTED
 }
 
-// User-submitted pollution report
-model Report {
+/// Append-only chronological log for pollution site lifecycle (mobile timeline + admin).
+model SiteHistoryEntry {
+  id             String               @id @default(cuid())
+  siteId         String
+  site           Site                 @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  kind           SiteHistoryEntryKind
+  occurredAt     DateTime             @default(now())
+  fromStatus     SiteStatus?
+  toStatus       SiteStatus?
+  reportId       String?
+  cleanupEventId String?
+  actorUserId    String?
+  actorRole      String?
+  note           String?
+  metadata       Json?
+  createdAt      DateTime             @default(now())
+
+  @@index([siteId, occurredAt(sort: Desc)])
+  @@index([reportId])
+  @@index([cleanupEventId])
+}
+
+enum SiteHistoryEntryKind {
+  SITE_CREATED
+  REPORT_SUBMITTED
+  REPORT_APPROVED
+  REPORT_REJECTED
+  REPORT_MERGED
+  STATUS_CHANGED
+  CLEANUP_EVENT_SCHEDULED
+  CLEANUP_EVENT_STARTED
+  CLEANUP_EVENT_COMPLETED
+  CLEANUP_EVENT_CANCELLED
+  ARCHIVED_BY_ADMIN
+  UNARCHIVED_BY_ADMIN
+  ADMIN_NOTE
+  RESOLUTION_SUBMITTED
+  RESOLUTION_APPROVED
+  RESOLUTION_REJECTED
+}
+
+enum SiteResolutionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Citizen-submitted cleanup confirmation for a pollution site (moderated before site → CLEANED).
+model SiteResolution {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  submittedById String?
+  submittedBy   User?   @relation("SiteResolutionSubmitter", fields: [submittedById], references: [id], onDelete: SetNull)
+
+  note      String?
+  mediaUrls String[] @default([])
+
+  status SiteResolutionStatus @default(PENDING)
+
+  /// True when submitter is reporter or co-reporter on this site (excluded from resolution points).
+  isReporterSubmission Boolean @default(false)
+
+  moderatedAt      DateTime?
+  moderationReason String?
+  moderatedById      String?
+  moderatedBy        User?     @relation("SiteResolutionModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  @@index([siteId, status, createdAt(sort: Desc)])
+  @@index([submittedById])
+  @@index([status, createdAt(sort: Desc)])
+}
+
+// User-submitted pollution report
+model Report {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  reportNumber String?  @unique // Human-friendly ID: CH-000001, set by DB trigger on insert
 
   siteId    String
   site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   reporterId String?
-  reporter   User?    @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+  reporter   User?    @relation("ReporterReports", fields: [reporterId], references: [id], onDelete: SetNull)
 
+  /// Short headline shown in lists and moderation (required on new submissions).
+  title       String
   description String?
   mediaUrls   String[] @default([])
+  category    String?
+  severity    Int?
+  cleanupEffort ReportCleanupEffort?
 
-  status    ReportStatus @default(PENDING)
+  status          ReportStatus @default(NEW)
+  moderatedAt     DateTime?
+  moderationReason String?
+  moderatedById   String?
+  moderatedBy     User?        @relation("ModeratorReports", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  // Optional link to a primary report this one is considered a potential duplicate of
+  potentialDuplicateOfId String?
+  potentialDuplicateOf   Report? @relation("ReportPotentialDuplicate", fields: [potentialDuplicateOfId], references: [id])
+  potentialDuplicates    Report[] @relation("ReportPotentialDuplicate")
+
+  /// Duplicate child reports merged into this canonical report (moderation merge).
+  mergedDuplicateChildCount Int @default(0)
+
+  coReporters ReportCoReporter[]
+  submitIdempotencyKeys ReportSubmitIdempotency[]
+  heroForSite Site? @relation("SiteHeroReport")
 
   @@index([siteId])
+  @@index([siteId, createdAt(sort: Desc)])
   @@index([reporterId])
   @@index([status])
+  @@index([potentialDuplicateOfId])
+  @@index([moderatedById])
 }
 
 enum ReportStatus {
-  PENDING
+  NEW
+  IN_REVIEW
   APPROVED
-  REJECTED
+  DELETED
+}
+
+// Additional reporters attached to an existing report
+model ReportCoReporter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  /// When this person filed their report (duplicate submission or merge source time).
+  reportedAt DateTime
+
+  reportId String
+  report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  userId   String?
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([reportId, userId])
+  @@index([userId])
+}
+
+/// Client-supplied key (UUID) so duplicate POST /reports retries return the same report without double spend.
+model ReportSubmitIdempotency {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  key      String
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([createdAt])
+  @@index([reportId])
+}
+
+/// Async-capable outbox for post-commit report side effects (merge notifications, audit, S3, WS).
+enum ReportSideEffectKind {
+  MERGE_DUPLICATE_POST
+  MODERATION_STATUS_POST
+}
+
+enum ReportSideEffectStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model ReportSideEffect {
+  id          String                 @id @default(cuid())
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  kind        ReportSideEffectKind
+  status      ReportSideEffectStatus @default(PENDING)
+  payload     Json
+  attempts    Int                    @default(0)
+  lastError   String?
+  processedAt DateTime?
+  processingAt DateTime?
+  leaseOwner   String?
+
+  @@index([status, createdAt])
+}
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  key   String @unique
+  value String
+
+  @@index([key])
+}
+
+enum BroadcastCampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  CANCELLED
+}
+
+enum BroadcastAudience {
+  ALL
+  ACTIVE
+  AREA
+  USERS
+}
+
+model BroadcastCampaign {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title           String
+  body            String
+  type            String                  @default("SYSTEM")
+  deeplink        String?
+  audience        BroadcastAudience
+  audienceUserIds String[]                @default([])
+  status          BroadcastCampaignStatus @default(DRAFT)
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+  sentCount       Int?
+
+  createdById String?
+  createdBy   User?   @relation("BroadcastCampaignCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([status, scheduledAt])
+  @@index([createdAt(sort: Desc)])
+}
+
+model FeatureFlag {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  key      String @unique
+  enabled  Boolean @default(false)
+  metadata Json?
+
+  @@index([key])
+}
+
+/// Postmark bounce/complaint/manual suppression — blocks outbound mail to the address.
+model EmailSuppression {
+  email     String   @id
+  reason    String
+  source    String   @default("postmark")
+  payload   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  actorId      String?
+  actor        User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action       String
+  resourceType String
+  resourceId   String?
+  metadata     Json?
+  ipAddress    String?
+
+  @@index([actorId, createdAt])
+  @@index([resourceType, createdAt])
+  @@index([action])
+}
+
+enum CleanupEventStatus {
+  PENDING   // Awaiting admin approval (user-created)
+  APPROVED  // Visible to users, can be joined
+  DECLINED  // Rejected by admin
+}
+
+/// Citizen-facing lifecycle (aligned with mobile EcoEventStatus).
+enum EcoEventLifecycleStatus {
+  UPCOMING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum EcoEventCategory {
+  GENERAL_CLEANUP
+  RIVER_AND_LAKE
+  TREE_AND_GREEN
+  RECYCLING_DRIVE
+  HAZARDOUS_REMOVAL
+  AWARENESS_AND_EDUCATION
+  OTHER
+}
+
+enum EcoCleanupScale {
+  SMALL
+  MEDIUM
+  LARGE
+  MASSIVE
+}
+
+enum EcoEventDifficulty {
+  EASY
+  MODERATE
+  HARD
 }
 
 // Cleanup event at a site
@@ -128,12 +919,876 @@ model CleanupEvent {
   siteId    String
   site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
+  title       String
+  description String @db.Text
+  category    EcoEventCategory @default(GENERAL_CLEANUP)
+
   scheduledAt DateTime
+  endAt       DateTime?
+  /// When set to the same instant as [endAt], the organizer "cleanup ending soon" push was sent for that end time. Cleared when [endAt] changes (extension).
+  endSoonNotifiedForEndAt DateTime?
   completedAt DateTime?
 
+  /// Moderation (admin approval for user-created events).
+  status CleanupEventStatus @default(APPROVED)
+
+  /// Admin who last approved or declined (null while pending or after return-to-pending).
+  moderatedById String?
+  moderatedBy   User?   @relation("CleanupEventModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  moderatedAt   DateTime?
+  /// Persisted decline reason (also mirrored in audit metadata).
+  declineReason String? @db.Text
+
+  /// Lifecycle shown in the mobile app when event is APPROVED.
+  lifecycleStatus EcoEventLifecycleStatus @default(UPCOMING)
+
   organizerId String?
+  organizer   User?   @relation("CleanupEventOrganizer", fields: [organizerId], references: [id], onDelete: SetNull)
+
   participantCount Int @default(0)
+
+  gear           String[] @default([])
+  scale          EcoCleanupScale?
+  difficulty     EcoEventDifficulty?
+  afterImageKeys String[] @default([])
+  maxParticipants Int?
+
+  /// Rotates when organizer opens check-in or taps rotate; invalidates old QR tokens.
+  checkInSessionId String?
+  checkInOpen      Boolean @default(false)
+  /// Denormalized count of [EventCheckIn] rows for this event.
+  checkedInCount   Int     @default(0)
+
+  participants EventParticipant[]
+  checkIns              EventCheckIn[]
+  checkInRedemptions    EventCheckInRedemption[]
+  chatMessages          EventChatMessage[]
+  chatReadCursors       EventChatReadCursor[]
+  chatMutes             EventChatMute[]
+  liveMetric            EventLiveMetric?
+  evidencePhotos        EventEvidencePhoto[]
+  routeSegments         EventRouteSegment[]
+  checkInRiskSignals    CheckInRiskSignal[]
+  moderationNotes       CleanupEventModerationNote[]
+
+  /// PostgreSQL `tsvector` for ranked full-text search (generated column + GIN index in migration).
+  /// Declared as [Unsupported] so Prisma Client does not expose it and migrations stay aligned with the DB.
+  searchVector Unsupported("tsvector")?
+
+  /// RFC 5545 RRULE string (e.g. FREQ=WEEKLY;COUNT=8;BYDAY=SA).
+  /// Null for non-recurring events.
+  recurrenceRule  String?
+
+  /// References the first event in a recurring series. Null for standalone/parent events.
+  parentEventId   String?
+  parentEvent     CleanupEvent?  @relation("RecurrenceSeries", fields: [parentEventId], references: [id], onDelete: SetNull)
+  seriesChildren  CleanupEvent[] @relation("RecurrenceSeries")
+
+  /// 0-based index within its series (0 = original/parent). Null for non-recurring.
+  recurrenceIndex Int?
 
   @@index([siteId])
   @@index([scheduledAt])
+  @@index([siteId, scheduledAt])
+  @@index([status])
+  @@index([lifecycleStatus, scheduledAt])
+  @@index([lifecycleStatus, endAt])
+  @@index([organizerId])
+  @@index([parentEventId])
+  @@index([moderatedById])
+}
+
+/// Internal admin-only notes on a cleanup event (not visible to organizers).
+model CleanupEventModerationNote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  authorId String?
+  author   User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorEmailSnapshot String?
+
+  body String @db.Text
+
+  @@index([eventId, createdAt])
+  @@index([authorId])
+}
+
+enum EventChatMessageType {
+  TEXT
+  SYSTEM
+  IMAGE
+  LOCATION
+  VIDEO
+  AUDIO
+  FILE
+}
+
+model EventParticipant {
+  id       String   @id @default(cuid())
+  joinedAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  reminderEnabled Boolean  @default(false)
+  reminderAt      DateTime?
+
+  @@unique([eventId, userId])
+  @@index([eventId, joinedAt])
+  @@index([userId])
+}
+
+/// Text or system message in an event participant chat (organizer + joiners).
+model EventChatMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  authorId String?
+  author   User? @relation("EventChatMessages", fields: [authorId], references: [id], onDelete: SetNull)
+
+  body String @db.Text
+
+  replyToId String?
+  replyTo   EventChatMessage?  @relation("ChatReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   EventChatMessage[] @relation("ChatReplies")
+
+  deletedAt DateTime?
+
+  editedAt DateTime?
+
+  isPinned   Boolean   @default(false)
+  pinnedAt   DateTime?
+  pinnedById String?
+  pinnedBy   User?     @relation("EventChatPinnedBy", fields: [pinnedById], references: [id], onDelete: SetNull)
+
+  messageType    EventChatMessageType @default(TEXT)
+  systemPayload  Json?
+
+  locationLat   Float?
+  locationLng   Float?
+  locationLabel String?
+
+  bodyEncrypted Boolean @default(false)
+
+  /// Client-generated UUID for idempotent sends (POST retry / offline flush).
+  clientMessageId String?
+
+  attachments EventChatAttachment[]
+
+  readCursorsLastRead EventChatReadCursor[] @relation("ReadCursorLastMessage")
+
+  @@unique([eventId, clientMessageId])
+  @@index([eventId, createdAt])
+  @@index([authorId])
+  @@index([eventId, isPinned, pinnedAt])
+  @@index([replyToId])
+  @@index([pinnedById])
+}
+
+model EventChatAttachment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  messageId String
+  message   EventChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  url          String
+  mimeType     String
+  fileName     String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  duration     Int?
+  thumbnailUrl String?
+
+  @@index([messageId])
+}
+
+/// Per-user mute for event chat push notifications (SSE still delivers).
+model EventChatMute {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation("EventChatMutes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+/// Per-user read position for event chat unread counts.
+model EventChatReadCursor {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation("EventChatReadCursors", fields: [userId], references: [id], onDelete: Cascade)
+
+  lastReadMessageId String?
+  lastReadMessage   EventChatMessage? @relation("ReadCursorLastMessage", fields: [lastReadMessageId], references: [id], onDelete: SetNull)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+  @@index([lastReadMessageId])
+}
+
+/// Attendee check-in at an event (registered user or manual guest list).
+model EventCheckIn {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  /// `u:<userId>` for app users, `g:<slug>` for manual guest rows (normalized name).
+  dedupeKey String
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  guestDisplayName String?
+
+  checkedInAt DateTime @default(now())
+
+  @@unique([eventId, dedupeKey])
+  @@index([eventId, checkedInAt])
+  @@index([userId])
+}
+
+/// Single-use QR token ids (jti) — prevents screenshot replay across different users.
+model EventCheckInRedemption {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  jti String @unique
+
+  @@index([eventId])
+}
+
+/// Denormalized organizer-reported live counters (pulse); aggregates also read from [CleanupEvent].
+model EventLiveMetric {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String @unique
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  reportedBagsCollected Int @default(0)
+}
+
+enum EventEvidenceKind {
+  BEFORE
+  AFTER
+  FIELD
+}
+
+model EventEvidencePhoto {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  kind       EventEvidenceKind
+  objectKey  String
+  caption    String?
+  uploadedById String?
+  uploadedBy   User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([eventId, kind, createdAt])
+  @@index([uploadedById])
+}
+
+enum RouteSegmentStatus {
+  OPEN
+  CLAIMED
+  COMPLETED
+}
+
+model EventRouteSegment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  sortOrder Int
+  label     String?
+  latitude  Float
+  longitude Float
+
+  status RouteSegmentStatus @default(OPEN)
+
+  claimedByUserId String?
+  claimedBy       User?   @relation("RouteSegmentClaims", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  claimedAt       DateTime?
+  completedAt     DateTime?
+
+  @@index([eventId, sortOrder])
+  @@index([claimedByUserId])
+}
+
+enum CheckInRiskSignalType {
+  FAR_FROM_SITE
+}
+
+model CheckInRiskSignal {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  expiresAt DateTime
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  signalType CheckInRiskSignalType
+  metadata   Json?
+
+  resolvedAt       DateTime?
+  resolvedByUserId String?
+  resolvedBy       User?     @relation("CheckInRiskSignalResolvedBy", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+  /** Admin action when resolved: resolve | dismiss */
+  resolutionAction String?
+
+  @@index([eventId, createdAt])
+  @@index([userId, createdAt])
+  @@index([expiresAt])
+  @@index([resolvedAt])
+}
+
+model SiteVote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([siteId, userId])
+  @@index([userId, createdAt])
+  @@index([siteId, createdAt])
+}
+
+model SiteSave {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, userId])
+  @@index([userId, createdAt])
+  @@index([siteId, createdAt])
+}
+
+model SiteComment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  parentId String?
+  parent   SiteComment?  @relation("SiteCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  SiteComment[] @relation("SiteCommentReplies")
+  likes    SiteCommentLike[]
+
+  body      String
+  isDeleted Boolean @default(false)
+  likesCount Int    @default(0)
+
+  @@index([siteId, createdAt])
+  @@index([siteId, parentId, createdAt])
+  @@index([authorId, createdAt])
+}
+
+model SiteCommentLike {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  commentId String
+  comment   SiteComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId, createdAt])
+  @@index([userId, createdAt])
+}
+
+enum SiteShareChannel {
+  native
+  link
+  whatsapp
+  facebook
+  x
+  other
+}
+
+model SiteShareEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  channel SiteShareChannel @default(native)
+
+  @@unique([siteId, userId])
+  @@index([siteId, createdAt])
+  @@index([userId, createdAt])
+}
+
+enum SiteShareAttributionEventType {
+  CLICK
+  OPEN
+}
+
+enum SiteShareAttributionSource {
+  WEB
+  APP
+  OTHER
+}
+
+model SiteShareLink {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cid       String   @unique
+  expiresAt DateTime
+  countedAt DateTime?
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  sharedByUserId String?
+  sharedByUser   User?  @relation(fields: [sharedByUserId], references: [id], onDelete: SetNull)
+
+  channel SiteShareChannel @default(native)
+
+  attributionEvents SiteShareAttributionEvent[]
+
+  @@index([siteId, createdAt])
+  @@index([sharedByUserId, createdAt])
+  @@index([expiresAt])
+}
+
+model SiteShareAttributionEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  shareLinkId String
+  shareLink   SiteShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+
+  eventType SiteShareAttributionEventType
+  source    SiteShareAttributionSource @default(OTHER)
+  dedupeKey String
+
+  ipHash    String?
+  userAgentHash String?
+  openedByUserId String?
+
+  @@unique([shareLinkId, eventType, dedupeKey])
+  @@index([shareLinkId, createdAt])
+  @@index([eventType, createdAt])
+}
+
+model UserFeedState {
+  userId             String   @id
+  mutedCategoryIds   String[] @default([])
+  hiddenSiteIds      String[] @default([])
+  followReporterIds  String[] @default([])
+  engagementProfile  Json?
+  recencyDecayFactor Float    @default(0)
+  lastFeedAt         DateTime?
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SiteFeatureSnapshot {
+  siteId           String   @id
+  velocity1h       Float    @default(0)
+  velocity6h       Float    @default(0)
+  velocity24h      Float    @default(0)
+  discussionRatio  Float    @default(0)
+  intentRatio      Float    @default(0)
+  qualityScore     Float    @default(0)
+  freshnessHours   Float    @default(0)
+  severityIndex    Float    @default(0)
+  verifiedAgeDays  Int      @default(0)
+  lastReportAt     DateTime?
+  denormHash       String   @default("")
+  updatedAt        DateTime @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+}
+
+model FeedImpression {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  siteId String
+  site   Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  variant  String
+  position Int?
+  dwellMs  Int?
+  engaged  Boolean @default(false)
+
+  @@index([userId, createdAt])
+  @@index([siteId, createdAt])
+}
+
+model FeedExperimentAssignment {
+  userId        String
+  experimentKey String
+  variant       String
+  assignedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, experimentKey])
+}
+
+enum DevicePlatform {
+  IOS
+  ANDROID
+}
+
+model UserDeviceToken {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token        String   @unique
+  platform     DevicePlatform
+  appVersion   String?
+  locale       String?
+  lastSeenAt   DateTime @default(now())
+  revokedAt    DateTime?
+  failureCount Int      @default(0)
+
+  @@index([userId, revokedAt])
+  @@index([token])
+}
+
+enum NotificationType {
+  SITE_UPDATE
+  REPORT_STATUS
+  UPVOTE
+  COMMENT
+  NEARBY_REPORT
+  CLEANUP_EVENT
+  EVENT_CHAT
+  SYSTEM
+  ACHIEVEMENT
+  WELCOME
+}
+
+model UserNotification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title  String
+  body   String
+  type   NotificationType
+  isRead Boolean @default(false)
+  data   Json?
+  sentAt DateTime?
+  openedAt DateTime?
+  threadKey  String?
+  groupKey   String?
+  archivedAt DateTime?
+
+  @@index([userId, isRead, createdAt])
+  @@index([userId, createdAt])
+  @@index([userId, type])
+  @@index([userId, groupKey, createdAt])
+  @@index([userId, archivedAt, createdAt])
+}
+
+model UserNotificationPreference {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type          NotificationType
+  muted         Boolean  @default(false)
+  mutedUntil    DateTime?
+  /// Minutes from local midnight (0–1439) when quiet hours start.
+  quietHoursStart     Int?
+  quietHoursEnd       Int?
+  quietHoursTimezone  String?
+  /// When true, transactional email for this notification type is suppressed for the user.
+  emailMuted      Boolean   @default(false)
+  emailMutedUntil DateTime?
+
+  @@unique([userId, type])
+  @@index([userId, muted])
+}
+
+model NotificationOutbox {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userNotificationId String
+  deviceToken        String
+  payload            Json
+  attempts           Int      @default(0)
+  nextRetryAt        DateTime?
+  processingAt       DateTime?
+  leaseOwner         String?
+  lastAttemptAt      DateTime?
+  lastErrorCode      String?
+  lastErrorMessage   String?
+  deliveredAt        DateTime?
+  failedPermanently  Boolean  @default(false)
+  idempotencyKey     String   @unique
+
+  @@index([deliveredAt, failedPermanently, attempts])
+  @@index([processingAt, nextRetryAt])
+  @@index([createdAt])
+}
+
+model EmailOutbox {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId         String
+  templateId     String
+  payload        Json
+  attempts       Int       @default(0)
+  nextRetryAt    DateTime?
+  processingAt   DateTime?
+  leaseOwner     String?
+  lastAttemptAt  DateTime?
+  lastError      String?
+  deliveredAt    DateTime?
+  failedPermanently Boolean @default(false)
+  idempotencyKey String    @unique
+
+  @@index([deliveredAt, failedPermanently, attempts])
+  @@index([processingAt, nextRetryAt])
+}
+
+model MapSiteProjection {
+  siteId            String    @id
+  site              Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  latitude          Float
+  longitude         Float
+  geo               Unsupported("geography(Point,4326)")?
+  status            SiteStatus
+  address           String?
+  description       String?
+  thumbnailUrl      String?
+  pollutionCategory String?
+  latestReportTitle String?
+  latestReportDescription String?
+  latestReportNumber String?
+  reportCount       Int       @default(0)
+  upvotesCount      Int       @default(0)
+  commentsCount     Int       @default(0)
+  savesCount        Int       @default(0)
+  sharesCount       Int       @default(0)
+  latestReportAt    DateTime?
+  siteCreatedAt     DateTime
+  siteUpdatedAt     DateTime
+  projectedAt       DateTime  @default(now())
+  isHot             Boolean   @default(true)
+  isArchivedByAdmin Boolean   @default(false)
+  archivedAt        DateTime?
+
+  @@index([isHot, status, latitude, longitude])
+  @@index([isArchivedByAdmin, status, latitude, longitude])
+  @@index([isHot, siteUpdatedAt])
+  @@index([status, siteCreatedAt])
+}
+
+enum MapEventOutboxStatus {
+  PENDING
+  DISPATCHED
+  FAILED
+}
+
+model MapEventOutbox {
+  id          String              @id @default(cuid())
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  eventId     String              @unique
+  siteId      String
+  eventType   String
+  payload     Json
+  status      MapEventOutboxStatus @default(PENDING)
+  attempts    Int                 @default(0)
+  lastError   String?
+  dispatchedAt DateTime?
+  leaseOwner  String?
+  processingAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([siteId, createdAt])
+  @@index([processingAt])
+}
+
+model MapCdnPurgeLog {
+  id           String   @id
+  createdAt    DateTime @default(now())
+  provider     String
+  status       String
+  keys         Json
+  errorMessage String?
+
+  @@index([createdAt])
+}
+
+/// Records client-supplied job ids for idempotent admin bulk mutations (e.g. bulk approve/decline).
+model AdminMutationIdempotency {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  actorUserId String
+  purpose     String
+  clientJobId String
+
+  @@unique([actorUserId, purpose, clientJobId])
+  @@index([createdAt])
+  @@map("admin_mutation_idempotency")
+}
+
+enum NewsPostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NewsCategory {
+  RELEASE
+  PARTNERSHIP
+  COMMUNITY
+  PRODUCT
+}
+
+enum NewsMediaKind {
+  COVER
+  INLINE_IMAGE
+  INLINE_VIDEO
+}
+
+model NewsPost {
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  slug        String         @unique
+  category    NewsCategory
+  status      NewsPostStatus @default(DRAFT)
+  publishedAt DateTime?
+  scheduledAt DateTime?
+
+  coverMediaId String? @unique
+  coverMedia   NewsMedia? @relation("NewsCover", fields: [coverMediaId], references: [id], onDelete: SetNull)
+
+  translations Json
+  createdById  String?
+  updatedById  String?
+  featured     Boolean        @default(false)
+
+  media NewsMedia[] @relation("NewsPostMedia")
+  revisions NewsPostRevision[]
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([featured, publishedAt(sort: Desc)])
+}
+
+model NewsPostRevision {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  postId      String
+  post        NewsPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  snapshot    Json
+  createdById String?
+
+  @@index([postId, createdAt(sort: Desc)])
+}
+
+model NewsMedia {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  postId String
+  post   NewsPost @relation("NewsPostMedia", fields: [postId], references: [id], onDelete: Cascade)
+
+  kind            NewsMediaKind
+  objectKey       String        @unique
+  mimeType        String
+  fileName        String?
+  sizeBytes       Int
+  width           Int?
+  height          Int?
+  durationSeconds Int?
+  altText         Json?
+  sortOrder       Int           @default(0)
+
+  coverForPost NewsPost? @relation("NewsCover")
 }

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "mk.chisto.app",
+      "sha256_cert_fingerprints": [
+        "49:23:EC:7D:AA:6F:14:F6:63:41:73:3C:BF:3D:A3:25:1E:77:10:08:05:65:A9:F7:2B:48:CB:4F:95:85:84:DE"
+      ]
+    }
+  }
+]

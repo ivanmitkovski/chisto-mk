@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local device captures (do not commit)
+bugreport*.zip
+flutter_*.png
+
+# Golden/widget test failure artifacts (transient diffs; never commit)
+test/**/failures/
+
+# Firebase (download from console or CI secrets; see apps/api/docs/push-notifications-setup.md)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist

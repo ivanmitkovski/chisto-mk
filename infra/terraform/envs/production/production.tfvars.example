@@ -1,0 +1,10 @@
+aws_region   = "eu-central-1"
+environment  = "production"
+name_prefix  = "chisto-prod"
+
+# Required: confirm SNS subscription from this inbox after apply.
+alarm_email = "contact@ivanmitkovski.dev"
+
+# Optional overrides
+# ecs_desired_count = 0  # use for first infra-only apply before ECR image exists
+# container_image_tag = "latest"

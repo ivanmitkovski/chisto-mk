@@ -1,0 +1,26 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  display: inline-flex;
+  outline: none;
+}
+
+.bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + var(--space-2));
+  z-index: var(--z-tooltip);
+  width: max-content;
+  max-width: 16rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--text-primary);
+  color: var(--bg-app);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  pointer-events: none;
+  transform: translateX(-50%);
+}

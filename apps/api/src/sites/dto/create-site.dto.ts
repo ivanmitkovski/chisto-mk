@@ -1,15 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsLatitude, IsLongitude, IsOptional, IsString, MaxLength } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class CreateSiteDto {
-  @ApiProperty({ example: 41.9981, description: 'Site latitude' })
-  @IsLatitude()
-  latitude!: number;
+import { GeoPointLatitudeLongitudeDto } from '../../common/dto/geo-point.dto';
 
-  @ApiProperty({ example: 21.4254, description: 'Site longitude' })
-  @IsLongitude()
-  longitude!: number;
-
+export class CreateSiteDto extends GeoPointLatitudeLongitudeDto {
   @ApiPropertyOptional({
     example: 'Illegal dumping near the riverbank.',
     description: 'Short report context for the created site.',

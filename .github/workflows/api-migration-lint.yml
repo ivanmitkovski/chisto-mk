@@ -1,0 +1,13 @@
+name: API migration lint
+
+on:
+  pull_request:
+    paths:
+      - 'apps/api/prisma/migrations/**'
+
+jobs:
+  concurrent-indexes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x apps/api/scripts/check-migration-indexes.sh && apps/api/scripts/check-migration-indexes.sh

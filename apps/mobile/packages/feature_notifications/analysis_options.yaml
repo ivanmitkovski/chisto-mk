@@ -1,0 +1,6 @@
+include: ../analysis_options.yaml
+
+analyzer:
+  exclude:
+    - lib/src/data/push_notification_handlers.dart
+    - lib/src/data/push_notification_local.dart

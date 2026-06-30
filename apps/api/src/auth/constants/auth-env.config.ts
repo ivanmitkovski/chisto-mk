@@ -1,0 +1,83 @@
+import type { ConfigService } from '@nestjs/config';
+
+export const AUTH_ENV_RUNTIME = 'AUTH_ENV_RUNTIME' as const;
+
+export type AuthEnvRuntime = {
+  saltRounds: number;
+  accessTokenTtl: number;
+  refreshTokenTtlDays: number;
+  refreshTokenStandardDays: number;
+  jwtClockToleranceSeconds: number;
+  maxSessionsPerUser: number;
+  refreshTokenRotationGraceSeconds: number;
+  shouldReturnDevCode: boolean;
+};
+
+export function loadAuthEnvRuntime(configService: ConfigService | null): AuthEnvRuntime {
+  const cfg = (key: string): string | undefined =>
+    configService?.get<string>(key)?.trim() ?? process.env[key]?.trim();
+  const nodeEnv = cfg('NODE_ENV') ?? 'development';
+  const isProduction = nodeEnv === 'production';
+  const isDeployed = isProduction || nodeEnv === 'staging';
+  const smsProvider = cfg('SMS_PROVIDER')?.toLowerCase() ?? 'none';
+  const devCodeFlag = (cfg('OTP_DEV_RETURN_CODE') ?? '').toLowerCase() === 'true';
+  const shouldReturnDevCode = !isDeployed && devCodeFlag && smsProvider !== 'twilio';
+  const accessRaw = cfg('JWT_ACCESS_EXPIRES_IN');
+  const accessTokenTtl = accessRaw ? Number(accessRaw) : 900;
+  if (!Number.isFinite(accessTokenTtl) || accessTokenTtl < 60 || accessTokenTtl > 86400) {
+    throw new Error(`JWT_ACCESS_EXPIRES_IN must be an integer between 60 and 86400 (got: ${accessRaw})`);
+  }
+  const refreshRaw = cfg('JWT_REFRESH_EXPIRES_DAYS');
+  const refreshTokenTtlDays = refreshRaw ? Number(refreshRaw) : 90;
+  if (!Number.isFinite(refreshTokenTtlDays) || refreshTokenTtlDays < 1 || refreshTokenTtlDays > 365) {
+    throw new Error(`JWT_REFRESH_EXPIRES_DAYS must be an integer between 1 and 365 (got: ${refreshRaw})`);
+  }
+  const standardRaw = cfg('JWT_REFRESH_STANDARD_DAYS');
+  const refreshTokenStandardDays = standardRaw ? Number(standardRaw) : 7;
+  if (
+    !Number.isFinite(refreshTokenStandardDays) ||
+    refreshTokenStandardDays < 1 ||
+    refreshTokenStandardDays > 365
+  ) {
+    throw new Error(
+      `JWT_REFRESH_STANDARD_DAYS must be an integer between 1 and 365 (got: ${standardRaw})`,
+    );
+  }
+  const clockToleranceRaw = cfg('JWT_CLOCK_TOLERANCE_SECONDS');
+  const jwtClockToleranceSeconds = clockToleranceRaw ? Number(clockToleranceRaw) : 30;
+  if (
+    !Number.isFinite(jwtClockToleranceSeconds) ||
+    jwtClockToleranceSeconds < 0 ||
+    jwtClockToleranceSeconds > 300
+  ) {
+    throw new Error(
+      `JWT_CLOCK_TOLERANCE_SECONDS must be an integer between 0 and 300 (got: ${clockToleranceRaw})`,
+    );
+  }
+  const maxSessionsRaw = cfg('MAX_SESSIONS_PER_USER');
+  const maxSessionsPerUser = maxSessionsRaw ? Number(maxSessionsRaw) : 20;
+  if (!Number.isFinite(maxSessionsPerUser) || maxSessionsPerUser < 1 || maxSessionsPerUser > 100) {
+    throw new Error(`MAX_SESSIONS_PER_USER must be an integer between 1 and 100 (got: ${maxSessionsRaw})`);
+  }
+  const graceRaw = cfg('REFRESH_TOKEN_ROTATION_GRACE_SECONDS');
+  const refreshTokenRotationGraceSeconds = graceRaw ? Number(graceRaw) : 120;
+  if (
+    !Number.isFinite(refreshTokenRotationGraceSeconds) ||
+    refreshTokenRotationGraceSeconds < 0 ||
+    refreshTokenRotationGraceSeconds > 300
+  ) {
+    throw new Error(
+      `REFRESH_TOKEN_ROTATION_GRACE_SECONDS must be an integer between 0 and 300 (got: ${graceRaw})`,
+    );
+  }
+  return {
+    saltRounds: 12,
+    accessTokenTtl,
+    refreshTokenTtlDays,
+    refreshTokenStandardDays,
+    jwtClockToleranceSeconds,
+    maxSessionsPerUser,
+    refreshTokenRotationGraceSeconds,
+    shouldReturnDevCode,
+  };
+}

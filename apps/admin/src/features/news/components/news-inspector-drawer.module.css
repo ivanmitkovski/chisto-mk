@@ -1,0 +1,22 @@
+.desktopPanel {
+  display: none;
+}
+
+.mobileToggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 64rem) {
+  .desktopPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+  }
+
+  .mobileToggle {
+    display: none;
+  }
+}

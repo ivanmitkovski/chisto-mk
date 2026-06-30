@@ -1,0 +1,55 @@
+.spinner {
+  flex-shrink: 0;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: currentColor;
+  border-top-color: transparent;
+  animation: spin var(--motion-duration-slow) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Sizes */
+.sizeSm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+.sizeMd {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-width: 2.5px;
+}
+
+.sizeLg {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 3px;
+}
+
+/* Inverted for use on primary (dark) backgrounds */
+.inverted {
+  border-color: rgba(8, 54, 39, 0.2);
+  border-top-color: currentColor;
+}

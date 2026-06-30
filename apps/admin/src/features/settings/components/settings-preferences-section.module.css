@@ -1,0 +1,157 @@
+.preferenceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.preferenceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.preferenceTitle {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.preferenceCaption {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.soundTestButton {
+  margin-top: var(--space-2);
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-status-success-fg);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.soundTestButton:hover {
+  color: var(--color-green-900);
+}
+
+.soundTestButton:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.soundTestButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.preferenceNote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(36, 172, 249, 0.08);
+  border: 1px solid rgba(36, 172, 249, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.preferenceNote p {
+  margin: 0;
+}
+
+.preferenceNote svg {
+  flex-shrink: 0;
+  color: var(--color-info);
+  margin-top: 2px;
+}
+
+.preferenceSelectLabel {
+  display: block;
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+.preferenceSelect {
+  width: 100%;
+  max-width: 16rem;
+  padding-block: 10px;
+  padding-inline: 12px var(--native-select-chevron-padding-end);
+  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.preferenceFootnote {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.toggle {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted);
+  cursor: pointer;
+  transition: background var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggleThumb {
+    transition: none;
+  }
+}
+
+.toggleOn {
+  background: var(--color-primary);
+}
+
+.toggleOn .toggleThumb {
+  transform: translateX(20px);
+}

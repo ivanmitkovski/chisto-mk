@@ -1,0 +1,196 @@
+.dropdownPanel {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  width: min(22rem, 90vw);
+  max-height: min(28rem, calc(100vh - 5rem));
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--shell-panel-border);
+  background: var(--shell-panel-bg);
+  box-shadow: var(--shell-panel-shadow), var(--shell-panel-inset-highlight);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  z-index: var(--z-topbar-panel);
+}
+
+.panelHeader {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--shell-strong-fg);
+}
+
+.panelSubtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--shell-muted-fg);
+}
+
+.panelAction {
+  border: 1px solid var(--shell-search-border);
+  border-radius: var(--radius-full);
+  min-height: 1.875rem;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-status-success-fg);
+  background: var(--shell-nav-link-hover-bg);
+  cursor: pointer;
+  transition: background-color var(--motion-duration-fast) ease;
+}
+
+.panelAction:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.panelAction:not(:disabled):hover {
+  background: var(--shell-profile-button-bg);
+}
+
+.panelAction:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.notificationListScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.notificationListScroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.notificationListScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notificationListScroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--border-default);
+}
+
+.notificationListScroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--shell-strong-fg) 28%, transparent);
+}
+
+.notificationList {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.notificationFooter {
+  flex-shrink: 0;
+  padding: 0 var(--space-3) var(--space-3);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.notificationLink {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--color-status-success-fg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+
+.notificationLink:hover {
+  text-decoration: underline;
+  color: var(--shell-nav-link-active-fg);
+}
+
+.notificationLink:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.notificationItem {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  display: grid;
+  gap: 0.12rem;
+  text-align: left;
+  padding: var(--space-3);
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.notificationItem:hover {
+  background: var(--shell-row-hover-bg);
+}
+
+.notificationItem:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+.notificationUnread {
+  border-color: var(--shell-search-border);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+.notificationHeading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--shell-strong-fg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.notificationMessage {
+  color: var(--shell-muted-fg);
+  font-size: var(--font-size-sm);
+}
+
+.notificationTime {
+  color: var(--shell-subtle-fg);
+  font-size: var(--font-size-xs);
+}
+
+.unreadPill {
+  border: 1px solid var(--shell-profile-button-border);
+  border-radius: var(--radius-full);
+  min-height: 1.125rem;
+  padding: 0 var(--space-2);
+  font-size: 0.625rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-status-success-fg);
+  background: var(--shell-nav-link-hover-bg);
+}
+
+@media (max-width: 48rem) {
+  .dropdownPanel {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: none;
+    max-height: 85vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+}

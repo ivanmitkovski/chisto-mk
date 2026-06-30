@@ -1,0 +1,241 @@
+.toolbar {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+
+.card {
+  min-width: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cardHeader h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.cardBadges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.section {
+  margin-top: var(--space-6);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.breakdownList {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.workerList {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.workerItem {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.workerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.workerMeta {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.perReplicaNote {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.card p {
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.metrics div {
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+}
+
+.metrics dt {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.metrics dd {
+  margin: var(--space-1) 0 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.alert {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-yellow-100);
+  color: var(--color-status-warning-fg);
+}
+
+.updated {
+  margin-bottom: 0;
+  font-size: var(--font-size-xs);
+}
+
+.linkRow {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.linkRow a {
+  color: var(--color-mint-700);
+  text-decoration: underline;
+}
+
+.pollHint {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.deadLetterList {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.deadLetterItem {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.deadLetterCode {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-status-danger-fg);
+}
+
+.deadLetterMeta {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.deadLetterMessage {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.deadLetterPagination {
+  margin-top: var(--space-3);
+}
+
+.deadLetterActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.pushStatusBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.remediationBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  background: var(--surface-subtle);
+}
+
+.remediationBanner p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.deadLetterRowActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+
+.metricsDetails {
+  margin-top: var(--space-4);
+}
+
+.metricsDetails summary {
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}

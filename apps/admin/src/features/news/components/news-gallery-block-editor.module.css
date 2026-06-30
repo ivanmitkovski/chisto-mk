@@ -1,0 +1,362 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.rootClassic {
+  gap: var(--space-3);
+}
+
+.rootDocument {
+  gap: 0.5rem;
+}
+
+.guidancePanel {
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-subtle) 70%, transparent);
+  overflow: hidden;
+}
+
+.guidanceSummary {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.guidanceSummary::-webkit-details-marker {
+  display: none;
+}
+
+.guidanceBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 0.625rem 0.625rem;
+}
+
+.guidanceBody p {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--text-secondary) 90%, transparent);
+}
+
+.stripHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.stripMeta {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.stripWarning {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-status-warning-fg);
+}
+
+.filmstrip {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.125rem 0.125rem 0.375rem;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.slide {
+  flex: 0 0 10.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  scroll-snap-align: start;
+}
+
+.slideDocument {
+  flex-basis: 11.5rem;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface-subtle);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.frameEmpty {
+  border: 1px dashed color-mix(in srgb, var(--border-default) 85%, transparent);
+}
+
+.frameFilled {
+  border: 1px solid var(--border-default);
+}
+
+.frameDragOver {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  transform: scale(1.01);
+}
+
+.frameUploading {
+  pointer-events: none;
+}
+
+.frameImage {
+  object-fit: cover;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  height: 100%;
+  padding: 0.75rem;
+  text-align: center;
+  color: color-mix(in srgb, var(--text-secondary) 80%, transparent);
+}
+
+.emptyLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.emptyHint {
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--text-secondary) 75%, transparent);
+}
+
+.slideBadge {
+  position: absolute;
+  top: 0.375rem;
+  left: 0.375rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--text-primary) 55%, transparent);
+  backdrop-filter: blur(8px);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--bg-surface);
+}
+
+.fileInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.frameTapTarget {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.frameTapTarget:disabled {
+  cursor: default;
+}
+
+.frameToolbar {
+  position: absolute;
+  inset-inline: 0.25rem;
+  top: 0.25rem;
+  z-index: 3;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.125rem;
+  padding: 0.125rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--text-primary) 8%, transparent);
+  opacity: 0;
+  transform: translateY(-2px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.slide:hover .frameToolbar,
+.slide:focus-within .frameToolbar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toolbarBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.toolbarBtn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  color: var(--text-primary);
+}
+
+.toolbarBtn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.toolbarBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.toolbarBtnDanger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-error) 12%, transparent);
+  color: var(--color-error);
+}
+
+.uploadOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: color-mix(in srgb, var(--bg-surface) 55%, transparent);
+}
+
+.librarySelect,
+.footerLibrarySelect {
+  width: 100%;
+  font-size: 0.75rem;
+}
+
+.captionField,
+.captionDocument {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.captionLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.captionInput {
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.3125rem 0.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.captionInput:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-primary) 25%, var(--border-default));
+}
+
+.captionInput:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--border-default));
+  box-shadow: var(--focus-ring);
+}
+
+.captionInput::placeholder {
+  color: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+}
+
+.captionInputDocument {
+  width: 100%;
+  min-height: 1.75rem;
+  padding: 0.125rem 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.captionInputDocument::placeholder {
+  color: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+}
+
+.uploadError {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-danger);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.addSlideBtn {
+  color: var(--text-secondary);
+}
+
+.addSlideBtn:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.footerLibrarySelect {
+  flex: 1 1 10rem;
+  max-width: 14rem;
+}
+
+.limitHint {
+  font-size: 0.75rem;
+  color: var(--color-status-warning-fg);
+}

@@ -1,0 +1,196 @@
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('AppErrorView', () {
+    testWidgets('renders error message', (WidgetTester tester) async {
+      const errorMessage = 'Something went wrong';
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError(code: 'ERR', message: errorMessage),
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        find.text('Something went wrong. Please try again.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('shows retry button for retryable errors', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError.network(),
+              onRetry: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Try again'), findsOneWidget);
+    });
+
+    testWidgets('hides retry button for non-retryable errors', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError.unauthorized(),
+              onRetry: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Try again'), findsNothing);
+      expect(find.text('Sign out'), findsOneWidget);
+    });
+
+    testWidgets('shows logout button for session-invalid errors', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError.unauthorized(),
+              onLogout: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Sign out'), findsOneWidget);
+      expect(find.byIcon(Icons.logout_rounded), findsOneWidget);
+      expect(find.text('Try again'), findsNothing);
+    });
+
+    testWidgets('shows logout for SESSION_REVOKED (revoked server session)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError(
+                code: 'SESSION_REVOKED',
+                message: 'Session is no longer valid',
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        find.text('Session is no longer valid. Please sign in again.'),
+        findsOneWidget,
+      );
+      expect(find.text('Sign out'), findsOneWidget);
+    });
+
+    testWidgets('does not show logout button for non-auth errors', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError.network(),
+              onRetry: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Sign out'), findsNothing);
+      expect(find.byIcon(Icons.logout_rounded), findsNothing);
+      expect(find.text('Try again'), findsOneWidget);
+    });
+
+    testWidgets('onLogout callback fires', (WidgetTester tester) async {
+      var loggedOut = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError.unauthorized(),
+              onLogout: () => loggedOut = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Sign out'));
+      await tester.pumpAndSettle();
+
+      expect(loggedOut, isTrue);
+    });
+
+    testWidgets('onRetry callback fires', (WidgetTester tester) async {
+      var retried = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              autoRecoverSession: false,
+              error: AppError.network(),
+              onRetry: () => retried = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Try again'));
+      await tester.pumpAndSettle();
+
+      expect(retried, isTrue);
+    });
+  });
+}

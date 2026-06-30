@@ -1,0 +1,79 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.fieldHint {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.input {
+  max-width: 16rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.input:hover,
+.input:focus {
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline: none;
+}
+
+.inputWide {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  max-width: 100%;
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 5rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  resize: vertical;
+}
+
+.textarea:hover,
+.textarea:focus {
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline: none;
+}
+
+.inputNumber {
+  max-width: 8rem;
+}
+
+.fieldError {
+  margin: var(--space-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-error);
+}
+
+@media (max-width: 48rem) {
+  .input {
+    max-width: none;
+  }
+}

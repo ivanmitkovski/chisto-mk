@@ -1,0 +1,25 @@
+{
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "typeToConfirm": "Type \"{phrase}\" to confirm",
+  "noData": "No data",
+  "filters": "Filters",
+  "applyFilters": "Apply filters",
+  "export": "Export",
+  "selectedCount": "{count} selected",
+  "selectedCountOfTotal": "{count} selected of {total}",
+  "dismissNotification": "Dismiss notification",
+  "calendar": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "selectDate": "Select date",
+    "selectDateTime": "Select date and time",
+    "clearDate": "Clear date",
+    "clearDateTime": "Clear date and time",
+    "time": "Time",
+    "hour": "Hour",
+    "minute": "Minute",
+    "days": "Calendar days"
+  }
+}

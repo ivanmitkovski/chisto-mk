@@ -1,0 +1,32 @@
+{
+  "groups": {
+    "recent": "Recent",
+    "navigation": "Navigation",
+    "actions": "Actions",
+    "context": "This page",
+    "users": "Users",
+    "reports": "Reports",
+    "sites": "Sites",
+    "events": "Events"
+  },
+  "openNotificationsPanel": "Open notifications panel",
+  "openNotificationsPanelDescription": "Show the notification dropdown in the header",
+  "refreshPage": "Refresh page",
+  "refreshPageDescription": "Reload the current page data",
+  "clearRecents": "Clear recent commands",
+  "clearRecentsDescription": "Remove recently used commands from the list",
+  "reportsInReview": "Reports in review",
+  "reportsInReviewDescription": "Open the reports queue filtered to in review",
+  "suspendedUsers": "Suspended users",
+  "suspendedUsersDescription": "Open users filtered to suspended accounts",
+  "eventsPendingModeration": "Events pending moderation",
+  "eventsPendingModerationDescription": "Open cleanup events awaiting moderation",
+  "unreadNotifications": "Unread notifications",
+  "unreadNotificationsDescription": "Filter notifications to unread only",
+  "resultCount": "{count, plural, =0 {No results} one {# result} other {# results}}",
+  "entitySearchFailed": "Some search results could not be loaded.",
+  "footerNavigateLabel": "Navigate",
+  "footerSelectLabel": "Select",
+  "footerCloseLabel": "Close",
+  "footerToggleLabel": "Toggle"
+}

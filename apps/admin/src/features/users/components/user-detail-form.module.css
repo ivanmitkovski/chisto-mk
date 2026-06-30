@@ -1,0 +1,130 @@
+.card {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.hidden {
+  display: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(16rem, 2fr) repeat(3, minmax(7rem, 1fr));
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.grid > div {
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+}
+
+.emailRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.summaryItemEmail {
+  min-width: 0;
+}
+
+.label {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.value {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+  line-height: var(--line-height-snug);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.readonlyField {
+  display: grid;
+  align-content: end;
+  min-width: 0;
+}
+
+.input,
+.select {
+  width: 100%;
+  min-height: 2.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-3) var(--native-select-chevron-padding-end);
+  font-size: var(--font-size-md);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.input:focus-visible,
+.select:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--focus-ring);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  min-width: 12rem;
+}
+
+@media (max-width: 64rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summaryItemEmail {
+    grid-column: 1 / -1;
+  }
+
+  .formRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 48rem) {
+  .grid,
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryItemEmail {
+    grid-column: auto;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+
+  .saveButton {
+    width: 100%;
+    min-width: 0;
+  }
+}

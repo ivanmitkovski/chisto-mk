@@ -1,0 +1,69 @@
+import { ButtonHTMLAttributes, forwardRef } from 'react';
+import { Spinner } from '../spinner';
+import styles from './button.module.css';
+
+type ButtonVariant = 'solid' | 'outline' | 'ghost' | 'icon' | 'danger';
+type ButtonSize = 'sm' | 'md';
+
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  isLoading?: boolean;
+  fullWidth?: boolean;
+};
+
+const variantClassByName: Record<ButtonVariant, string> = {
+  solid: styles.variantSolid,
+  outline: styles.variantOutline,
+  ghost: styles.variantGhost,
+  icon: styles.variantIcon,
+  danger: styles.variantDanger,
+};
+
+const sizeClassByName: Record<ButtonSize, string> = {
+  sm: styles.sizeSm,
+  md: styles.sizeMd,
+};
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    variant = 'solid',
+    size = 'md',
+    isLoading = false,
+    fullWidth = false,
+    className,
+    disabled,
+    type,
+    children,
+    ...rest
+  },
+  ref,
+) {
+  const resolvedClassName = [
+    styles.button,
+    variantClassByName[variant],
+    variant === 'icon' ? '' : sizeClassByName[size],
+    fullWidth ? styles.fullWidth : '',
+    isLoading ? styles.loading : '',
+    className ?? '',
+  ]
+    .join(' ')
+    .trim();
+
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      type={type ?? 'button'}
+      className={resolvedClassName}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading}
+    >
+      {isLoading ? (
+        <Spinner size="sm" />
+      ) : (
+        children
+      )}
+    </button>
+  );
+});

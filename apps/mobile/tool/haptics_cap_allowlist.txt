@@ -1,0 +1,2 @@
+# Optional per-file caps on AppHaptics.* call count (path:max).
+# Files not listed are uncapped; listed files may not exceed max during migration.

@@ -1,0 +1,20 @@
+{
+  "pageTitle": "Notifications",
+  "title": "Notifications",
+  "subtitle": "{unread} unread · {total} total",
+  "filtersAria": "Notification filters",
+  "listAria": "Notifications list",
+  "activity": "Activity",
+  "filters": {
+    "all": "All",
+    "unread": "Unread",
+    "reports": "Reports",
+    "system": "System",
+    "analytics": "Analytics"
+  },
+  "emptyAll": "No notifications in this view yet.",
+  "emptyUnread": "You are all caught up.",
+  "loading": "Loading notifications…",
+  "emptyDashboard": "No notifications are available yet.",
+  "viewDetails": "View details"
+}

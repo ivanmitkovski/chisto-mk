@@ -1,0 +1,129 @@
+{
+  "dashboard": "Paneli",
+  "reports": "Raportet",
+  "duplicates": "Raportet e dyfishta",
+  "users": "Përdoruesit",
+  "sites": "Vendet",
+  "resolutions": "Rezolucione vendesh",
+  "map": "Harta",
+  "events": "Ngjarjet e pastrimit",
+  "risk-signals": "Sinjalet e rrezikut të check-in",
+  "moderation": "Moderimi UGC",
+  "broadcasts": "Transmetimet",
+  "news": "Lajme",
+  "team": "Ekipi",
+  "gamification": "Gamifikimi",
+  "app-config": "Konfigurimi i aplikacionit",
+  "operations": "Operacionet",
+  "active-users": "Përdorues aktivë",
+  "emailSuppressions": "Bllokimet e emailit",
+  "webhookLogs": "Regjistrat e webhook",
+  "audit": "Regjistri i auditimit",
+  "notifications": "Njoftimet",
+  "settings": "Cilësimet",
+  "commands": {
+    "goDashboard": {
+      "label": "Shko te paneli",
+      "description": "Hap metrikat e përmbledhjes dhe tabelën e raporteve"
+    },
+    "goReports": {
+      "label": "Shko te raportet",
+      "description": "Shqyrto raportet e ardhura për ndotje"
+    },
+    "goDuplicates": {
+      "label": "Shko te raportet e dyfishta",
+      "description": "Bashko grupet e raporteve të dyfishta"
+    },
+    "goUsers": {
+      "label": "Shko te përdoruesit",
+      "description": "Shfletoni dhe menaxhoni përdoruesit admin"
+    },
+    "goSites": {
+      "label": "Shko te vendet",
+      "description": "Vendet e ndotjes dhe statusi i ciklit jetësor"
+    },
+    "goResolutions": {
+      "label": "Shko te rezolutat e vendeve",
+      "description": "Shqyrto dhe menaxho rrjedhat e rezolutave të vendeve"
+    },
+    "goMap": {
+      "label": "Shko te harta",
+      "description": "Vendet në hartë"
+    },
+    "goEvents": {
+      "label": "Shko te ngjarjet e pastrimit",
+      "description": "Planifiko dhe shqyrto ngjarjet e pastrimit"
+    },
+    "goRiskSignals": {
+      "label": "Shko te sinjalet e rrezikut",
+      "description": "Shqyrto sinjalet e rrezikut të check-in të ngjarjes"
+    },
+    "goModeration": {
+      "label": "Shko te moderimi UGC",
+      "description": "Triage raportet UGC të qytetarëve"
+    },
+    "goBroadcasts": {
+      "label": "Shko te transmetimet",
+      "description": "Dërgo fushata njoftimesh"
+    },
+    "goNews": {
+      "label": "Shko te lajmet",
+      "description": "Menaxho postimet dhe mediat e faqes së landing"
+    },
+    "goTeam": {
+      "label": "Shko te ekipi",
+      "description": "Fto stafin dhe menaxho rolet admin"
+    },
+    "goGamification": {
+      "label": "Shko te gamifikimi",
+      "description": "Pikët, renditjet dhe shpërblimet"
+    },
+    "goAppConfig": {
+      "label": "Shko te konfigurimi i aplikacionit",
+      "description": "Konfigurimi dhe eksperimentet e aplikacionit mobil"
+    },
+    "goOperations": {
+      "label": "Shko te operacionet",
+      "description": "Shëndeti i platformës dhe operacionet e dorëzimit"
+    },
+    "goActiveUsers": {
+      "label": "Shko te përdoruesit aktivë",
+      "description": "Sesione live, angazhim dhe analitikë aktiviteti"
+    },
+    "goEmailSuppressions": {
+      "label": "Shko te bllokimet e emailit",
+      "description": "Shqyrto dhe hiq adresat e emailit të bllokuara"
+    },
+    "goWebhookLogs": {
+      "label": "Shko te regjistrat e webhook",
+      "description": "Webhook dorëzimi dhe auditimi i komunikimeve"
+    },
+    "goAudit": {
+      "label": "Shko te regjistri i auditimit",
+      "description": "Aktiviteti dhe ndryshimet admin"
+    },
+    "goSettings": {
+      "label": "Shko te cilësimet",
+      "description": "Menaxho profilin dhe preferencat admin"
+    },
+    "goNotifications": {
+      "label": "Shko te njoftimet",
+      "description": "Hap qendrën e aktivitetit të njoftimeve"
+    }
+  },
+  "profileMenu": {
+    "profileSettings": "Cilësimet e profilit",
+    "preferences": "Preferencat",
+    "signOut": "Dil"
+  },
+  "quickActions": {
+    "menu": "Menyja e veprimeve të shpejta",
+    "label": "Veprime të shpejta",
+    "newReports": "Raporte të reja",
+    "inReview": "Në shqyrtim",
+    "users": "Përdoruesit",
+    "sites": "Vendet",
+    "events": "Ngjarjet",
+    "auditLog": "Regjistri i auditimit"
+  }
+}

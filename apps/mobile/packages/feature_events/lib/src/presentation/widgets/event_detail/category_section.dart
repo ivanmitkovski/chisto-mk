@@ -1,0 +1,131 @@
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/event_ui_mappers.dart';
+import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class CategorySection extends StatelessWidget {
+  const CategorySection({
+    super.key,
+    required this.event,
+    this.embeddedInGroupedPanel = false,
+  });
+
+  final EcoEvent event;
+
+  /// When true, uses inset row styling and a trailing chevron (use inside [EventDetailGroupedPanel]).
+  final bool embeddedInGroupedPanel;
+
+  /// Same sheet as tapping the category row on the event detail screen.
+  static void showCategoryInfoSheet(BuildContext context, EcoEvent event) {
+    AppBottomSheet.show<void>(
+      context: context,
+      backgroundColor: AppColors.transparent,
+      builder: (BuildContext ctx) {
+        return ReportSheetScaffold(
+          title: ctx.l10n.eventsCategorySheetTitle,
+          subtitle: event.category.localizedLabel(ctx.l10n),
+          fitToContent: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                ),
+                child: Icon(
+                  event.category.icon,
+                  size: 28,
+                  color: AppColors.primaryDark,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                event.category.localizedDescription(ctx.l10n),
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: AppTypography.eventsBodyMuted(
+                  Theme.of(ctx).textTheme,
+                ).copyWith(height: 1.5),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCategoryInfo(BuildContext context) =>
+      showCategoryInfoSheet(context, event);
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: context.l10n.eventsCategorySemantic(
+        event.category.localizedLabel(context.l10n),
+      ),
+      child: Material(
+        color: AppColors.transparent,
+        child: InkWell(
+          onTap: () => _showCategoryInfo(context),
+          borderRadius: BorderRadius.circular(
+            embeddedInGroupedPanel ? AppSpacing.radiusLg : AppSpacing.radius10,
+          ),
+          child: embeddedInGroupedPanel
+              ? EventDetailGroupedMetadataRow(
+                  leading: EventDetailGroupedMetadataRowLeading(
+                    icon: event.category.icon,
+                  ),
+                  center: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      event.category.localizedLabel(context.l10n),
+                      style: AppTypography.eventsGroupedRowPrimary(
+                        Theme.of(context).textTheme,
+                      ),
+                    ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.xxs,
+                    horizontal: AppSpacing.xxs / 2,
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        event.category.icon,
+                        size: AppSpacing.iconMd,
+                        color: AppColors.primaryDark,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          event.category.localizedLabel(context.l10n),
+                          style: AppTypography.eventsBodyMediumSecondary(
+                            Theme.of(context).textTheme,
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        CupertinoIcons.info_circle,
+                        size: 16,
+                        color: AppColors.textMuted,
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+}

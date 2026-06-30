@@ -1,0 +1,48 @@
+{
+  "pageTitle": "Конфигурација на апликација",
+  "description": "Контролирајте текови на мобилна апликација: кредити за пријави, feed ranking, quiz и правна верзија.",
+  "reportCredits": {
+    "title": "Кредити за пријави",
+    "dailyCredits": "Дневни кредити",
+    "emergencyWindowHours": "Emergency window (часови)",
+    "refillIntervalHours": "Refill interval (часови)",
+    "validationError": "Сите полиња за кредити мора да се позитивни цели броеви.",
+    "save": "Зачувај кредити за пријави",
+    "savedMessage": "Конфигурацијата за кредити за пријави е ажурирана.",
+    "invalidValuesMessage": "Полињата за кредити мора да се позитивни цели броеви."
+  },
+  "feedRanking": {
+    "title": "Рангирање на фид",
+    "defaultVariant": "Стандардна варијанта",
+    "experimentEnabled": "Експериментот е вклучен",
+    "save": "Зачувај feed ranking",
+    "savedMessage": "Конфигурацијата за feed ranking е ажурирана.",
+    "defaultVariantRequired": "Стандардната варијанта е задолжителна.",
+    "experimentConfirmTitle": "Овозможи експеримент за feed?",
+    "experimentConfirmDescription": "Ова вклучува A/B рангирање на feed за мобилни клиенти. Потврдете пред овозможување.",
+    "experimentConfirmAction": "Овозможи експеримент"
+  },
+  "organizerQuiz": {
+    "title": "Квиз за организатор",
+    "locale": "Локал",
+    "localeEnglish": "English (en)",
+    "localeMacedonian": "Macedonian (mk)",
+    "jsonAria": "Organizer quiz JSON",
+    "loading": "Вчитување quiz за {locale}…",
+    "invalidObject": "Quiz JSON мора да биде објект.",
+    "save": "Зачувај organizer quiz",
+    "savedMessage": "Organizer quiz е ажуриран.",
+    "loadFailedMessage": "Не може да се вчита organizer quiz.",
+    "discardLocaleTitle": "Да се отфрлат измените на quiz?",
+    "discardLocaleDescription": "Имате незачувани промени на quiz. Да се смени локалот без зачувување?",
+    "discardLocaleConfirm": "Смени локал"
+  },
+  "terms": {
+    "title": "Верзија на услови",
+    "version": "Верзија",
+    "save": "Зачувај верзија на услови",
+    "savedMessage": "Верзијата на услови е ажурирана.",
+    "validationError": "Користете 1-32 знаци: букви, бројки, точки, долна цrta или цrtички.",
+    "invalidVersionMessage": "Форматот на верзијата на условите е неважечки."
+  }
+}

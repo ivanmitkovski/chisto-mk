@@ -1,0 +1,193 @@
+{
+  "pageTitle": "Settings",
+  "skipToContent": "Skip to settings content",
+  "sidebarAria": "Settings sections",
+  "groups": {
+    "account": "Account",
+    "system": "System",
+    "preferences": "Preferences"
+  },
+  "sections": {
+    "profile": "Profile",
+    "security": "Security",
+    "environment": "Environment",
+    "featureFlags": "Feature flags",
+    "moderationEmails": "Moderation emails",
+    "preferences": "Preferences"
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Your account information.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "unsavedChanges": "Unsaved changes",
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "savedToast": "Profile updated.",
+    "errorToast": "Error"
+  },
+  "security": {
+    "title": "Security",
+    "description": "Sessions, password, and activity.",
+    "sessionsLabel": "Sessions",
+    "activeSessionsTitle": "Active sessions",
+    "activeSessionsHint": "Devices currently signed in to your account.",
+    "thisDevice": "This device",
+    "signOutOtherSessions": "Sign out other sessions",
+    "passwordLabel": "Password",
+    "changePasswordTitle": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "changePasswordButton": "Change password",
+    "activityLabel": "Activity",
+    "recentActivityTitle": "Recent activity",
+    "recentActivityHint": "Security-related events on your account.",
+    "noActivityYet": "No activity yet."
+  },
+  "mfa": {
+    "sectionLabel": "Two-factor authentication",
+    "title": "2FA",
+    "hint": "Add an extra layer of security by requiring a code from your authenticator app when signing in.",
+    "recommendedBadge": "Recommended",
+    "recommendedCopy": "Protect your admin account with a code from your authenticator app. You can set this up in a minute.",
+    "banner": {
+      "title": "Strengthen your account security",
+      "message": "Two-factor authentication is not enabled yet. Add it in Settings when you are ready.",
+      "action": "Review security settings",
+      "dismiss": "Not now"
+    },
+    "enabled": "Two-factor authentication is on",
+    "disabled": "Two-factor authentication is off",
+    "enable2fa": "Enable 2FA",
+    "starting": "Starting…",
+    "disable2fa": "Disable 2FA",
+    "disableConfirmTitle": "Disable two-factor authentication?",
+    "disableHint": "Enter your password to turn off two-factor authentication.",
+    "passwordRequiredTitle": "Password required",
+    "passwordRequiredMessage": "Please enter your current password to disable 2FA.",
+    "disabling": "Disabling…",
+    "setupStep": "Scan with your authenticator app (e.g. Google Authenticator, 1Password)",
+    "qrAlt": "QR code for authenticator setup",
+    "manualKey": "Or enter this code manually: {secret}",
+    "enterSixDigitCode": "Enter the 6-digit code",
+    "codePlaceholder": "000000",
+    "verifyAndEnable": "Verify and enable",
+    "verifying": "Verifying…",
+    "backupCodesTitle": "Save your backup codes",
+    "backupCodesHint": "Store these codes in a safe place. Each can be used once if you lose access to your authenticator app.",
+    "copyBackupCodes": "Copy all codes",
+    "downloadBackupCodes": "Download codes",
+    "backupCodesAttestation": "I have stored these backup codes securely",
+    "copyBackupCodesSuccessTitle": "Copied",
+    "copyBackupCodesSuccessMessage": "Backup codes copied to clipboard.",
+    "copyBackupCodesFailedMessage": "Could not copy backup codes. Try download instead.",
+    "done": "Done",
+    "toast": {
+      "setupError": "Could not start setup",
+      "enterCodeTitle": "Enter code",
+      "enterCodeMessage": "Please enter the 6-digit code from your authenticator app.",
+      "verificationFailedTitle": "Verification failed",
+      "invalidCodeMessage": "Invalid code. Please try again.",
+      "disabledTitle": "2FA disabled",
+      "disabledMessage": "Two-factor authentication has been turned off.",
+      "failedTitle": "Failed",
+      "incorrectPassword": "Incorrect password."
+    }
+  },
+  "preferences": {
+    "title": "Preferences",
+    "description": "Display options for this browser. Other devices are not affected.",
+    "displayLabel": "Display",
+    "interfaceMotionTitle": "Interface motion",
+    "interfaceMotionHint": "Shortens transitions across the admin app using design tokens. Stored only on this device.",
+    "reduceMotionTitle": "Reduce motion",
+    "reduceMotionCaption": "Minimize animations and transitions",
+    "notificationsLabel": "Notifications",
+    "deliveryPreferencesTitle": "Delivery preferences",
+    "deliveryPreferencesHint": "Per-browser toggles for live report alerts. This does not change settings on other devices.",
+    "soundOnNewReportsTitle": "Sound on new reports",
+    "soundOnNewReportsCaption": "Plays a subtle chime when a new report arrives in real time",
+    "playTestSound": "Play test sound",
+    "serverAlertsNote": "Server-managed alerts still appear in the top bar and Notifications page.",
+    "languageLabel": "Language",
+    "localeTitle": "Locale",
+    "localeHint": "Admin UI language.",
+    "displayLanguage": "Display language",
+    "localeEnglish": "English",
+    "localeMacedonian": "Македонски",
+    "localeAlbanian": "Shqip",
+    "localeFootnote": "Locale preference is stored in this browser.",
+    "reduceMotionToggleAria": "Reduce motion",
+    "soundOnNewReportsToggleAria": "Sound on new reports"
+  },
+  "environment": {
+    "title": "Environment",
+    "description": "System configuration. Super admin only.",
+    "restricted": "This section is restricted to super administrators.",
+    "configEntriesTitle": "Configuration entries",
+    "saveConfiguration": "Save configuration",
+    "confirmSaveTitle": "Save configuration changes?",
+    "confirmSaveDescription": "Updated values take effect immediately across the platform.",
+    "savedToast": "Configuration updated."
+  },
+  "featureFlags": {
+    "title": "Feature flags",
+    "description": "Enable or disable features across the platform.",
+    "empty": "No feature flags configured.",
+    "updateError": "Could not update flag",
+    "toggleAria": "Toggle feature flag {name}",
+    "confirmToggleTitle": "Change feature flag?",
+    "confirmToggleDescription": "Set {key} to {state}.",
+    "confirmEnable": "enabled",
+    "confirmDisable": "disabled"
+  },
+  "moderationEmails": {
+    "title": "Moderation emails",
+    "description": "Immediate email when user actions need admin review. Delivery requires platform email (`EMAIL_ENABLED`, `email_enabled`, and `admin_moderation_email_enabled` flags).",
+    "loadError": "Unable to load preferences. Try refreshing the page.",
+    "defaultForRole": "Default for your role",
+    "notificationsAria": "{title} email notifications",
+    "categories": {
+      "NEW_REPORT": {
+        "title": "New pollution reports",
+        "description": "When a citizen submits a report that enters the moderation queue."
+      },
+      "EVENT_PENDING": {
+        "title": "Events pending approval",
+        "description": "When a cleanup event is created or returns to pending review."
+      },
+      "UGC_REPORT": {
+        "title": "UGC reports",
+        "description": "When a user flags content (comments, chat, profiles, sites, events)."
+      },
+      "CHECKIN_RISK": {
+        "title": "Check-in risk signals",
+        "description": "When a participant checks in far from the event site."
+      },
+      "SITE_RESOLUTION": {
+        "title": "Site cleanup confirmations",
+        "description": "When a citizen submits cleanup evidence for a pollution site."
+      }
+    }
+  },
+  "securityModals": {
+    "signOutOthersTitle": "Sign out other sessions",
+    "signOutOthersDescription": "This will revoke access for all other devices. You will stay signed in on this device.",
+    "signOutOthersConfirm": "Revoke all",
+    "updatePasswordTitle": "Update password",
+    "updatePasswordDescription": "Your new password will take effect on your next sign in.",
+    "updatePasswordConfirm": "Update password"
+  },
+  "securityToast": {
+    "signedOutTitle": "Signed out",
+    "signedOutMessage": "Other sessions were revoked.",
+    "passwordUpdatedTitle": "Password updated",
+    "passwordUpdatedMessage": "Use your new password next sign in."
+  },
+  "passwordValidation": {
+    "required": "Required",
+    "minLength": "Min 8 characters",
+    "mustMatch": "Must match"
+  }
+}

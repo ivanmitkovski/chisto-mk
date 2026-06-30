@@ -1,0 +1,209 @@
+.reportsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--overview-label-size);
+  font-weight: var(--overview-label-weight);
+  letter-spacing: var(--overview-label-tracking);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+
+.reportsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.reportsHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.statusPill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.reportsSubline {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-warning);
+  font-weight: var(--font-weight-medium);
+}
+
+.viewAllLink {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-green-700);
+  text-decoration: none;
+}
+
+.viewAllLink:hover {
+  color: var(--color-green-600);
+  text-decoration: underline;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.insightsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.insightsHeading {
+  margin: 0;
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.insightsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  min-width: 0;
+  align-items: stretch;
+}
+
+.insightCardWrapper {
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.insightCardWrapper > * {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+@media (min-width: 64rem) {
+  .insightsRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 48rem) {
+  .insightsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.insightsError {
+  min-width: 0;
+}
+
+.feedDiagnosticsCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.feedDiagnosticsTitle {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.feedDiagnosticsSubline {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.feedReasonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.feedReasonRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.feedReasonCode {
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.feedReasonCount {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.feedDriftList {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.feedDriftRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.feedDriftSite {
+  color: var(--text-secondary);
+}
+
+.feedDriftScore {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+
+.dataErrorWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  padding: var(--space-6);
+}
+
+.contentFallbackHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.contentFallbackStatsWrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

@@ -1,0 +1,57 @@
+# Curated workspace lint baseline.
+#
+# Single source of truth for app + every package (each package's
+# analysis_options.yaml does `include: ../analysis_options.yaml`, and the app
+# root `analysis_options.yaml` includes this file too). CI enforces this set
+# with `--fatal-infos`, so the disabled rules below are deliberate, documented
+# exceptions rather than silent noise.
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    # Generated code we do not hand-edit (codegen owns its own style).
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gr.dart"
+    - "**/*.mocks.dart"
+    - "**/*.config.dart"
+    - "**/l10n/app_localizations*.dart"
+    - "lib/firebase_options.dart"
+  errors:
+    # Part-file extensions on private State types are intentional.
+    library_private_types_in_public_api: ignore
+
+linter:
+  rules:
+    # --- Deliberately disabled (house conventions / low signal) ---
+    # The codebase consistently uses explicit local variable types for
+    # readability in a large multi-package app; this rule fights that choice.
+    omit_local_variable_types: false
+    # Doc comments are not required on every public member (most public symbols
+    # are tokens, enums, and generated localizations).
+    public_member_api_docs: false
+    # Line width is owned by `dart format`, not the linter.
+    lines_longer_than_80_chars: false
+    # Reordering to put required-named params first churns large, stable
+    # constructor signatures for no behavioural gain.
+    always_put_required_named_parameters_first: false
+    # Explicit "redundant" argument values are often kept for call-site clarity.
+    avoid_redundant_argument_values: false
+    # Cascades vs. repeated receivers is a style preference here.
+    cascade_invocations: false
+    # `[ref]` doc resolution is noisy across part files and generated symbols.
+    comment_references: false
+    # Boundary code intentionally uses broad `catch (e, st)` + AppLog logging;
+    # the empty-catch guard (tool/check_no_empty_catch.dart) already enforces
+    # that every catch logs or recovers, making typed-only catches impractical.
+    avoid_catches_without_on_clauses: false
+    # Pubspec dependency ordering is grouped by intent (first-party vs pub.dev),
+    # not strict alphabetical; this purely cosmetic rule is not enforced.
+    sort_pub_dependencies: false
+    # First-party monorepo: packages intentionally share internal `src/` layout.
+    # The intended boundaries are enforced by purpose-built guards
+    # (tool/check_cross_feature_imports.dart and check_package_boundary_imports.dart)
+    # that understand the allowed first-party exceptions, so this pub-publishing
+    # oriented lint is delegated to them.
+    implementation_imports: false

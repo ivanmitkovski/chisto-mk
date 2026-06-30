@@ -1,0 +1,129 @@
+{
+  "dashboard": "Dashboard",
+  "reports": "Reports",
+  "duplicates": "Duplicate Reports",
+  "users": "Users",
+  "sites": "Sites",
+  "resolutions": "Site resolutions",
+  "map": "Map",
+  "events": "Cleanup events",
+  "risk-signals": "Check-in risk signals",
+  "moderation": "UGC Moderation",
+  "broadcasts": "Broadcasts",
+  "news": "News",
+  "team": "Team",
+  "gamification": "Gamification",
+  "app-config": "App config",
+  "operations": "Operations",
+  "active-users": "Active users",
+  "emailSuppressions": "Email suppressions",
+  "webhookLogs": "Webhook logs",
+  "audit": "Audit log",
+  "notifications": "Notifications",
+  "settings": "Settings",
+  "commands": {
+    "goDashboard": {
+      "label": "Go to Dashboard",
+      "description": "Open admin overview metrics and report table"
+    },
+    "goReports": {
+      "label": "Go to Reports",
+      "description": "Review incoming pollution reports"
+    },
+    "goDuplicates": {
+      "label": "Go to Duplicate Reports",
+      "description": "Merge duplicate report groups"
+    },
+    "goUsers": {
+      "label": "Go to Users",
+      "description": "Browse and manage admin users"
+    },
+    "goSites": {
+      "label": "Go to Sites",
+      "description": "Pollution sites and lifecycle status"
+    },
+    "goResolutions": {
+      "label": "Go to Site Resolutions",
+      "description": "Review and manage site resolution workflows"
+    },
+    "goMap": {
+      "label": "Go to Map",
+      "description": "Sites on the map"
+    },
+    "goEvents": {
+      "label": "Go to Cleanup Events",
+      "description": "Schedule and review cleanup events"
+    },
+    "goRiskSignals": {
+      "label": "Go to Risk Signals",
+      "description": "Review event check-in risk signals"
+    },
+    "goModeration": {
+      "label": "Go to UGC Moderation",
+      "description": "Triage citizen UGC reports"
+    },
+    "goBroadcasts": {
+      "label": "Go to Broadcasts",
+      "description": "Send notification campaigns"
+    },
+    "goNews": {
+      "label": "Go to News",
+      "description": "Manage landing news posts and media"
+    },
+    "goTeam": {
+      "label": "Go to Team",
+      "description": "Invite staff and manage admin roles"
+    },
+    "goGamification": {
+      "label": "Go to Gamification",
+      "description": "Points, rankings, and rewards"
+    },
+    "goAppConfig": {
+      "label": "Go to App Config",
+      "description": "Mobile app configuration and experiments"
+    },
+    "goOperations": {
+      "label": "Go to Operations",
+      "description": "Platform health and delivery ops"
+    },
+    "goActiveUsers": {
+      "label": "Go to Active Users",
+      "description": "Live sessions, engagement, and activity analytics"
+    },
+    "goEmailSuppressions": {
+      "label": "Go to Email Suppressions",
+      "description": "Review and remove blocked email addresses"
+    },
+    "goWebhookLogs": {
+      "label": "Go to Webhook Logs",
+      "description": "Delivery webhooks and comms audit trail"
+    },
+    "goAudit": {
+      "label": "Go to Audit Log",
+      "description": "Admin activity and changes"
+    },
+    "goSettings": {
+      "label": "Go to Settings",
+      "description": "Manage profile and admin preferences"
+    },
+    "goNotifications": {
+      "label": "Go to Notifications",
+      "description": "Open the notifications activity center"
+    }
+  },
+  "profileMenu": {
+    "profileSettings": "Profile settings",
+    "preferences": "Preferences",
+    "signOut": "Sign out"
+  },
+  "quickActions": {
+    "menu": "Quick actions menu",
+    "label": "Quick actions",
+    "newReports": "New reports",
+    "inReview": "In review",
+    "users": "Users",
+    "sites": "Sites",
+    "events": "Events",
+    "auditLog": "Audit log"
+  }
+}

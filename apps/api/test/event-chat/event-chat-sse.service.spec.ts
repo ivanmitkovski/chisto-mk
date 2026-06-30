@@ -1,0 +1,64 @@
+import { EventChatClusterConfig } from '../../src/event-chat/constants/event-chat-cluster.config';
+import { EventChatRoomEmitterService } from '../../src/event-chat/services/event-chat-room-emitter.service';
+import { EventChatSseService } from '../../src/event-chat/services/event-chat-sse.service';
+import { EventChatTelemetryService } from '../../src/event-chat/services/event-chat-telemetry.service';
+
+describe('EventChatSseService', () => {
+  const originalRedis = process.env.REDIS_URL;
+
+  afterEach(() => {
+    if (originalRedis === undefined) {
+      delete process.env.REDIS_URL;
+    } else {
+      process.env.REDIS_URL = originalRedis;
+    }
+  });
+
+  it('ingestFromRedis does not emit to WebSocket gateway when Socket.IO is clustered', () => {
+    delete process.env.REDIS_URL;
+    const roomEmitter = { isReady: () => true, emitToRoom: jest.fn() } as unknown as EventChatRoomEmitterService;
+    const cluster = new EventChatClusterConfig();
+    cluster.setSocketIoClustered(true);
+    const telemetry = new EventChatTelemetryService();
+    const svc = new EventChatSseService(roomEmitter, cluster, telemetry);
+
+    const payload = JSON.stringify({
+      streamEventId: 'se-1',
+      eventId: 'evt-1',
+      type: 'message_created',
+      message: { id: 'm1', body: 'hi' },
+    });
+    (svc as unknown as { ingestFromRedis: (eid: string, p: string) => void }).ingestFromRedis(
+      'evt-1',
+      payload,
+    );
+
+    expect(roomEmitter.emitToRoom).not.toHaveBeenCalled();
+  });
+
+  it('ingestFromRedis emits to WebSocket gateway when Socket.IO is not clustered', () => {
+    delete process.env.REDIS_URL;
+    const roomEmitter = { isReady: () => true, emitToRoom: jest.fn() } as unknown as EventChatRoomEmitterService;
+    const cluster = new EventChatClusterConfig();
+    cluster.setSocketIoClustered(false);
+    const telemetry = new EventChatTelemetryService();
+    const svc = new EventChatSseService(roomEmitter, cluster, telemetry);
+
+    const payload = JSON.stringify({
+      streamEventId: 'se-2',
+      eventId: 'evt-2',
+      type: 'message_created',
+      message: { id: 'm2', body: 'yo' },
+    });
+    (svc as unknown as { ingestFromRedis: (eid: string, p: string) => void }).ingestFromRedis(
+      'evt-2',
+      payload,
+    );
+
+    expect(roomEmitter.emitToRoom).toHaveBeenCalledWith(
+      'evt-2',
+      'message_created',
+      expect.objectContaining({ streamEventId: 'se-2', eventId: 'evt-2' }),
+    );
+  });
+});

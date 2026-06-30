@@ -1,0 +1,50 @@
+{
+  "pageTitle": "Gamification",
+  "description": "Configure levels, point values, and review weekly rankings.",
+  "tabs": {
+    "config": "Config",
+    "weeklyRankings": "Weekly rankings"
+  },
+  "config": {
+    "levelThresholds": "Level thresholds (comma-separated)",
+    "pointValues": "Point values",
+    "action": "Action",
+    "points": "Points",
+    "remove": "Remove",
+    "addAction": "Add action",
+    "saveConfig": "Save config",
+    "saving": "Saving…"
+  },
+  "validation": {
+    "thresholdRequired": "Add at least one level threshold.",
+    "thresholdNonNegative": "Thresholds must be non-negative integers.",
+    "thresholdIncreasing": "Thresholds must be strictly increasing.",
+    "actionRequired": "Add at least one point action.",
+    "actionKeyFormat": "Action keys must be UPPER_SNAKE_CASE.",
+    "pointsNonNegative": "Point values must be non-negative numbers."
+  },
+  "rankings": {
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "currentWeek": "Current week",
+    "weekRange": "Week {start} - {end}",
+    "empty": "No rankings for this week yet.",
+    "columns": {
+      "rank": "Rank",
+      "user": "User",
+      "email": "Email",
+      "points": "Points",
+      "leaderboard": "Leaderboard"
+    },
+    "showOnLeaderboardYes": "Yes",
+    "showOnLeaderboardNo": "No"
+  },
+  "toast": {
+    "invalidConfigTitle": "Invalid config",
+    "savedMessage": "Gamification config updated.",
+    "saveFailedTitle": "Save failed",
+    "saveFailedMessage": "Unable to save config.",
+    "loadFailedMessage": "Unable to load rankings."
+  },
+  "tabsAria": "Gamification sections"
+}

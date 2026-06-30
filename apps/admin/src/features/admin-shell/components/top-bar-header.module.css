@@ -1,0 +1,120 @@
+.titleWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(var(--font-size-xl), 2vw, var(--font-size-3xl));
+  font-weight: var(--font-weight-bold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.menuButton {
+  flex: 0 0 auto;
+  align-self: center;
+  background: var(--shell-nav-link-hover-bg);
+  border-color: var(--shell-search-border);
+  color: var(--shell-profile-button-fg);
+  box-shadow: var(--shell-panel-inset-highlight);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: clamp(11rem, 24vw, 19rem);
+  min-width: 9rem;
+  cursor: pointer;
+  background: var(--shell-search-bg);
+  border-color: var(--shell-search-border);
+}
+
+.searchInput:focus {
+  border-color: var(--shell-search-border-focus);
+}
+
+.shortcutPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--bg-surface) 92%, transparent);
+  color: var(--shell-muted-fg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.02em;
+}
+
+.iconCluster {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 48rem) {
+  .searchInput {
+    width: 11rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .searchInput {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .iconCluster {
+    flex-shrink: 0;
+  }
+
+  .titleWrap {
+    width: 100%;
+    justify-content: space-between;
+    flex: 1 1 100%;
+  }
+
+  .title {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+@media (max-width: 36rem) {
+  .title {
+    font-size: var(--font-size-lg);
+  }
+
+  .searchInput {
+    max-width: none;
+  }
+
+  .shortcutPill {
+    display: none;
+  }
+}

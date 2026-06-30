@@ -1,0 +1,27 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+  width: 100%;
+}
+
+.siteFilterBanner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgba(37, 219, 134, 0.08);
+  border: 1px solid rgba(37, 219, 134, 0.2);
+  font-size: 0.875rem;
+  color: rgba(8, 54, 39, 0.85);
+  margin: 0;
+}
+
+.siteFilterLink {
+  font-weight: 600;
+  color: var(--color-green-700);
+  text-decoration: none;
+}
+
+.siteFilterLink:hover {
+  text-decoration: underline;
+}

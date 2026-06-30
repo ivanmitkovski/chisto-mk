@@ -1,0 +1,57 @@
+# Production Dockerfile for Chisto API
+# Build from repo root: docker build -f Dockerfile.prod -t chisto-api .
+FROM node:20-bookworm-slim AS base
+# wget: required by ECS task-definition container health check (`wget -qO- http://localhost:3000/health`).
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
+RUN corepack enable && corepack prepare pnpm@10.27.0 --activate
+WORKDIR /app
+
+FROM base AS deps
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/map-contracts/package.json ./packages/map-contracts/
+COPY packages/news-content/package.json ./packages/news-content/
+COPY packages/prisma-cli/package.json ./packages/prisma-cli/
+RUN pnpm install --frozen-lockfile
+
+FROM base AS builder
+COPY --from=deps /app ./
+COPY . .
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
+RUN pnpm --filter @chisto/news-content build
+RUN pnpm --filter @chisto/api exec prisma generate
+RUN pnpm --filter @chisto/api build
+
+FROM base AS deploy
+COPY --from=builder /app/ ./
+RUN pnpm --filter @chisto/api deploy --prod --legacy /deployed
+
+# Prisma CLI bundle (pnpm deploy inherits root security overrides; npm install does not).
+FROM builder AS prisma-cli
+RUN pnpm --filter @chisto/prisma-cli deploy --prod --legacy /opt/prisma-cli \
+  && cd /opt/prisma-cli && DATABASE_URL="postgresql://build:build@localhost:5432/build" node node_modules/prisma/build/index.js version
+
+FROM node:20-bookworm-slim AS runner
+ENV NODE_ENV=production
+# Patch distro packages with available security fixes (Trivy image scan).
+RUN apt-get update \
+  && apt-get -y upgrade \
+  && apt-get install -y --no-install-recommends ca-certificates wget \
+  && rm -rf /var/lib/apt/lists/* \
+  # Production runtime only needs node; bundled npm ships vulnerable transitive deps (Trivy).
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+WORKDIR /app
+RUN groupadd --gid 1001 chisto && useradd --uid 1001 --gid chisto --create-home chisto
+COPY --from=deploy /deployed ./
+COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/docker-entrypoint.sh ./docker-entrypoint.sh
+COPY --from=prisma-cli /opt/prisma-cli /opt/prisma-cli
+ENV PATH="/opt/prisma-cli/node_modules/.bin:${PATH}"
+ENV NODE_PATH="/opt/prisma-cli/node_modules"
+RUN chmod +x ./docker-entrypoint.sh \
+  && chown -R chisto:chisto /app /opt/prisma-cli
+USER chisto
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:3000/health || exit 1
+ENTRYPOINT ["./docker-entrypoint.sh"]

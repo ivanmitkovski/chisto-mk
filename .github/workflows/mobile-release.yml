@@ -1,0 +1,55 @@
+name: Mobile release build
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: 'Upload to stores (requires secrets)'
+        required: false
+        default: 'false'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Verify release env guard
+        run: dart run tool/check_release_env.dart
+      - name: Verify Android Play media permission policy
+        run: dart run tool/check_android_play_media_permissions.dart
+      - name: Analyze and test
+        run: |
+          flutter analyze --fatal-infos lib
+          dart run tool/check_pii_in_logs.dart
+          flutter test test/features/auth/api_auth_repository_logout_cleanup_test.dart test/core/observability/chisto_sentry_test.dart
+          flutter test --coverage test/
+          dart run tool/check_coverage.dart --print-summary
+      - name: Build IPA (prod)
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: |
+          flutter build ipa --release \
+            --dart-define=ENV=prod \
+            --dart-define=SITE_HISTORY_TAB_ENABLED=true \
+            ${SENTRY_DSN:+--dart-define=SENTRY_DSN=$SENTRY_DSN}
+      - name: Build AAB (prod)
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ secrets.ANDROID_KEYSTORE_PATH }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: |
+          flutter build appbundle --release \
+            --dart-define=ENV=prod \
+            --dart-define=SITE_HISTORY_TAB_ENABLED=true \
+            ${SENTRY_DSN:+--dart-define=SENTRY_DSN=$SENTRY_DSN}

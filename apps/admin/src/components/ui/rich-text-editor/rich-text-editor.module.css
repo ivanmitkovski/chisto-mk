@@ -1,0 +1,220 @@
+.richTextEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.375rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.375rem;
+  background: var(--surface-subtle);
+}
+
+.toolbarButton {
+  min-width: 2rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toolbarButton:hover:not(:disabled) {
+  background: var(--color-button-ghost-hover-bg);
+  color: var(--text-primary);
+}
+
+.toolbarButtonActive {
+  background: var(--color-button-icon-bg);
+  color: var(--color-primary);
+}
+
+.toolbarButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editorSurface {
+  min-height: 7rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.375rem;
+  background: var(--bg-surface);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.editorSurface:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--shell-focus-halo);
+}
+
+.editorSurface :global(.ProseMirror) {
+  outline: none;
+  min-height: 5.5rem;
+}
+
+.editorSurface :global(.ProseMirror p) {
+  margin: 0;
+}
+
+.editorSurface :global(.ProseMirror p + p) {
+  margin-top: 0.75rem;
+}
+
+.editorSurface :global(.ProseMirror ul),
+.editorSurface :global(.ProseMirror ol) {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.editorSurface :global(.ProseMirror a) {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.editorSurface :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--shell-muted-fg);
+  pointer-events: none;
+  height: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.charCount {
+  font-size: 0.75rem;
+  color: var(--shell-muted-fg);
+}
+
+.linkDialog {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.linkTextPreview {
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.375rem;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+}
+
+.linkTextLabel {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.linkTextValue {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.linkTextEmpty {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.linkField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.linkField span {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.linkField input {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.linkActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.richTextEditorDocument {
+  position: relative;
+  gap: 0;
+}
+
+/* Document mode: neutral chrome only on hover/focus — never the default green field border */
+.editorSurface.editorSurfaceDocument,
+.editorSurfaceDocument {
+  min-height: 1.75rem;
+  padding: 0.125rem 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  box-shadow: none;
+}
+
+.editorSurface.editorSurfaceDocument:focus-within,
+.editorSurfaceDocument:focus-within {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.editorSurfaceDocument :global(.ProseMirror) {
+  min-height: 1.5rem;
+  outline: none;
+  caret-color: var(--color-primary);
+}
+
+.editorSurfaceDocument :global(.ProseMirror:focus),
+.editorSurfaceDocument :global(.ProseMirror:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.editorSurfaceDocument :global(.ProseMirror p + p) {
+  margin-top: 1rem;
+}
+
+.editorSurfaceDocument :global(.ProseMirror a) {
+  color: var(--color-primary);
+}
+
+.editorSurfaceDocument :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  color: color-mix(in srgb, var(--text-secondary) 65%, transparent);
+  font-style: italic;
+}

@@ -1,0 +1,88 @@
+.card {
+  overflow: hidden;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sub {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.deviceBadge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  background: color-mix(in srgb, var(--color-info) 12%, transparent);
+  color: var(--color-status-info-fg);
+}
+
+.statusPill {
+  display: inline-flex;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.statusOnline {
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  color: var(--color-green-900);
+}
+
+.statusAway {
+  background: color-mix(in srgb, var(--color-warning) 16%, transparent);
+  color: var(--color-status-warning-fg);
+}
+
+.statusOffline {
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.pagination {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-default);
+}
+
+.mobileCard {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--text-secondary);
+}
+
+.wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border-default);
+}

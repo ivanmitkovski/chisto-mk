@@ -1,0 +1,23 @@
+{
+  "pageTitle": "Site resolutions",
+  "pageDescription": "Review citizen proposals to mark sites as cleaned or resolved.",
+  "approve": "Approve",
+  "reject": "Reject",
+  "filters": {
+    "status": "Status",
+    "all": "All",
+    "pending": "Pending review",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "table": {
+    "submitted": "Submitted",
+    "site": "Site",
+    "submitter": "Submitter",
+    "status": "Status",
+    "photos": "Photos",
+    "actions": "Actions",
+    "empty": "No resolution submissions match your filters.",
+    "resolutionsCount": "{count} resolution(s) · page {page}"
+  }
+}

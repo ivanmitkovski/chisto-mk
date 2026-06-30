@@ -1,0 +1,253 @@
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:design_system/design_system.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class TimeRangePicker extends StatelessWidget {
+  const TimeRangePicker({
+    super.key,
+    required this.startTime,
+    required this.endTime,
+    required this.onStartChanged,
+    required this.onEndChanged,
+    this.hasError = false,
+
+    /// Shell date `2000-01-01` + time; passed to [CupertinoDatePicker.minimumDate].
+    this.minimumStartPickerTime,
+    this.maximumStartPickerTime,
+    this.minimumEndPickerTime,
+    this.maximumEndPickerTime,
+  });
+
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
+  final ValueChanged<TimeOfDay> onStartChanged;
+  final ValueChanged<TimeOfDay> onEndChanged;
+  final bool hasError;
+  final DateTime? minimumStartPickerTime;
+  final DateTime? maximumStartPickerTime;
+  final DateTime? minimumEndPickerTime;
+  final DateTime? maximumEndPickerTime;
+
+  String _formatTime(TimeOfDay t) =>
+      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+
+  DateTime _shellFromTimeOfDay(TimeOfDay t) =>
+      DateTime(2000, 1, 1, t.hour, t.minute);
+
+  TimeOfDay _clampInitialTimeOfDay(
+    TimeOfDay initial, {
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+  }) {
+    DateTime dt = _shellFromTimeOfDay(initial);
+    if (minimumDate != null && dt.isBefore(minimumDate)) {
+      dt = minimumDate;
+    }
+    if (maximumDate != null && dt.isAfter(maximumDate)) {
+      dt = maximumDate;
+    }
+    return TimeOfDay(hour: dt.hour, minute: dt.minute);
+  }
+
+  Future<void> _pickTime(
+    BuildContext context, {
+    required TimeOfDay initial,
+    required ValueChanged<TimeOfDay> onChanged,
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+  }) async {
+    final TimeOfDay clampedInitial = _clampInitialTimeOfDay(
+      initial,
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
+    );
+    TimeOfDay picked = clampedInitial;
+    final DateTime initialDateTime = _shellFromTimeOfDay(clampedInitial);
+
+    await AppBottomSheet.show<void>(
+      context: context,
+      backgroundColor: AppColors.panelBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXl),
+        ),
+      ),
+      builder: (BuildContext ctx) {
+        return SafeArea(
+          top: false,
+          child: SizedBox(
+            height: 280,
+            child: Column(
+              children: <Widget>[
+                const SizedBox(height: AppSpacing.xs),
+                Container(
+                  width: AppSpacing.sheetHandle,
+                  height: AppSpacing.sheetHandleHeight,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                  ),
+                ),
+                Expanded(
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    use24hFormat: true,
+                    initialDateTime: initialDateTime,
+                    minimumDate: minimumDate,
+                    maximumDate: maximumDate,
+                    onDateTimeChanged: (DateTime dt) {
+                      picked = TimeOfDay(hour: dt.hour, minute: dt.minute);
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.md,
+                  ),
+                  child: AppButton.primary(
+                    label: ctx.l10n.eventsTimePickerConfirm,
+                    onPressed: () {
+                      onChanged(picked);
+                      Navigator.of(ctx).pop();
+                    },
+                    expand: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          context.l10n.eventsTimePickerSelectTime,
+          style: AppTypography.eventsFormLeadHeading(textTheme),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.panelBackground,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            border: hasError
+                ? Border.all(color: AppColors.error.withValues(alpha: 0.4))
+                : null,
+            boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _TimeBlock(
+                label: context.l10n.eventsTimePickerFrom,
+                semanticLabel: context.l10n.eventsTimePickerTimeBlockSemantic(
+                  context.l10n.eventsTimePickerFrom,
+                  _formatTime(startTime),
+                ),
+                value: _formatTime(startTime),
+                onTap: () => _pickTime(
+                  context,
+                  initial: startTime,
+                  onChanged: onStartChanged,
+                  minimumDate: minimumStartPickerTime,
+                  maximumDate: maximumStartPickerTime,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 20,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              _TimeBlock(
+                label: context.l10n.eventsTimePickerTo,
+                semanticLabel: context.l10n.eventsTimePickerTimeBlockSemantic(
+                  context.l10n.eventsTimePickerTo,
+                  _formatTime(endTime),
+                ),
+                value: _formatTime(endTime),
+                onTap: () => _pickTime(
+                  context,
+                  initial: endTime,
+                  onChanged: onEndChanged,
+                  minimumDate: minimumEndPickerTime,
+                  maximumDate: maximumEndPickerTime,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TimeBlock extends StatelessWidget {
+  const _TimeBlock({
+    required this.label,
+    required this.semanticLabel,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String label;
+  final String semanticLabel;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadii.lg,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xs,
+            vertical: AppSpacing.xxs / 2,
+          ),
+          child: Column(
+            children: <Widget>[
+              Text(
+                label,
+                style: AppTypography.eventsCaptionStrong(
+                  Theme.of(context).textTheme,
+                  color: AppColors.primary,
+                ).copyWith(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: AppSpacing.xxs),
+              AnimatedDefaultTextStyle(
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : AppMotion.fast,
+                style: AppTypography.eventsTimePickerClockValue(
+                  Theme.of(context).textTheme,
+                ),
+                child: Text(value),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

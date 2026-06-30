@@ -1,0 +1,2 @@
+# Logic-layer floor (data/domain/application). Ratchet — do not decrease. Target: 75%.
+69

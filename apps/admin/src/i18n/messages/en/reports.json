@@ -1,0 +1,297 @@
+{
+  "pageTitle": "Reports",
+  "detailTitle": "Report",
+  "backToReportsList": "Back to reports list",
+  "backToReports": "Reports",
+  "refreshReportAria": "Refresh report",
+  "outbox": "Outbox",
+  "prioritySuffix": "{priority} priority",
+  "duplicateNotice": "This report may be a duplicate{ofReport}.",
+  "duplicateOfReport": " of report {reportNumber}",
+  "reviewDuplicateGroups": "Review duplicate groups",
+  "viewers": {
+    "oneOther": "{name} is viewing this report",
+    "twoOthers": "{firstName} and {secondName} are viewing this report",
+    "manyOthers": "{firstName} and {count} others are viewing this report"
+  },
+  "moderationWorkspace": "Moderation workspace",
+  "duplicateOfAnother": "This report may be a duplicate of another.",
+  "duplicateOfSpecific": "This report may be a duplicate of {reportNumber}.",
+  "alsoReportedBy": " Also reported by {names}.",
+  "viewAllDuplicateReports": "View all duplicate reports",
+  "severity": {
+    "LOW": "Low",
+    "MEDIUM": "Moderate",
+    "SIGNIFICANT": "Significant",
+    "HIGH": "High",
+    "CRITICAL": "Critical"
+  },
+  "status": {
+    "NEW": "New",
+    "IN_REVIEW": "In review",
+    "APPROVED": "Approved",
+    "DELETED": "Rejected"
+  },
+  "queuePriority": {
+    "Critical": "Critical",
+    "High": "High",
+    "Normal": "Normal"
+  },
+  "sla": {
+    "newRemaining": "2h remaining",
+    "inReviewRemaining": "1h remaining",
+    "completed": "Completed"
+  },
+  "filters": {
+    "all": "All",
+    "duplicates": "Duplicates",
+    "new": "New",
+    "inReview": "In review",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "columns": {
+    "reportNumber": "Report #",
+    "name": "Name",
+    "location": "Location",
+    "dateReported": "Date reported",
+    "status": "Status"
+  },
+  "toolbar": {
+    "searchAria": "Search reports by name, location, or number",
+    "searchPlaceholder": "Search reports…",
+    "filterByStatusAria": "Filter by status"
+  },
+  "queue": {
+    "reportsCount": "{count} reports",
+    "reportsCountFiltered": "{shown} of {total} report(s)",
+    "needAttention": "{count} need attention",
+    "duplicatesLink": "{count} duplicate(s)",
+    "title": "Reports",
+    "refreshAria": "Refresh reports",
+    "potentialDuplicates": "{count} potential duplicate(s)",
+    "duplicates": "Duplicates",
+    "showingRange": "Showing {from} to {to} of {total}"
+  },
+  "empty": "No reports match your filters.",
+  "emptyStates": {
+    "noReportsYet": "No reports yet. Share the Chisto app or reporting link with citizens to get started.",
+    "noFilterMatch": "No reports match the selected filter.",
+    "noSearchMatch": "No reports match \"{query}\".",
+    "searchHint": "Try a different search term or clear the search."
+  },
+  "siteFilter": {
+    "banner": "Filtered by site.",
+    "showAll": "Show all reports"
+  },
+  "columnsActions": "Actions",
+  "tableCaption": "Reports list columns",
+  "confirmList": {
+    "rejectDescription": "Reject \"{name}\"? A reason is required.",
+    "approveDescription": "Approve \"{name}\" and move it to approved state?"
+  },
+  "contextDetail": {
+    "close": "Close",
+    "submitted": {
+      "title": "Submitted",
+      "description": "This report was submitted on {value}.",
+      "body": "Submission time is recorded when the citizen completes and sends the report. All timestamps use the server timezone for consistency across moderators and audit logs."
+    },
+    "reporter": {
+      "title": "Reporter",
+      "description": "Report submitted by {value}.",
+      "body": "Reporter identity is anonymized to protect privacy. The alias shown is used for moderation traceability only. Personal details are not visible to moderators."
+    },
+    "coReporters": {
+      "title": "Also reported by",
+      "description": "Co-reporters: {value}.",
+      "body": "Multiple citizens reported this same issue. Co-reported issues may indicate higher urgency or community concern. Each co-reporter contributes to the report's visibility in the moderation queue."
+    },
+    "trustTier": {
+      "title": "Trust tier",
+      "description": "Reporter trust level: {value}.",
+      "body": "Trust tiers (Bronze, Silver, Gold) reflect the reporter's verification history and past report quality. Higher tiers indicate more established, verified contributors. This helps moderators gauge report reliability."
+    },
+    "queue": {
+      "title": "Queue",
+      "description": "Current queue: {value}.",
+      "body": "Reports are organized into queues by urgency, type, or workflow stage. Queues help moderators focus on the right batch and ensure SLA targets are met. This report is in the {value} work stream."
+    }
+  },
+  "list": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "noFurtherActions": "No further actions",
+    "estimatedCleanupTeamSize": "Estimated cleanup team size",
+    "approveAria": "Approve {reportNumber}",
+    "rejectAria": "Reject {reportNumber}",
+    "finalDecisionAria": "{reportNumber} already has a final decision"
+  },
+  "operationalContext": {
+    "title": "Operational context",
+    "legendAria": "Show operational context legend",
+    "legendTitle": "What do these fields mean?",
+    "legendRegionAria": "Operational context legend",
+    "assignedModeratorTerm": "Assigned moderator",
+    "assignedModeratorDesc": "The staff member currently responsible for reviewing this report. Admins can assign from the picker below; anyone with moderate access can claim with Assign to me or release when handing off.",
+    "slaTerm": "SLA",
+    "slaDesc": "Service Level Agreement: the time remaining before a response or decision is expected.",
+    "queueTerm": "Current queue",
+    "queueDesc": "The work stream or category this report belongs to.",
+    "assignedModerator": "Assigned moderator",
+    "sla": "SLA",
+    "currentQueue": "Current queue",
+    "assignedModeratorFallback": "Assigned moderator",
+    "unassigned": "Unassigned",
+    "assignToMe": "Assign to me",
+    "releaseAssignment": "Release assignment",
+    "takeOverAssignment": "Take over assignment",
+    "reassignHint": "Currently assigned to {name}. Reassign by releasing then claiming, or contact an admin.",
+    "assignModeratorLabel": "Assign moderator",
+    "assignModeratorPlaceholder": "Search staff…",
+    "confirmAssignTitle": "Confirm assignment",
+    "confirmAssignDescription": "Assign this report to {name}?",
+    "confirmUnassignTitle": "Remove assignment",
+    "confirmUnassignDescription": "Clear the assigned moderator for this report?",
+    "confirmAssignLabel": "Confirm",
+    "roleSupport": "Support",
+    "roleAdmin": "Admin",
+    "roleSuperAdmin": "Super admin"
+  },
+  "moderationActions": {
+    "title": "Moderation actions",
+    "toolbarAria": "Moderation actions",
+    "reportApproved": "Report approved",
+    "reportRejected": "Report rejected",
+    "lifecycleComplete": "No further actions available. The lifecycle for this report is complete.",
+    "hint": "Apply an explicit decision and keep the lifecycle clean. Every action writes a timeline entry.",
+    "shortcutHint": "Tip: use Arrow keys to move between actions.",
+    "setInReview": "Set in review",
+    "approveReport": "Approve report",
+    "rejectReport": "Reject report",
+    "aria": {
+      "setInReview": "Set in review",
+      "setInReviewAlready": "Set in review (already in review)",
+      "setInReviewDisabled": "Set in review (no further actions)",
+      "approve": "Approve report",
+      "approveDisabled": "Approve report (no further actions)",
+      "reject": "Reject report",
+      "rejectDisabled": "Reject report (no further actions)"
+    }
+  },
+  "evidence": {
+    "title": "Evidence",
+    "filesCount": "{count} files",
+    "filesAria": "Evidence files",
+    "empty": "No evidence files were attached to this report.",
+    "photoPreviewAria": "Evidence photo preview",
+    "closePhotoAria": "Close photo preview",
+    "previousPhotoAria": "Previous photo",
+    "nextPhotoAria": "Next photo",
+    "thumbnailsAria": "Photo thumbnails",
+    "openFullscreenAria": "Open photo in fullscreen",
+    "summaryAria": "Report summary",
+    "reportNumber": "Report {reportNumber}",
+    "viewSubmittedAria": "View submission details",
+    "viewReporterAria": "View reporter details",
+    "cleanupEffortAria": "Cleanup effort from citizen",
+    "viewCoReportersAria": "View co-reporters details",
+    "viewTrustTierAria": "View trust tier details",
+    "viewQueueAria": "View queue details",
+    "metaSubmitted": "Submitted",
+    "metaReporter": "Reporter",
+    "metaCleanupEffort": "Cleanup effort",
+    "metaCoReporters": "Also reported by",
+    "metaTrustTier": "Trust tier",
+    "metaQueue": "Queue"
+  },
+  "timeline": {
+    "sectionTitle": "Lifecycle timeline",
+    "eventsCount": "{count} events",
+    "byActor": "By {actor}",
+    "ariaLabel": "Report timeline",
+    "empty": "Timeline entries will appear as moderation actions are performed.",
+    "approvedTitle": "Report approved",
+    "approvedDetail": "Moderator accepted the report and moved it to approved lifecycle state.",
+    "rejectedTitle": "Report rejected",
+    "rejectedDetail": "Report was rejected and marked as removed.",
+    "rejectedDetailWithReason": "Report was rejected and marked as removed. Reason: {reason}",
+    "inReviewTitle": "Moved to in-review",
+    "inReviewDetail": "Report status moved to in-review for deeper moderation checks."
+  },
+  "rejectionReasons": {
+    "label": "Rejection reason",
+    "selectPlaceholder": "Select rejection reason",
+    "falseReport": "False report",
+    "duplicateSubmission": "Duplicate submission",
+    "insufficientEvidence": "Insufficient evidence",
+    "outOfJurisdiction": "Out of jurisdiction",
+    "policyViolation": "Policy violation",
+    "required": "Please select a rejection reason.",
+    "notesLabel": "Additional notes (optional)",
+    "notesPlaceholder": "Add optional context for audit trail"
+  },
+  "confirm": {
+    "approvalTitle": "Confirm approval",
+    "approvalDescription": "Approve this report and move it to the approved lifecycle state?",
+    "rejectionTitle": "Confirm rejection",
+    "rejectionDescription": "Reject this report. A rejection reason is required for moderation traceability.",
+    "statusUpdateTitle": "Confirm status update",
+    "statusUpdateDescription": "Move this report into in-review status for deeper moderation checks?",
+    "approveLabel": "Approve report",
+    "rejectLabel": "Reject report",
+    "setInReviewLabel": "Set in review",
+    "concurrentViewersWarning": "{count, plural, one {1 other moderator is viewing this report right now. Proceed only if you have coordinated.} other {# other moderators are viewing this report right now. Proceed only if you have coordinated.}}"
+  },
+  "toast": {
+    "approvedTitle": "Report approved",
+    "approvedMessage": "This report has been accepted successfully.",
+    "inReviewTitle": "Status updated",
+    "inReviewMessage": "This report is now marked as in review.",
+    "rejectedTitle": "Report rejected",
+    "rejectedMessage": "This report has been rejected and marked removed.",
+    "rejectedWithReasonMessage": "This report has been rejected. Reason: {reason}",
+    "actionFailedTitle": "Action failed",
+    "assignmentUpdatedTitle": "Assignment updated",
+    "assignmentUpdatedMessage": "Report assignment was saved.",
+    "assignmentFailedTitle": "Assignment failed"
+  },
+  "duplicates": {
+    "pageTitle": "Duplicate Reports",
+    "empty": "No duplicate report groups are currently waiting for moderation.",
+    "groupsTitle": "Duplicate groups",
+    "groupsCount": "{count} group(s)",
+    "selectGroupEmpty": "Select a duplicate group to review and merge.",
+    "mergeWorkspaceTitle": "Merge workspace",
+    "mergeWorkspaceSubtitle": "Primary {reportNumber} · {count} reports",
+    "primaryReport": "Primary report",
+    "viewReport": "View report",
+    "duplicatesToMerge": "Duplicates to merge ({count})",
+    "selectAllDuplicatesAria": "Select all duplicates",
+    "deselectAllDuplicatesAria": "Deselect all duplicates",
+    "selectDuplicateAria": "Select duplicate {reportNumber}",
+    "mediaCount": "{count} media",
+    "selectionHint": "{count} of {total} selected",
+    "approveAndMerge": "Approve and merge",
+    "confirmMergeTitle": "Confirm duplicate merge",
+    "confirmMergeDescription": "This will approve the primary report, merge selected child evidence and co-reporters, then close selected child reports as merged duplicates.",
+    "mergeReasonLabel": "Merge reason (optional)",
+    "mergeReasonPlaceholder": "Add optional merge context for the audit trail",
+    "toast": {
+      "noSelectionTitle": "No duplicates selected",
+      "noSelectionMessage": "Select at least one duplicate report before merging.",
+      "groupChangedTitle": "Duplicate group changed",
+      "groupChangedMessage": "Another moderator may have updated this group. The list was refreshed. Review and try again.",
+      "groupChangedRefreshMessage": "This duplicate group changed. Refresh the page and try again.",
+      "mergeFailedTitle": "Merge failed",
+      "mergeFailedMessage": "Unable to merge duplicate reports right now.",
+      "mergeSuccessTitle": "Duplicates merged",
+      "mergeSuccessMessage": "Merged {count} duplicate report(s) into {reportNumber}."
+    }
+  },
+  "pageDescription": "Review and moderate citizen pollution reports.",
+  "locationMap": {
+    "title": "Location map",
+    "openInOpenStreetMap": "Open in OpenStreetMap"
+  }
+}

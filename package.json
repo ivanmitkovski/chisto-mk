@@ -9,7 +9,7 @@
     "dev:admin": "pnpm --filter @chisto/admin dev",
     "dev:landing": "pnpm --filter @chisto/landing dev",
     "dev:mobile": "pnpm --filter @chisto/mobile dev",
-    "build": "pnpm -r --filter '!@chisto/mobile' run build",
+    "build": "pnpm -r --workspace-concurrency=1 --filter '!@chisto/mobile' run build",
     "build:api": "pnpm --filter @chisto/api build",
     "build:admin": "pnpm --filter @chisto/admin build",
     "build:landing": "pnpm --filter @chisto/landing build",
@@ -21,14 +21,44 @@
     "db:push": "pnpm --filter @chisto/api exec prisma db push",
     "db:studio": "pnpm --filter @chisto/api exec prisma studio",
     "ci:check": "pnpm --filter @chisto/api exec prisma generate && pnpm --filter @chisto/api exec prisma validate && pnpm build",
+    "verify:contract": "node scripts/verify-contract.mjs",
     "lint": "pnpm -r --filter '!@chisto/mobile' run lint",
     "test": "pnpm -r --filter '!@chisto/mobile' run test",
     "prepare": "husky"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.19.0"
   },
-  "packageManager": "pnpm@9.14.2",
+  "packageManager": "pnpm@10.27.0",
+  "pnpm": {
+    "overrides": {
+      "handlebars": "4.7.9",
+      "protobufjs": "7.6.4",
+      "axios": "1.16.0",
+      "follow-redirects": "1.15.11",
+      "path-to-regexp@0.1.12": "0.1.13",
+      "multer": "2.2.0",
+      "serialize-javascript": "7.0.5",
+      "fast-uri": "3.1.2",
+      "picomatch": "4.0.3",
+      "defu": "6.1.7",
+      "lodash": "4.18.1",
+      "@nestjs/common": "10.4.22",
+      "@nestjs/core": "10.4.22",
+      "node-emoji": "2.2.0",
+      "effect": "3.21.2",
+      "fast-xml-parser": "5.8.0",
+      "tmp": "0.2.7",
+      "@grpc/grpc-js": "1.14.4",
+      "ws": "8.21.0",
+      "form-data": "4.0.6",
+      "hono": "4.12.25",
+      "@hono/node-server": "1.19.14",
+      "testcontainers>undici": "7.28.0",
+      "tar": "7.5.16",
+      "cross-spawn": "7.0.6"
+    }
+  },
   "devDependencies": {
     "husky": "^9.1.7"
   }

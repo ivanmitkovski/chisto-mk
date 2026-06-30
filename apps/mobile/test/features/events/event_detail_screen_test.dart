@@ -1,0 +1,605 @@
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/screens/edit_event_sheet.dart';
+import 'package:feature_events/src/presentation/screens/event_detail_screen.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/date_time_section.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/hero_image_bar.dart'
+    show kEventDetailHeroChatKey, kEventDetailHeroEditKey;
+import 'package:feature_events/src/presentation/widgets/event_detail/title_section.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail_skeleton.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../shared/widget_test_bootstrap.dart';
+import '../../support/events/in_memory_events_store.dart';
+
+void main() {
+  late InMemoryEventsStore store;
+
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    store = InMemoryEventsStore.instance;
+    setEventsRepositoryTestOverride(store);
+    store.resetToSeed();
+    store.loadInitialIfNeeded();
+    await store.ready;
+  });
+
+  tearDown(() {
+    store.simulateDetailPrefetchFailureOnForce = false;
+    setEventsRepositoryTestOverride(null);
+  });
+
+  EcoEvent buildEvent({
+    required String id,
+    required EcoEventStatus status,
+    required bool isJoined,
+    required String organizerId,
+    bool reminderEnabled = false,
+    bool isCheckInOpen = false,
+    AttendeeCheckInStatus attendeeCheckInStatus =
+        AttendeeCheckInStatus.notCheckedIn,
+    bool moderationApproved = true,
+    String? recurrenceRule,
+    int? recurrenceSeriesTotal,
+    int? recurrenceSeriesPosition,
+    double? siteLat,
+    double? siteLng,
+    int? maxParticipants,
+  }) {
+    return EcoEvent(
+      id: id,
+      title: 'Test event $id',
+      description: 'Test event description',
+      category: EcoEventCategory.generalCleanup,
+      siteId: '1',
+      siteName: 'Illegal landfill near the river',
+      siteImageUrl: 'assets/images/references/onboarding_reference.png',
+      siteDistanceKm: 4,
+      siteLat: siteLat,
+      siteLng: siteLng,
+      organizerId: organizerId,
+      organizerName: organizerId == 'current_user'
+          ? 'You'
+          : 'Another organizer',
+      date: DateTime.now().add(const Duration(days: 1)),
+      startTime: const EventTime(hour: 10, minute: 0),
+      endTime: const EventTime(hour: 12, minute: 0),
+      participantCount: 8,
+      maxParticipants: maxParticipants,
+      status: status,
+      createdAt: DateTime.now(),
+      isJoined: isJoined,
+      reminderEnabled: reminderEnabled,
+      isCheckInOpen: isCheckInOpen,
+      attendeeCheckInStatus: attendeeCheckInStatus,
+      moderationApproved: moderationApproved,
+      recurrenceRule: recurrenceRule,
+      recurrenceSeriesTotal: recurrenceSeriesTotal,
+      recurrenceSeriesPosition: recurrenceSeriesPosition,
+    );
+  }
+
+  testWidgets(
+    'joined attendee sees reminder action and leave secondary action',
+    (WidgetTester tester) async {
+      final EcoEvent event = buildEvent(
+        id: 'evt-detail-joined',
+        status: EcoEventStatus.upcoming,
+        isJoined: true,
+        organizerId: 'someone_else',
+      );
+      await store.create(event);
+
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Set reminder'), findsOneWidget);
+      expect(find.text('Leave event'), findsOneWidget);
+      expect(find.byKey(kEventDetailHeroChatKey), findsOneWidget);
+    },
+  );
+
+  testWidgets('guest not joined does not see hero group chat action', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-detail-guest',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(kEventDetailHeroChatKey), findsNothing);
+  });
+
+  testWidgets('in-progress attendee sees scan to check in action', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-detail-checkin',
+      status: EcoEventStatus.inProgress,
+      isJoined: true,
+      organizerId: 'someone_else',
+      isCheckInOpen: true,
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Scan to check in'), findsOneWidget);
+  });
+
+  testWidgets('organizer with approved upcoming event sees Start event CTA', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-detail-organizer',
+      status: EcoEventStatus.upcoming,
+      isJoined: true,
+      organizerId: 'current_user',
+      moderationApproved: true,
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Start event'), findsOneWidget);
+  });
+
+  testWidgets('detail shows RefreshIndicator', (WidgetTester tester) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-refresh',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(RefreshIndicator), findsOneWidget);
+  });
+
+  testWidgets('recurring event shows localized series label when total known', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-series',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+      recurrenceRule: 'FREQ=WEEKLY',
+      recurrenceSeriesTotal: 3,
+      recurrenceSeriesPosition: 2,
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Event 2 of 3'), findsOneWidget);
+    expect(find.text('Every week'), findsOneWidget);
+  });
+
+  testWidgets(
+    'location long-press sheet offers Open in Maps when coordinates set',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(480, 1600));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
+
+      final EcoEvent event = buildEvent(
+        id: 'evt-maps',
+        status: EcoEventStatus.upcoming,
+        isJoined: false,
+        organizerId: 'someone_else',
+        siteLat: 41.9965,
+        siteLng: 21.4314,
+      );
+      await store.create(event);
+
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Facts card exposes maps as a direct action when coordinates exist.
+      expect(find.byTooltip('Open in Maps'), findsOneWidget);
+
+      await tester.longPress(find.text('Illegal landfill near the river'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Open in Maps'), findsAtLeastNWidgets(1));
+    },
+  );
+
+  testWidgets('date and time range appear only on when card not under title', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-title-subtitle',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TitleSection), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(TitleSection),
+        matching: find.textContaining('10:00'),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(DateTimeSection),
+        matching: find.textContaining('10:00 - 12:00'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('missing event shows not-found layout with browse action', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        MediaQuery(
+          data: const MediaQueryData(
+            size: Size(400, 800),
+            disableAnimations: true,
+          ),
+          child: EventDetailScreen(
+            eventsRepository: store,
+            eventId: 'does-not-exist',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EventDetailSkeleton), findsNothing);
+    expect(find.text('Browse events'), findsOneWidget);
+  });
+
+  testWidgets('pending moderation organizer sees moderation banner', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-moderation',
+      status: EcoEventStatus.upcoming,
+      isJoined: true,
+      organizerId: 'current_user',
+      moderationApproved: false,
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Awaiting approval'), findsWidgets);
+  });
+
+  testWidgets('stale refresh banner when forced prefetch fails with cache', (
+    WidgetTester tester,
+  ) async {
+    store.simulateDetailPrefetchFailureOnForce = true;
+    final EcoEvent event = buildEvent(
+      id: 'evt-stale-banner',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retry'), findsOneWidget);
+
+    store.simulateDetailPrefetchFailureOnForce = false;
+    await tester.tap(find.text('Retry'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retry'), findsNothing);
+  });
+
+  testWidgets('organizer opens edit event sheet from hero edit control', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-organizer-edit',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'current_user',
+      moderationApproved: true,
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(kEventDetailHeroChatKey), findsOneWidget);
+
+    await tester.tap(find.byKey(kEventDetailHeroEditKey));
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EditEventSheet), findsOneWidget);
+  });
+
+  testWidgets('pull to refresh clears stale banner when prefetch succeeds', (
+    WidgetTester tester,
+  ) async {
+    store.simulateDetailPrefetchFailureOnForce = true;
+    final EcoEvent event = buildEvent(
+      id: 'evt-pull-refresh-stale',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retry'), findsOneWidget);
+
+    store.simulateDetailPrefetchFailureOnForce = false;
+    await tester.drag(
+      find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+      const Offset(0, 320),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retry'), findsNothing);
+  });
+
+  testWidgets('detail renders at increased text scale without throwing', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-text-scale',
+      status: EcoEventStatus.upcoming,
+      isJoined: true,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        MediaQuery(
+          data: const MediaQueryData(
+            size: Size(400, 900),
+            textScaler: TextScaler.linear(1.45),
+          ),
+          child: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(TitleSection), findsOneWidget);
+  });
+
+  testWidgets('organizer completed event shows after-photos CTA label', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-completed-organizer',
+      status: EcoEventStatus.completed,
+      isJoined: true,
+      organizerId: 'current_user',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Upload after photos'), findsOneWidget);
+  });
+
+  testWidgets(
+    'organizer on completed event sees trash bags collected section',
+    (WidgetTester tester) async {
+      final EcoEvent event = buildEvent(
+        id: 'evt-completed-bags-ui',
+        status: EcoEventStatus.completed,
+        isJoined: true,
+        organizerId: 'current_user',
+      );
+      await store.create(event);
+
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trash bags collected'), findsOneWidget);
+      expect(find.text('Save'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'completed non-organizer does not see organizer trash bags section',
+    (WidgetTester tester) async {
+      final EcoEvent event = buildEvent(
+        id: 'evt-completed-attendee-bags',
+        status: EcoEventStatus.completed,
+        isJoined: true,
+        organizerId: 'someone_else',
+      );
+      await store.create(event);
+
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trash bags collected'), findsNothing);
+    },
+  );
+
+  testWidgets('detail renders when MediaQuery disableAnimations is true', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-reduce-motion',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        MediaQuery(
+          data: const MediaQueryData(
+            size: Size(400, 800),
+            disableAnimations: true,
+          ),
+          child: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TitleSection), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(TitleSection),
+        matching: find.textContaining('10:00'),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(DateTimeSection),
+        matching: find.textContaining('10:00 - 12:00'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+    'rapid detail route replacement with thumbnail hero off does not throw',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          EventDetailScreen(
+            eventsRepository: store,
+            eventId: 'evt-1',
+            enableThumbnailHero: false,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final NavigatorState nav = tester.state<NavigatorState>(
+        find.byType(Navigator),
+      );
+
+      for (int i = 0; i < 10; i++) {
+        final String id = i.isEven ? 'evt-1' : 'evt-2';
+        nav.pushReplacement(
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => EventDetailScreen(
+              eventsRepository: store,
+              eventId: id,
+              enableThumbnailHero: false,
+            ),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(TitleSection), findsOneWidget);
+    },
+  );
+}

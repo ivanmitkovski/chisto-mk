@@ -1,0 +1,45 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
+import { adminQueryKeys, fetchNotifications } from '@/lib/api';
+import { useNotifications } from '../context/notifications-context';
+
+/**
+ * Syncs React Query notifications data to NotificationsContext.
+ * When notifications are invalidated (e.g. by SSE), this refetches and updates the context.
+ */
+export function NotificationsQuerySync() {
+  const ctx = useNotifications();
+  const setItemsRef = useRef(ctx?.setItems);
+  const setUnreadCountRef = useRef(ctx?.setUnreadCount);
+  setItemsRef.current = ctx?.setItems;
+  setUnreadCountRef.current = ctx?.setUnreadCount;
+
+  const { data } = useQuery({
+    queryKey: adminQueryKeys.notifications({ page: 1, limit: 10 }),
+    queryFn: () => fetchNotifications({ page: 1, limit: 10 }),
+    staleTime: 90_000,
+    gcTime: 600_000,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (data && setItemsRef.current && setUnreadCountRef.current) {
+      const items = data.items.slice(0, 10).map((item) => ({
+        id: item.id,
+        title: item.title,
+        message: item.message,
+        timeLabel: item.timeLabel,
+        ...(item.createdAt && { createdAt: item.createdAt }),
+        isUnread: item.isUnread,
+        ...(item.href && { href: item.href }),
+      }));
+      setItemsRef.current(items);
+      setUnreadCountRef.current(data.unreadCount);
+    }
+  }, [data]);
+
+  return null;
+}

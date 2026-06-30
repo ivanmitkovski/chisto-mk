@@ -1,0 +1,96 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  IsDateString,
+  IsEnum,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+  MinLength,
+  Matches,
+  ValidateIf,
+} from 'class-validator';
+import { CleanupEventStatus, EcoEventLifecycleStatus } from '../../prisma-client';
+
+const RRULE_MAX = 2048;
+
+export class PatchCleanupEventDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  title?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  scheduledAt?: string;
+
+  @ApiPropertyOptional({
+    description: 'Empty string clears endAt (legacy rows only).',
+  })
+  @IsOptional()
+  /** class-validator calls `(object, value)`; use the object, not the property value. */
+  @ValidateIf((o: PatchCleanupEventDto) => o.endAt != null && String(o.endAt).trim() !== '')
+  @IsDateString()
+  endAt?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  completedAt?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  participantCount?: number;
+
+  @ApiPropertyOptional({
+    description: 'Optional recurrence rule (RFC 5545). Empty string clears.',
+    maxLength: RRULE_MAX,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(RRULE_MAX)
+  @Matches(/^[\x09\x0A\x0D\x20-\x7E]*$/, {
+    message: 'recurrenceRule must be printable ASCII',
+  })
+  recurrenceRule?: string;
+
+  @ApiPropertyOptional({
+    description: 'Admin-only lifecycle correction (e.g. cancel a published event)',
+    enum: EcoEventLifecycleStatus,
+  })
+  @IsOptional()
+  @IsEnum(EcoEventLifecycleStatus)
+  lifecycleStatus?: EcoEventLifecycleStatus;
+
+  @ApiPropertyOptional({
+    description: 'Moderation status: APPROVED, DECLINED, or PENDING (return-to-pending)',
+    enum: ['APPROVED', 'DECLINED', 'PENDING'],
+  })
+  @IsOptional()
+  @IsIn([CleanupEventStatus.APPROVED, CleanupEventStatus.DECLINED, CleanupEventStatus.PENDING])
+  status?: CleanupEventStatus;
+
+  @ApiPropertyOptional({
+    description: 'Required when declining a pending event (stored on event and in audit metadata)',
+    maxLength: 2000,
+  })
+  @ValidateIf((o) => o.status === CleanupEventStatus.DECLINED)
+  @IsString()
+  @MinLength(3, { message: 'declineReason must be at least 3 characters when declining an event' })
+  @MaxLength(2000)
+  declineReason?: string;
+}

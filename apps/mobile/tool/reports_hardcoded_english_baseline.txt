@@ -1,0 +1,9 @@
+lib/src/domain/models/report_draft.dart:42:Illegal landfill
+lib/src/domain/models/report_draft.dart:43:Water pollution
+lib/src/domain/models/report_draft.dart:44:Air pollution
+lib/src/domain/models/report_draft.dart:45:Industrial waste
+lib/src/domain/models/report_draft.dart:46:Other
+lib/src/domain/models/report_draft_summary.freezed.dart:15:It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models
+lib/src/presentation/controllers/new_report_controller.dart:580:missing photo(s)
+lib/src/presentation/controllers/new_report_submit_ui_flow.dart:199:runSubmit post-success failure (report already submitted) 
+lib/src/presentation/l10n/report_status_l10n.dart:54:in review

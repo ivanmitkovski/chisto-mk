@@ -1,6 +1,7 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.5
+    platform: linux/amd64
     environment:
       POSTGRES_USER: chisto
       POSTGRES_PASSWORD: chisto

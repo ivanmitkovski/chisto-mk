@@ -1,0 +1,164 @@
+.snapshot {
+  min-width: 0;
+}
+
+.snapshotDocument {
+  padding: 0.125rem 0;
+}
+
+.paragraphDocument {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.paragraphDocument p {
+  margin: 0;
+}
+
+.paragraphDocument p + p {
+  margin-top: 1rem;
+}
+
+.paragraphDocument a {
+  color: var(--color-primary);
+}
+
+.paragraphClassic {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.heading2Document,
+.heading3Document {
+  margin: 0;
+  padding: 0.125rem 0;
+  color: var(--text-primary);
+}
+
+.heading2Document {
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.heading3Document {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.listDocument,
+.listClassic {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.listClassic {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.listItem {
+  margin: 0.25rem 0;
+}
+
+.mediaWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.mediaThumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg, 0.75rem);
+  overflow: hidden;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+}
+
+.mediaThumbImage {
+  object-fit: cover;
+}
+
+.mediaVideo {
+  width: 100%;
+  border-radius: var(--radius-lg, 0.75rem);
+}
+
+.caption {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.galleryStrip {
+  display: flex;
+  gap: 0.375rem;
+  overflow: hidden;
+}
+
+.gallerySlot {
+  position: relative;
+  flex: 0 0 4.5rem;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md, 0.375rem);
+  overflow: hidden;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+}
+
+.galleryMore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 4.5rem;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md, 0.375rem);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.htmlPreview {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--text-secondary) 80%, transparent);
+}
+
+.classicBlock {
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.classicType {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}

@@ -1,0 +1,104 @@
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/network/api_failure_mapper.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('appErrorFromFailedResponse parses ISO timestamp from API JSON', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 400,
+      json: <String, dynamic>{
+        'code': 'BAD_REQUEST',
+        'message': 'Invalid input',
+        'timestamp': '2026-04-14T12:34:56.000Z',
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.serverTimestamp, isNotNull);
+    expect(err.serverTimestamp!.toUtc().year, 2026);
+    expect(err.serverTimestamp!.toUtc().month, 4);
+    expect(err.serverTimestamp!.toUtc().day, 14);
+  });
+
+  test(
+    'appErrorFromFailedResponse leaves serverTimestamp null when absent',
+    () {
+      final AppError err = appErrorFromFailedResponse(
+        statusCode: 404,
+        json: <String, dynamic>{'code': 'NOT_FOUND', 'message': 'Missing'},
+        bodyStr: null,
+        retryAfterHeader: null,
+      );
+      expect(err.serverTimestamp, isNull);
+    },
+  );
+
+  test('404 preserves API error code such as SITE_NOT_FOUND', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 404,
+      json: <String, dynamic>{
+        'code': 'SITE_NOT_FOUND',
+        'message': 'Site missing',
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'SITE_NOT_FOUND');
+  });
+
+  test('422 maps to AppError.validation with stable VALIDATION_ERROR code', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 422,
+      json: <String, dynamic>{
+        'code': 'SOME_SERVER_CODE',
+        'message': 'Title is required',
+        'details': <String, dynamic>{'field': 'title'},
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'VALIDATION_ERROR');
+    expect(err.message, 'Title is required');
+    expect(err.details, isA<Map<String, dynamic>>());
+  });
+
+  test('409 honors retryable and retryAfterSeconds', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 409,
+      json: <String, dynamic>{
+        'code': 'DUPLICATE_SUBMIT_INFLIGHT',
+        'message': 'Another submission is in progress',
+        'retryable': true,
+        'retryAfterSeconds': 5,
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'DUPLICATE_SUBMIT_INFLIGHT');
+    expect(err.retryable, isTrue);
+    expect(err.details, isA<Map<String, dynamic>>());
+    expect((err.details! as Map<String, dynamic>)['retryAfterSeconds'], 5);
+  });
+
+  test('appErrorFromFailedResponse merges API details for 429', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 429,
+      json: <String, dynamic>{
+        'code': 'MAP_RATE_LIMITED',
+        'message': 'Too many map requests',
+        'details': <String, dynamic>{
+          'ttlSeconds': 60,
+          'limit': 480,
+          'mode': 'redis',
+        },
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'TOO_MANY_REQUESTS');
+    expect(err.details, isA<Map<String, dynamic>>());
+    final Map<String, dynamic> d = err.details! as Map<String, dynamic>;
+    expect(d['ttlSeconds'], 60);
+    expect(d['limit'], 480);
+  });
+}

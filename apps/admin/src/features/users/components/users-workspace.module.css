@@ -1,0 +1,456 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.statsBar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+}
+
+.statCard {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--bg-surface) 92%, transparent);
+  box-shadow: var(--elevation-sticky);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  transition: box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.statCard:hover {
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-green-900) 8%, transparent);
+}
+
+.statIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: color-mix(in srgb, var(--color-green-900) 92%, transparent);
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.statCardLink {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  text-decoration: none;
+  color: inherit;
+}
+
+.toolbarSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.quickFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.toolbarFiltersRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.lastActiveRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+}
+
+.lastActiveLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.lastActiveFields {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lastActiveRangeGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.lastActivePicker {
+  width: 10.5rem;
+  flex-shrink: 0;
+}
+
+.lastActiveSep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1rem;
+  color: color-mix(in srgb, var(--text-secondary) 72%, transparent);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  user-select: none;
+}
+
+.lastActiveActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.toolbarHints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.toolbarHintLink {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-green-700);
+  text-decoration: none;
+}
+
+.toolbarHintLink:hover {
+  text-decoration: underline;
+}
+
+.tableCard {
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--bg-surface) 95%, transparent);
+  box-shadow: var(--elevation-sticky);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  min-width: 12rem;
+}
+
+.filterSelect {
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3) var(--native-select-chevron-padding-end);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background-color: color-mix(in srgb, var(--bg-surface) 90%, transparent);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-strong);
+  cursor: pointer;
+  line-height: 1.5;
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.filterSelect:hover,
+.filterSelect:focus {
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline: none;
+}
+
+.bulkBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  flex-wrap: wrap;
+}
+
+.bulkLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.bulkDanger {
+  color: var(--color-error);
+  border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
+}
+
+.bulkDanger:hover {
+  background: color-mix(in srgb, var(--color-error) 8%, transparent);
+}
+
+.bulkClear {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+
+.bulkClear:hover {
+  color: var(--color-text-strong);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-green-900) 6%, transparent);
+}
+
+.table th {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.table tbody tr {
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-primary) 4%, transparent);
+}
+
+.rowSelected {
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+}
+
+@keyframes userRowHighlight {
+  0% {
+    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.rowHighlighted {
+  animation: userRowHighlight 1.1s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rowHighlighted {
+    animation: none;
+    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+}
+
+.mobileCardSelected {
+  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+}
+
+.mobileCardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mobileCardHeader input {
+  accent-color: var(--color-green-700);
+  flex-shrink: 0;
+}
+
+.mobileCardActions {
+  margin-top: var(--space-1);
+}
+
+.mobileCardActions a {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.table th:first-child,
+.table td:first-child {
+  width: 2.5rem;
+  padding-right: 0;
+}
+
+.table th:first-child input,
+.table td:first-child input {
+  accent-color: var(--color-green-700);
+  cursor: pointer;
+}
+
+.table th:last-child,
+.table td:last-child {
+  text-align: right;
+}
+
+.nameLink {
+  color: var(--color-link);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nameLink:hover {
+  text-decoration: underline;
+}
+
+.statusPill {
+  display: inline-flex;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.statusActive {
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  color: var(--color-green-900);
+}
+
+.statusSuspended {
+  background: var(--color-red-050);
+  color: var(--color-error);
+}
+
+.statusDeleted {
+  background: color-mix(in srgb, var(--color-green-900) 12%, transparent);
+  color: var(--text-secondary);
+}
+
+.tableWithBulk {
+  /* checkbox column */
+}
+
+.statusDefault {
+  background: color-mix(in srgb, var(--color-green-900) 10%, transparent);
+  color: var(--text-secondary);
+}
+
+.rolePill {
+  display: inline-flex;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.roleUser {
+  background: color-mix(in srgb, var(--color-green-900) 8%, transparent);
+  color: var(--text-secondary);
+}
+
+.roleSupport {
+  background: color-mix(in srgb, var(--color-info) 14%, transparent);
+  color: var(--color-status-info-fg);
+}
+
+.roleAdmin {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-green-900);
+}
+
+.roleSuperAdmin {
+  background: color-mix(in srgb, var(--color-green-900) 15%, transparent);
+  color: var(--color-green-900);
+}
+
+.roleDefault {
+  background: color-mix(in srgb, var(--color-green-900) 8%, transparent);
+  color: var(--text-secondary);
+}
+
+.actionLink {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+.actionLink:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  padding: var(--space-10);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.footer {
+  margin-top: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}

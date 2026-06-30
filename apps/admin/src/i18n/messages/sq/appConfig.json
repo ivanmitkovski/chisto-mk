@@ -1,0 +1,48 @@
+{
+  "pageTitle": "Konfigurimi i aplikacionit",
+  "description": "Kontrollo rrjedhat e aplikacionit mobil: kreditet e raporteve, feed ranking, quiz dhe versioni ligjor.",
+  "reportCredits": {
+    "title": "Kreditet e raporteve",
+    "dailyCredits": "Kreditet ditore",
+    "emergencyWindowHours": "Emergency window (orë)",
+    "refillIntervalHours": "Refill interval (orë)",
+    "validationError": "Të gjitha fushat e krediteve duhet të jenë numra të plotë pozitivë.",
+    "save": "Ruaj kreditet e raporteve",
+    "savedMessage": "Konfigurimi i krediteve të raporteve u përditësua.",
+    "invalidValuesMessage": "Fushat e krediteve duhet të jenë numra të plotë pozitivë."
+  },
+  "feedRanking": {
+    "title": "Renditja e feed-it",
+    "defaultVariant": "Varianti i parazgjedhur",
+    "experimentEnabled": "Eksperimenti aktiv",
+    "save": "Ruaj feed ranking",
+    "savedMessage": "Konfigurimi i feed ranking u përditësua.",
+    "defaultVariantRequired": "Varianti i parazgjedhur është i detyrueshëm.",
+    "experimentConfirmTitle": "Aktivizo eksperimentin e feed-it?",
+    "experimentConfirmDescription": "Kjo aktivizon renditjen A/B të feed-it për klientët mobilë. Konfirmoni para aktivizimit.",
+    "experimentConfirmAction": "Aktivizo eksperimentin"
+  },
+  "organizerQuiz": {
+    "title": "Kuizi i organizatorit",
+    "locale": "Lokali",
+    "localeEnglish": "English (en)",
+    "localeMacedonian": "Macedonian (mk)",
+    "jsonAria": "Organizer quiz JSON",
+    "loading": "Duke ngarkuar quiz për {locale}…",
+    "invalidObject": "Quiz JSON duhet të jetë objekt.",
+    "save": "Ruaj organizer quiz",
+    "savedMessage": "Organizer quiz u përditësua.",
+    "loadFailedMessage": "Nuk mund të ngarkohet organizer quiz.",
+    "discardLocaleTitle": "Të hidhen poshtë ndryshimet e quiz-it?",
+    "discardLocaleDescription": "Keni ndryshime të paruajtura në quiz. Të ndryshohet gjuha pa ruajtur?",
+    "discardLocaleConfirm": "Ndrysho gjuhën"
+  },
+  "terms": {
+    "title": "Versioni i kushteve",
+    "version": "Versioni",
+    "save": "Ruaj versionin e kushteve",
+    "savedMessage": "Versioni i kushteve u përditësua.",
+    "validationError": "Përdorni 1-32 karaktere: shkronja, numra, pika, nënvizime ose viza.",
+    "invalidVersionMessage": "Formati i versionit të kushteve është i pavlefshëm."
+  }
+}

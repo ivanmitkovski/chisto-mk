@@ -1,0 +1,9 @@
+{
+  "metrics": {
+    "http_req_duration": { "p95_max": 800 },
+    "http_req_failed": { "p95_max": 0.01 },
+    "feed_list_duration": { "p95_max": 400 },
+    "map_query_duration": { "p95_max": 300 },
+    "report_submit_duration": { "p95_max": 600 }
+  }
+}

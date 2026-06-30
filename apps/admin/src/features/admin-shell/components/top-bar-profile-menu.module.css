@@ -1,0 +1,59 @@
+.dropdownPanel {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  width: 14rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--shell-panel-border);
+  background: var(--shell-panel-bg);
+  box-shadow: var(--shell-panel-shadow), var(--shell-panel-inset-highlight);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  z-index: var(--z-topbar-panel);
+}
+
+.profileActions {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.profileActionButton {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  min-height: 2.2rem;
+  padding: 0 var(--space-3);
+  background: transparent;
+  color: var(--shell-strong-fg);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.profileActionButton:hover {
+  border-color: var(--shell-search-border);
+  background: var(--shell-nav-link-hover-bg);
+}
+
+.profileActionButton:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+@media (max-width: 48rem) {
+  .dropdownPanel {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: none;
+    max-height: 85vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+}

@@ -1,0 +1,259 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ReportSideEffectKind, ReportSideEffectStatus } from '../../prisma-client';
+import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../../audit/services/audit.service';
+import { reportStatusCopy } from '../../notifications/util/notification-templates';
+import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
+import { ReportEventsService } from '../../admin-realtime/services/report-events.service';
+import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
+import { ReportsOwnerEventsService } from '../services/reports-owner-events.service';
+import {
+  DuplicateMergePostTxInput,
+  DuplicateMergeSideEffectsService,
+  DuplicateMergeSiteStatusEvent,
+} from '../duplicates/duplicate-merge-side-effects.service';
+import { ObservabilityStore } from '../../observability/observability.store';
+import { NearbyReportNotificationService } from '../../notifications/services/nearby-report-notification.service';
+import {
+  claimReportSideEffect,
+  reportSideEffectLeaseOwner,
+} from './report-side-effect-claim.util';
+import {
+  parseMergeDuplicateSideEffectPayload,
+  parseModerationStatusSideEffectPayload,
+} from './report-side-effect-payload.schema';
+
+export type {
+  MergeDuplicateSideEffectPayload,
+  ModerationStatusSideEffectPayload,
+} from './report-side-effect-payload.schema';
+
+@Injectable()
+export class ReportSideEffectProcessorService {
+  private readonly logger = new Logger(ReportSideEffectProcessorService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly duplicateMergeSideEffects: DuplicateMergeSideEffectsService,
+    private readonly audit: AuditService,
+    private readonly reportEventsService: ReportEventsService,
+    private readonly siteEventsService: SiteEventsService,
+    private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly nearbyReportNotification: NearbyReportNotificationService,
+  ) {}
+
+  async processMergeDuplicatePost(effectId: string): Promise<number> {
+    const row = await this.prisma.reportSideEffect.findUnique({
+      where: { id: effectId },
+    });
+    if (!row || row.kind !== ReportSideEffectKind.MERGE_DUPLICATE_POST) {
+      this.logger.warn(`processMergeDuplicatePost: skip missing or wrong kind id=${effectId}`);
+      return 0;
+    }
+    if (row.status === ReportSideEffectStatus.COMPLETED) {
+      return 0;
+    }
+
+    const leaseOwner = reportSideEffectLeaseOwner();
+    if (!(await claimReportSideEffect(this.prisma, effectId, leaseOwner))) {
+      this.logger.debug(`processMergeDuplicatePost: could not claim id=${effectId}`);
+      return 0;
+    }
+
+    const raw = parseMergeDuplicateSideEffectPayload(row.payload);
+    try {
+      const siteStatusEvent: DuplicateMergeSiteStatusEvent | null =
+        raw.siteStatusEvent == null
+          ? null
+          : {
+              id: raw.siteStatusEvent.id,
+              status: raw.siteStatusEvent.status,
+              latitude: raw.siteStatusEvent.latitude,
+              longitude: raw.siteStatusEvent.longitude,
+              updatedAt: new Date(raw.siteStatusEvent.updatedAt),
+            };
+
+      const input: DuplicateMergePostTxInput = {
+        moderator: raw.moderator as AuthenticatedUser,
+        primaryReport: {
+          ...raw.primaryReport,
+          createdAt: new Date(raw.primaryReport.createdAt),
+        },
+        selectedChildIds: raw.selectedChildIds,
+        selectedChildren: raw.selectedChildren,
+        plannedNewCoReporterIds: raw.plannedNewCoReporterIds,
+        duplicateMediaUrls: raw.duplicateMediaUrls,
+        siteStatusEvent,
+      };
+
+      const mergedMediaDeletedCount =
+        await this.duplicateMergeSideEffects.runPostMergeEffects(input);
+
+      await this.prisma.reportSideEffect.update({
+        where: { id: effectId },
+        data: {
+          status: ReportSideEffectStatus.COMPLETED,
+          processedAt: new Date(),
+          lastError: null,
+          processingAt: null,
+          leaseOwner: null,
+        },
+      });
+
+      return mergedMediaDeletedCount;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.error(`MERGE_DUPLICATE_POST side effect failed id=${effectId}`, err);
+      await this.prisma.reportSideEffect.update({
+        where: { id: effectId },
+        data: {
+          status: ReportSideEffectStatus.FAILED,
+          lastError: message.slice(0, 4000),
+          processingAt: null,
+          leaseOwner: null,
+        },
+      });
+      ObservabilityStore.recordReportSideEffectFailed();
+      return 0;
+    }
+  }
+
+  async processModerationStatusPost(effectId: string): Promise<void> {
+    const row = await this.prisma.reportSideEffect.findUnique({
+      where: { id: effectId },
+    });
+    if (!row || row.kind !== ReportSideEffectKind.MODERATION_STATUS_POST) {
+      this.logger.warn(`processModerationStatusPost: skip missing or wrong kind id=${effectId}`);
+      return;
+    }
+    if (row.status === ReportSideEffectStatus.COMPLETED) {
+      return;
+    }
+
+    const leaseOwner = reportSideEffectLeaseOwner();
+    if (!(await claimReportSideEffect(this.prisma, effectId, leaseOwner))) {
+      this.logger.debug(`processModerationStatusPost: could not claim id=${effectId}`);
+      return;
+    }
+
+    const raw = parseModerationStatusSideEffectPayload(row.payload);
+    try {
+      if (raw.siteStatusEvent != null) {
+        this.siteEventsService.emitSiteUpdated(raw.siteStatusEvent.id, {
+          kind: 'status_changed',
+          status: raw.siteStatusEvent.status,
+          latitude: raw.siteStatusEvent.latitude,
+          longitude: raw.siteStatusEvent.longitude,
+          updatedAt: new Date(raw.siteStatusEvent.updatedAt),
+        });
+      }
+
+      await this.audit.log({
+        actorId: raw.moderatorUserId,
+        action: 'REPORT_STATUS_UPDATED',
+        resourceType: 'Report',
+        resourceId: raw.reportId,
+        metadata: {
+          from: raw.fromStatus,
+          to: raw.toStatus,
+          ...(raw.reason != null && raw.reason.trim() !== '' ? { reason: raw.reason.trim() } : {}),
+        },
+      });
+
+      this.reportEventsService.emitReportStatusUpdated(raw.reportId);
+      this.reportsOwnerEventsService.emitToReportInterestedParties(
+        raw.reportId,
+        raw.reporterId,
+        raw.coReporterUserIds,
+        'report_updated',
+        { kind: 'status_changed', status: raw.toStatus },
+      );
+
+      const recipientUserIds = [
+        ...(raw.reporterId ? [raw.reporterId] : []),
+        ...raw.coReporterUserIds,
+      ];
+      const uniqueRecipients = [...new Set(recipientUserIds)];
+      if (uniqueRecipients.length > 0) {
+        const reportRow = await this.prisma.report.findUnique({
+          where: { id: raw.reportId },
+          select: { reportNumber: true },
+        });
+        const reportNumberLabel = reportRow?.reportNumber ?? '';
+        const statusLabel = raw.toStatus.toLowerCase().replace(/_/g, ' ');
+        const localeBy = await notificationLocalesByUserId(
+          this.prisma,
+          uniqueRecipients,
+        );
+        for (const recipientId of uniqueRecipients) {
+          const locale = localeBy.get(recipientId)!;
+          const copy = reportStatusCopy(locale, statusLabel);
+          this.eventEmitter.emit('notification.send', {
+            recipientUserIds: [recipientId],
+            title: copy.title,
+            body: copy.body,
+            type: 'REPORT_STATUS',
+            threadKey: `report:${raw.reportId}`,
+            groupKey: `REPORT_STATUS:site:${raw.siteId}`,
+            data: {
+              reportId: raw.reportId,
+              siteId: raw.siteId,
+              status: raw.toStatus,
+              reason: raw.reason ?? undefined,
+              reportNumber: reportNumberLabel,
+            },
+          });
+        }
+      }
+
+      if (raw.toStatus === 'APPROVED') {
+        const siteCoords =
+          raw.siteStatusEvent != null
+            ? {
+                latitude: raw.siteStatusEvent.latitude,
+                longitude: raw.siteStatusEvent.longitude,
+              }
+            : await this.prisma.site.findUnique({
+                where: { id: raw.siteId },
+                select: { latitude: true, longitude: true },
+              });
+        if (siteCoords != null) {
+          this.nearbyReportNotification.emitForApprovedReport({
+            siteId: raw.siteId,
+            latitude: siteCoords.latitude,
+            longitude: siteCoords.longitude,
+            reporterId: raw.reporterId,
+            coReporterUserIds: raw.coReporterUserIds,
+          });
+        }
+      }
+
+      await this.prisma.reportSideEffect.update({
+        where: { id: effectId },
+        data: {
+          status: ReportSideEffectStatus.COMPLETED,
+          processedAt: new Date(),
+          lastError: null,
+          processingAt: null,
+          leaseOwner: null,
+        },
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.error(`MODERATION_STATUS_POST side effect failed id=${effectId}`, err);
+      await this.prisma.reportSideEffect.update({
+        where: { id: effectId },
+        data: {
+          status: ReportSideEffectStatus.FAILED,
+          lastError: message.slice(0, 4000),
+          processingAt: null,
+          leaseOwner: null,
+        },
+      });
+      ObservabilityStore.recordReportSideEffectFailed();
+    }
+  }
+}

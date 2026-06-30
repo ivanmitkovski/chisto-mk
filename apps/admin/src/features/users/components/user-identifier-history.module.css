@@ -1,0 +1,33 @@
+.root {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-default);
+}
+
+.title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.item {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.action {
+  font-weight: var(--font-weight-medium);
+}
+
+.meta {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}

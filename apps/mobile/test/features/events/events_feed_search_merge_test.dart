@@ -1,0 +1,61 @@
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/eco_event_filter.dart';
+import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/presentation/utils/events_feed_search_merge.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('mergedForChip leaves sheet unchanged for all, nearby, myEvents', () {
+    const EcoEventSearchParams sheet = EcoEventSearchParams(
+      categories: <EcoEventCategory>{EcoEventCategory.riverAndLake},
+      statuses: <EcoEventStatus>{EcoEventStatus.inProgress},
+    );
+    expect(
+      EventsFeedSearchMerge.mergedForChip(sheet, EcoEventFilter.all),
+      sheet,
+    );
+    expect(
+      EventsFeedSearchMerge.mergedForChip(sheet, EcoEventFilter.nearby),
+      sheet,
+    );
+    expect(
+      EventsFeedSearchMerge.mergedForChip(sheet, EcoEventFilter.myEvents),
+      sheet,
+    );
+  });
+
+  test('mergedForChip upcoming overrides sheet lifecycle', () {
+    const EcoEventSearchParams sheet = EcoEventSearchParams(
+      statuses: <EcoEventStatus>{EcoEventStatus.completed},
+    );
+    final EcoEventSearchParams merged = EventsFeedSearchMerge.mergedForChip(
+      sheet,
+      EcoEventFilter.upcoming,
+    );
+    expect(merged.statuses, <EcoEventStatus>{EcoEventStatus.upcoming});
+    expect(merged.categories, isEmpty);
+  });
+
+  test('mergedForChip past sets completed and cancelled', () {
+    const EcoEventSearchParams sheet = EcoEventSearchParams();
+    final EcoEventSearchParams merged = EventsFeedSearchMerge.mergedForChip(
+      sheet,
+      EcoEventFilter.past,
+    );
+    expect(merged.statuses, <EcoEventStatus>{
+      EcoEventStatus.completed,
+      EcoEventStatus.cancelled,
+    });
+  });
+
+  test('serverFetchGroup clusters client-only chips', () {
+    expect(
+      EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.all),
+      EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.nearby),
+    );
+    expect(
+      EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.upcoming),
+      isNot(EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.past)),
+    );
+  });
+}

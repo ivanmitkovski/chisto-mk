@@ -1,0 +1,32 @@
+{
+  "groups": {
+    "recent": "Неодамнешни",
+    "navigation": "Навигација",
+    "actions": "Акции",
+    "context": "Оваа страница",
+    "users": "Корисници",
+    "reports": "Пријави",
+    "sites": "Локации",
+    "events": "Настани"
+  },
+  "openNotificationsPanel": "Отвори панел за известувања",
+  "openNotificationsPanelDescription": "Прикажи го паѓачкиот список за известувања во заглавието",
+  "refreshPage": "Освежи страница",
+  "refreshPageDescription": "Повторно вчитај ги податоците на тековната страница",
+  "clearRecents": "Исчисти неодамнешни команди",
+  "clearRecentsDescription": "Отстрани неодамнешно користени команди од списокот",
+  "reportsInReview": "Пријави во преглед",
+  "reportsInReviewDescription": "Отвори ред на пријави филтриран на „во преглед“",
+  "suspendedUsers": "Суспендирани корисници",
+  "suspendedUsersDescription": "Отвори корисници филтрирани на суспендирани сметки",
+  "eventsPendingModeration": "Настани во модерација",
+  "eventsPendingModerationDescription": "Отвори настани за чистење што чекаат модерација",
+  "unreadNotifications": "Непрочитани известувања",
+  "unreadNotificationsDescription": "Филтрирај известувања само на непрочитани",
+  "resultCount": "{count, plural, =0 {Нема резултати} one {# резултат} other {# резултати}}",
+  "entitySearchFailed": "Некои резултати од пребарувањето не можеа да се вчитаат.",
+  "footerNavigateLabel": "Навигација",
+  "footerSelectLabel": "Избери",
+  "footerCloseLabel": "Затвори",
+  "footerToggleLabel": "Префрли"
+}

@@ -1,0 +1,133 @@
+name: Mobile PR checks
+
+on:
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/mobile-pr.yml'
+
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.44.0'
+          cache: true
+      - run: flutter pub get
+      - name: Format
+        run: dart format --set-exit-if-changed lib test tool packages
+      - name: Analyze workspace
+        # Warnings and errors are fatal; info-level lints are not, matching the
+        # required CI gate in ci.yml. Remaining infos are tracked for cleanup.
+        run: |
+          dart analyze packages/chisto_core
+          flutter analyze --no-fatal-infos lib packages/design_system/lib
+          for pkg in packages/*/lib; do
+            if [ -d "$pkg" ] && [ "$pkg" != "packages/design_system/lib" ]; then
+              flutter analyze --no-fatal-infos "$pkg"
+            fi
+          done
+      - name: Package tests
+        run: |
+          flutter test packages/chisto_networking/test/
+          flutter test packages/chisto_localization/test/
+          flutter test packages/design_system/test/
+          flutter test packages/feature_safety/test/
+          flutter test packages/feature_events/test/
+      - name: Architecture guards
+        # Same guard set as the required CI gate (ci.yml Flutter mobile tests).
+        run: |
+          set -euo pipefail
+          dart run tool/check_haptics_usage.dart
+          dart run tool/check_app_bootstrap_reads.dart
+          dart run tool/check_screen_size.dart
+          dart run tool/check_no_service_locator.dart
+          dart run tool/check_no_hex_in_reports.dart
+          dart run tool/check_no_hex_in_features.dart
+          dart run tool/check_no_textstyle_in_features.dart
+          dart run tool/check_no_material_colors_in_features.dart
+          dart run tool/check_shared_widgets_layering.dart
+          dart run tool/check_no_raw_button_in_features.dart
+          dart run tool/check_no_raw_snackbar_in_features.dart
+          dart run tool/check_no_raw_radius_in_features.dart
+          dart run tool/check_no_raw_shadow_in_features.dart
+          dart run tool/check_no_raw_progress_indicator_in_features.dart
+          dart run tool/check_no_raw_textfield_in_features.dart
+          dart run tool/check_no_unowned_firebase_listeners.dart
+          dart run tool/check_no_direct_set_unauthenticated_in_features.dart
+          dart run tool/check_arb_key_parity.dart
+          dart run tool/check_no_em_dash_in_arb.dart
+          dart run tool/check_no_inline_textstyle_overrides.dart
+          dart run tool/check_hardcoded_strings.dart
+          dart run tool/check_release_env.dart
+          dart run tool/check_pii_in_logs.dart
+          dart run tool/check_realtime_client_shape.dart
+          dart run tool/check_no_raw_json_cast.dart
+          dart run tool/check_buildcontext_after_await.dart
+          dart run tool/check_no_flutter_in_chisto_core.dart
+          dart run tool/check_no_flutter_in_domain.dart
+          dart run tool/check_no_api_client_in_presentation.dart
+          dart run tool/check_cross_feature_imports.dart
+          dart run tool/check_no_empty_catch.dart
+          dart run tool/check_no_readasbytes_in_upload_paths.dart
+          dart run tool/check_loading_empty_error_triple.dart
+      - name: Unit tests with coverage
+        run: flutter test --coverage test/
+      - name: Coverage gate
+        run: dart run tool/check_coverage.dart --print-summary
+      - name: Debug APK smoke
+        run: flutter build apk --debug --dart-define=ENV=dev
+
+  mobile-ios-smoke:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.44.0'
+          cache: true
+      - run: flutter pub get
+      - name: Provide placeholder GoogleService-Info.plist (gitignored; real one ships via CI secrets)
+        run: |
+          cat > ios/Runner/GoogleService-Info.plist <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+          	<key>API_KEY</key>
+          	<string>ci-placeholder-api-key</string>
+          	<key>GCM_SENDER_ID</key>
+          	<string>000000000000</string>
+          	<key>PROJECT_ID</key>
+          	<string>chisto-ci</string>
+          	<key>STORAGE_BUCKET</key>
+          	<string>chisto-ci.appspot.com</string>
+          	<key>IS_ADS_ENABLED</key>
+          	<false/>
+          	<key>IS_ANALYTICS_ENABLED</key>
+          	<false/>
+          	<key>IS_APPINVITE_ENABLED</key>
+          	<true/>
+          	<key>IS_GCM_ENABLED</key>
+          	<true/>
+          	<key>IS_SIGNIN_ENABLED</key>
+          	<true/>
+          	<key>GOOGLE_APP_ID</key>
+          	<string>1:000000000000:ios:0000000000000000000000</string>
+          	<key>BUNDLE_ID</key>
+          	<string>mk.chisto.app</string>
+          </dict>
+          </plist>
+          PLIST
+      - name: iOS simulator build smoke
+        run: flutter build ios --simulator --no-codesign --dart-define=ENV=dev

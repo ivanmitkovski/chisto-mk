@@ -1,0 +1,210 @@
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/utils/event_media_path_image_provider.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/detail_section_header.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class AfterPhotosGallery extends StatelessWidget {
+  const AfterPhotosGallery({
+    super.key,
+    required this.event,
+    required this.onImageTap,
+  });
+
+  final EcoEvent event;
+  final ValueChanged<int> onImageTap;
+
+  static const double _thumbSize = 96;
+
+  @override
+  Widget build(BuildContext context) {
+    // No images: nothing to show — EventCompletedDetailCallouts handles the
+    // organizer's "add photos" prompt separately.
+    if (event.afterImagePaths.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        DetailSectionHeader(context.l10n.eventsAfterCleanupTitle),
+        SizedBox(
+          height: _thumbSize,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: event.afterImagePaths.length,
+            separatorBuilder: (BuildContext context, int index) =>
+                const SizedBox(width: AppSpacing.xs),
+            itemBuilder: (BuildContext context, int index) {
+              final String path = event.afterImagePaths[index];
+              final ImageProvider provider = eventMediaPathToImageProvider(
+                path,
+              );
+
+              return Semantics(
+                button: true,
+                label: context.l10n.eventsAfterPhotoSemantic(
+                  index + 1,
+                  event.afterImagePaths.length,
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    onImageTap(index);
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    child: Image(
+                      image: provider,
+                      width: _thumbSize,
+                      height: _thumbSize,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (
+                            BuildContext context,
+                            Object error,
+                            StackTrace? stack,
+                          ) {
+                            return Container(
+                              width: _thumbSize,
+                              height: _thumbSize,
+                              decoration: BoxDecoration(
+                                color: AppColors.inputFill,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMd,
+                                ),
+                              ),
+                              child: const Icon(
+                                CupertinoIcons.photo,
+                                size: 28,
+                                color: AppColors.textMuted,
+                              ),
+                            );
+                          },
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class FullscreenGalleryPage extends StatefulWidget {
+  const FullscreenGalleryPage({
+    super.key,
+    required this.event,
+    required this.initialIndex,
+  });
+
+  final EcoEvent event;
+  final int initialIndex;
+
+  @override
+  State<FullscreenGalleryPage> createState() => _FullscreenGalleryPageState();
+}
+
+class _FullscreenGalleryPageState extends State<FullscreenGalleryPage> {
+  late final PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final int total = widget.event.afterImagePaths.length;
+
+    return Scaffold(
+      backgroundColor: AppColors.black,
+      body: Stack(
+        children: <Widget>[
+          PageView.builder(
+            controller: _pageController,
+            itemCount: total,
+            onPageChanged: (int index) => setState(() => _currentIndex = index),
+            itemBuilder: (BuildContext context, int index) {
+              final String path = widget.event.afterImagePaths[index];
+              final ImageProvider provider = eventMediaPathToImageProvider(
+                path,
+              );
+              return InteractiveViewer(
+                child: Center(
+                  child: Image(
+                    image: provider,
+                    fit: BoxFit.contain,
+                    errorBuilder:
+                        (
+                          BuildContext context,
+                          Object error,
+                          StackTrace? stack,
+                        ) {
+                          return Icon(
+                            CupertinoIcons.photo,
+                            size: 48,
+                            color: AppColors.onMediaMuted,
+                          );
+                        },
+                  ),
+                ),
+              );
+            },
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              child: Row(
+                children: <Widget>[
+                  IconButton(
+                    tooltip: context.l10n.commonClose,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(CupertinoIcons.xmark_circle_fill),
+                    color: AppColors.white,
+                    iconSize: 28,
+                  ),
+                  const Spacer(),
+                  if (total > 1)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.radius10,
+                        vertical: AppSpacing.xxs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.overlayStrong,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
+                      ),
+                      child: Text(
+                        '${_currentIndex + 1} / $total',
+                        style: AppTypography.chipLabel(
+                          textTheme,
+                        ).copyWith(color: AppColors.textOnDark),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

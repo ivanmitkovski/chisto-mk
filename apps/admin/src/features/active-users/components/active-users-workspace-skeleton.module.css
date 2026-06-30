@@ -1,0 +1,132 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.titleBar {
+  height: 2rem;
+  width: 14rem;
+  border-radius: var(--radius-md);
+}
+
+.descBar {
+  height: 1rem;
+  width: 22rem;
+  border-radius: var(--radius-md);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.searchBar {
+  flex: 1 1 14rem;
+  min-width: 12rem;
+  max-width: 28rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+}
+
+.chipBar {
+  height: 1.75rem;
+  width: 3.5rem;
+  border-radius: var(--radius-full);
+}
+
+.selectBar {
+  height: 2.25rem;
+  width: 7rem;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-4);
+}
+
+.main,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--space-3);
+}
+
+.kpiCard {
+  height: 5.5rem;
+  border-radius: var(--radius-lg);
+}
+
+.chartRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.chartCard {
+  height: 12rem;
+  border-radius: var(--radius-lg);
+}
+
+.sectionLabel {
+  height: 1.25rem;
+  width: 8rem;
+  border-radius: var(--radius-md);
+}
+
+.sideCard {
+  height: 14rem;
+  border-radius: var(--radius-lg);
+}
+
+.mapCard {
+  height: 16rem;
+  border-radius: var(--radius-lg);
+}
+
+.shimmer {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    var(--surface-subtle) 0%,
+    color-mix(in srgb, var(--border-default) 40%, transparent) 50%,
+    var(--surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 64rem) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .chartRow {
+    grid-template-columns: 1fr;
+  }
+}

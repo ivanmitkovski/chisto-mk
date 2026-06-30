@@ -1,21 +1,133 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { RedisThrottlerStorage } from './common/throttle/redis-throttler.storage';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ReportsModule } from './reports/reports.module';
+import { ReportsOwnerWsModule } from './reports/owner-events/reports-owner-ws.module';
 import { SitesModule } from './sites/sites.module';
 import { AuthModule } from './auth/auth.module';
+import { AdminRealtimeModule } from './admin-realtime/admin-realtime.module';
+import { AdminModule } from './admin/admin.module';
+import { AdminNotificationsModule } from './admin-notifications/admin-notifications.module';
+import { HealthModule } from './health/health.module';
+import { AuditModule } from './audit/audit.module';
+import { SessionsModule } from './sessions/sessions.module';
+import { AdminUsersModule } from './admin-users/admin-users.module';
+import { AdminInvitesModule } from './admin-invites/admin-invites.module';
+import { AdminModerationEmailModule } from './admin-moderation-email/admin-moderation-email.module';
+import { SystemConfigModule } from './system-config/system-config.module';
+import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
+import { PublicConfigModule } from './public-config/public-config.module';
+import { CleanupEventsModule } from './cleanup-events/cleanup-events.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ObservabilityModule } from './observability/observability.module';
+import { GamificationModule } from './gamification/gamification.module';
+import { EventsModule } from './events/events.module';
+import { EventChatModule } from './event-chat/event-chat.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
+import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
+import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analytics.module';
+import { ModerationModule } from './moderation/moderation.module';
+import { AdminControlModule } from './admin-control/admin-control.module';
+import { ActiveUsersModule } from './active-users/active-users.module';
+import { NewsModule } from './news/news.module';
+import { LoggerModule } from 'nestjs-pino';
+import { safePinoReqSerializer } from './common/logging/safe-pino-req.serializer';
+import { pinoLogMixin, resolveLogLevel } from './common/logging/pino-log-context';
+import { StorageModule } from './storage/storage.module';
+import { IdempotencyInterceptor } from './common/idempotency/idempotency.interceptor';
+import { IdempotencyResponseStore } from './common/idempotency/idempotency-response.store';
+import { RequestMetricsInterceptor } from './observability/util/request-metrics.interceptor';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: resolveLogLevel(),
+        autoLogging: false,
+        mixin: pinoLogMixin,
+        serializers: {
+          req: safePinoReqSerializer,
+        },
+        redact: {
+          paths: [
+            'req.headers.authorization',
+            'req.headers.Authorization',
+            'req.headers.cookie',
+            'req.headers.Cookie',
+            'req.body.refreshToken',
+            'req.body.deviceToken',
+            'req.body.token',
+            'req.body.otp',
+            'req.body.code',
+            'req.body.password',
+            'req.body.newPassword',
+            'req.body.currentPassword',
+            'req.body.mfaSecret',
+            'req.body.privateKey',
+            'req.body.To',
+            'req.body.From',
+            'req.body.email',
+            'req.body.phoneNumber',
+            '*.email',
+            '*.phoneNumber',
+          ],
+          remove: true,
+        },
+      },
+    }),
+    EventEmitterModule.forRoot(),
+    StorageModule,
+    HealthModule,
+    ThrottlerModule.forRootAsync({
+      useFactory: () => ({
+        throttlers: [{ ttl: 60_000, limit: 60 }],
+        storage: new RedisThrottlerStorage(),
+      }),
+    }),
     PrismaModule,
+    AuditModule,
     AuthModule,
+    SessionsModule,
     SitesModule,
     ReportsModule,
+    ReportsOwnerWsModule,
+    AdminRealtimeModule,
+    AdminModule,
+    AdminNotificationsModule,
+    AdminUsersModule,
+    AdminInvitesModule,
+    AdminModerationEmailModule,
+    SystemConfigModule,
+    FeatureFlagsModule,
+    PublicConfigModule,
+    CleanupEventsModule,
+    NotificationsModule,
+    ObservabilityModule.register(),
+    GamificationModule,
+    EventsModule,
+    EventChatModule,
+    WebhooksModule,
+    DiscoveryAnalyticsModule.register(),
+    ModerationModule,
+    AdminControlModule,
+    ActiveUsersModule,
+    NewsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    RedisIoAdapterLifecycle,
+    IdempotencyResponseStore,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_INTERCEPTOR, useClass: RequestMetricsInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
+  ],
 })
 export class AppModule {}

@@ -1,0 +1,73 @@
+import type { IconName } from '@/components/ui';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
+import type { AdminNotification, NotificationTone } from '../types';
+
+type AdminNotificationApiItem = {
+  id: string;
+  title: string;
+  message: string;
+  timeLabel: string;
+  createdAt?: string;
+  tone: string;
+  category: string;
+  isUnread: boolean;
+  href: string | null;
+  messageTemplateKey?: string | null;
+  messageTemplateParams?: Record<string, unknown> | null;
+};
+
+type AdminNotificationsListResponse = {
+  data: AdminNotificationApiItem[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    unreadCount: number;
+  };
+};
+
+function toneCategoryToIcon(tone: string, category: string): IconName {
+  if (category === 'reports') return 'document-text';
+  if (category === 'system') return 'shield';
+  if (category === 'analytics') return 'document-duplicate';
+  if (tone === 'warning') return 'alert-triangle';
+  if (tone === 'success') return 'check';
+  return 'info';
+}
+
+function mapApiItemToAdminNotification(item: AdminNotificationApiItem): AdminNotification {
+  return {
+    id: item.id,
+    title: item.title,
+    message: item.message,
+    timeLabel: item.timeLabel,
+    ...(item.createdAt && { createdAt: item.createdAt }),
+    tone: item.tone as NotificationTone,
+    isUnread: item.isUnread,
+    category: item.category as AdminNotification['category'],
+    icon: toneCategoryToIcon(item.tone, item.category),
+    ...(item.href && { href: item.href }),
+    ...(item.messageTemplateKey != null && item.messageTemplateKey !== ''
+      ? { messageTemplateKey: item.messageTemplateKey }
+      : {}),
+    ...(item.messageTemplateParams != null
+      ? { messageTemplateParams: item.messageTemplateParams }
+      : {}),
+  };
+}
+
+export async function getAdminNotifications(): Promise<{
+  items: AdminNotification[];
+  unreadCount: number;
+}> {
+
+  const response = await serverAuthenticatedFetch<AdminNotificationsListResponse>('/admin/notifications', {
+    method: 'GET',
+  });
+
+  return {
+    items: response.data.map(mapApiItemToAdminNotification),
+    unreadCount: response.meta.unreadCount,
+  };
+}
+

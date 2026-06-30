@@ -1,0 +1,2 @@
+# Typography guard allowlist — ratchet to zero.
+# Format: path:line or path prefix (e.g. packages/foo/lib/bar.dart:42)

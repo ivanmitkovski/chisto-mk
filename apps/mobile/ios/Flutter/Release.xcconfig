@@ -1,1 +1,7 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"
+EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
+
+// Required by lib/main.dart (kReleaseMode). Without ENV=prod, release builds show a white screen.
+// Base64 of "ENV=prod". Prefer `flutter build ipa` / scripts/build-prod.sh for full define sets.
+DART_DEFINES=$(DART_DEFINES)$(inherited),RU5WPXByb2Q=

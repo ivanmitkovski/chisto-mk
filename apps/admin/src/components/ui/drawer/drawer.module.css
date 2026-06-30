@@ -1,0 +1,151 @@
+@keyframes drawerScrimIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawerScrimOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes drawerPanelInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawerPanelOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes drawerPanelInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawerPanelOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(5, 20, 14, 0.42);
+  cursor: pointer;
+}
+
+.root[data-state='enter'] .scrim,
+.root[data-state='open'] .scrim {
+  animation: drawerScrimIn var(--motion-duration-medium) var(--motion-ease-out) forwards;
+}
+
+.root[data-state='exit'] .scrim {
+  animation: drawerScrimOut var(--motion-duration-fast) var(--motion-ease-out) forwards;
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(28rem, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-xl);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.root[data-state='enter'] .drawer[data-side='right'],
+.root[data-state='open'] .drawer[data-side='right'] {
+  animation: drawerPanelInRight var(--motion-duration-medium) var(--motion-ease-emphasized) forwards;
+}
+
+.root[data-state='exit'] .drawer[data-side='right'] {
+  animation: drawerPanelOutRight var(--motion-duration-fast) var(--motion-ease-out) forwards;
+}
+
+.root[data-state='enter'] .drawer[data-side='left'],
+.root[data-state='open'] .drawer[data-side='left'] {
+  animation: drawerPanelInLeft var(--motion-duration-medium) var(--motion-ease-emphasized) forwards;
+}
+
+.root[data-state='exit'] .drawer[data-side='left'] {
+  animation: drawerPanelOutLeft var(--motion-duration-fast) var(--motion-ease-out) forwards;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-green-010);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.body {
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-5);
+}
+
+.close {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

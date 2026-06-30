@@ -1,0 +1,17 @@
+{
+  "name": "Chisto.mk",
+  "short_name": "Chisto.mk",
+  "description": "Civic environmental platform for reporting pollution and joining cleanups in Macedonia.",
+  "start_url": "/mk",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2FD788",
+  "icons": [
+    {
+      "src": "/brand/chisto-mark-green.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

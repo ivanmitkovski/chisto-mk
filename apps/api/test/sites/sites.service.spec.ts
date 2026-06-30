@@ -1,0 +1,677 @@
+import { SiteCommentsCountService } from '../../src/sites/services/site-comments-count.service';
+import { SiteCommentsListService } from '../../src/sites/services/site-comments-list.service';
+import { SiteCommentsMutationsService } from '../../src/sites/services/site-comments-mutations.service';
+import { SiteCommentsService } from '../../src/sites/services/site-comments.service';
+import { SitesDetailService } from '../../src/sites/services/sites-detail.service';
+import { SitesFeedCandidatesService } from '../../src/sites/services/sites-feed-candidates.service';
+import { SitesFeedEnrichmentService } from '../../src/sites/services/sites-feed-enrichment.service';
+import { SitesFeedQueryService } from '../../src/sites/services/sites-feed-query.service';
+import { SitesFeedService } from '../../src/sites/services/sites-feed.service';
+import { SitesReporterNotificationService } from '../../src/sites/services/sites-reporter-notification.service';
+
+function withVelocityPrisma(base: Record<string, unknown>) {
+  const emptyGroupBy = jest.fn().mockResolvedValue([]);
+  return {
+    ...base,
+    siteVote: { groupBy: emptyGroupBy },
+    siteSave: { groupBy: emptyGroupBy },
+    siteShareEvent: { groupBy: emptyGroupBy },
+  };
+}
+
+function makeSitesService(
+  prisma: any,
+  options?: {
+    feedRanking?: any;
+    reportsUpload?: any;
+    siteEngagement?: any;
+  },
+) {
+  const siteEngagement =
+    options?.siteEngagement ?? ({ ensureSiteExists: jest.fn(async () => undefined) } as any);
+  const feedRanking =
+    options?.feedRanking ??
+    ({
+      score: jest.fn(() => 0),
+      scoreDetailed: jest.fn(() => ({ score: 0, reasonCodes: ['test'], components: {} })),
+    } as any);
+  const reportsUpload =
+    options?.reportsUpload ?? ({ signUrls: jest.fn(async (v: string[]) => v) } as any);
+  const feedV2 = {
+    resolveVariant: jest.fn(async () => 'v1' as const),
+    rerankRows: jest.fn(async (rows: unknown[]) => rows),
+  } as any;
+  const feedCache = {
+    buildFeedCacheKey: jest.fn(() => 'feed-cache-key'),
+    get: jest.fn(() => undefined),
+    set: jest.fn(),
+    invalidate: jest.fn(),
+  } as any;
+  const feedPreferences = {
+    applyUserPreferences: jest.fn((rows: unknown[]) => rows),
+    setVariantMemo: jest.fn(),
+    getFeedVariantForUser: jest.fn(() => 'v1'),
+  } as any;
+  const feedTracking = {
+    trackFeedEvent: jest.fn(),
+    submitFeedFeedback: jest.fn(),
+  } as any;
+  const moderation = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) } as any;
+  const feedCandidates = new SitesFeedCandidatesService(prisma);
+  const siteCommentsCount = new SiteCommentsCountService(
+    prisma,
+    moderation as never,
+  );
+  const siteResolutionQuery = {
+    getViewerStatusBySiteIds: jest.fn(async () => new Map()),
+  } as any;
+  const feedEnrichment = new SitesFeedEnrichmentService(
+    prisma,
+    reportsUpload,
+    feedRanking,
+    feedV2,
+    feedCache,
+    feedPreferences,
+    siteCommentsCount,
+    siteResolutionQuery,
+  );
+  const feedQuery = new SitesFeedQueryService(feedCandidates, feedEnrichment);
+  const sitesFeed = new SitesFeedService(feedQuery, feedCache, feedPreferences, feedTracking);
+  const siteDetailRepository = {
+    findByIdWithRelations: jest.fn(async (siteId: string, _reportsTake: number, _eventsTake: number) => {
+      if (prisma.site?.findUnique) {
+        return prisma.site.findUnique({ where: { id: siteId } });
+      }
+      return null;
+    }),
+    countReports: jest.fn(async () => 0),
+    countEvents: jest.fn(async () => 0),
+    findVoteBySiteAndUser: jest.fn(async () => null),
+    findSaveBySiteAndUser: jest.fn(async () => null),
+    viewerCanAccessReportedSite: jest.fn(async () => true),
+  } as any;
+  const sitesDetail = new SitesDetailService(
+    siteDetailRepository,
+    reportsUpload,
+    siteResolutionQuery,
+  );
+  const eventEmitter = { emit: jest.fn() } as any;
+  const reporterNotifications = new SitesReporterNotificationService(prisma, eventEmitter);
+  const siteComments = new SiteCommentsService(
+    new SiteCommentsListService(
+      prisma,
+      siteEngagement,
+      reportsUpload,
+      moderation,
+      siteCommentsCount,
+    ),
+    new SiteCommentsMutationsService(
+      prisma,
+      siteEngagement,
+      siteCommentsCount,
+      reportsUpload,
+    ),
+    sitesFeed,
+    reporterNotifications,
+  );
+  return {
+    findAll: (query: any, user?: any) => sitesFeed.findAll(query, user),
+    likeSiteComment: (siteId: string, commentId: string, user: any) =>
+      siteComments.likeSiteComment(siteId, commentId, user),
+    unlikeSiteComment: (siteId: string, commentId: string, user: any) =>
+      siteComments.unlikeSiteComment(siteId, commentId, user),
+    findOne: (siteId: string, user?: any) => sitesDetail.findOne(siteId, user),
+    siteResolutionQuery,
+  };
+}
+
+describe('Sites public feed and comment engagement', () => {
+  const baseUser = { userId: 'user_1' } as any;
+
+  const buildService = (prismaMock: any, ensureSiteExists?: jest.Mock) =>
+    makeSitesService(prismaMock, {
+      siteEngagement: {
+        ensureSiteExists: ensureSiteExists ?? jest.fn(async () => undefined),
+      } as any,
+    });
+
+  it('rejects partial geo query (lat without lng)', async () => {
+    const service = buildService({} as any);
+    await expect(
+      service.findAll({ lat: 41.6, page: 1, limit: 20, radiusKm: 10, sort: 'hybrid' } as any),
+    ).rejects.toMatchObject({
+      response: { code: 'INVALID_GEO_QUERY' },
+    });
+  });
+
+  it('keeps like idempotent when already liked', async () => {
+    const prismaMock = {
+      siteComment: {
+        findUnique: jest.fn(async () => ({
+          id: 'comment_1',
+          siteId: 'site_1',
+          isDeleted: false,
+          likesCount: 7,
+        })),
+      },
+      $transaction: jest.fn(async (cb: any) =>
+        cb({
+          siteCommentLike: {
+            findUnique: jest.fn(async () => ({ id: 'like_1' })),
+            create: jest.fn(async () => undefined),
+          },
+          siteComment: {
+            update: jest.fn(async () => ({ id: 'comment_1', likesCount: 8 })),
+            findUniqueOrThrow: jest.fn(async () => ({ id: 'comment_1', likesCount: 7 })),
+          },
+        }),
+      ),
+    } as any;
+    const service = buildService(prismaMock);
+
+    const snapshot = await service.likeSiteComment('site_1', 'comment_1', baseUser);
+    expect(snapshot).toEqual({ commentId: 'comment_1', likesCount: 7, isLikedByMe: true });
+  });
+
+  it('keeps unlike idempotent when not liked', async () => {
+    const prismaMock = {
+      siteComment: {
+        findUnique: jest.fn(async () => ({
+          id: 'comment_1',
+          siteId: 'site_1',
+          isDeleted: false,
+          likesCount: 4,
+        })),
+      },
+      $transaction: jest.fn(async (cb: any) =>
+        cb({
+          siteCommentLike: {
+            deleteMany: jest.fn(async () => ({ count: 0 })),
+          },
+          siteComment: {
+            update: jest.fn(async () => ({ id: 'comment_1', likesCount: 3 })),
+            findUniqueOrThrow: jest.fn(async () => ({ id: 'comment_1', likesCount: 4 })),
+          },
+        }),
+      ),
+    } as any;
+    const service = buildService(prismaMock);
+
+    const snapshot = await service.unlikeSiteComment('site_1', 'comment_1', baseUser);
+    expect(snapshot).toEqual({ commentId: 'comment_1', likesCount: 4, isLikedByMe: false });
+  });
+
+  it('uses hybrid ranking even when geo context is present', async () => {
+    const siteNear = {
+      id: 'site_near',
+      createdAt: new Date('2026-03-27T08:00:00.000Z'),
+      latitude: 41.61,
+      longitude: 21.75,
+      status: 'REPORTED',
+      upvotesCount: 2,
+      commentsCount: 0,
+      savesCount: 0,
+      sharesCount: 0,
+      reports: [
+        {
+          title: 'Near',
+          description: 'Near',
+          mediaUrls: [] as string[],
+          category: 'illegal',
+          createdAt: new Date('2026-03-27T08:00:00.000Z'),
+          reportNumber: 'R-1',
+        },
+      ],
+      votes: [],
+      saves: [],
+      _count: { reports: 1 },
+    };
+    const siteFarHighQuality = {
+      id: 'site_far_high',
+      createdAt: new Date('2026-03-27T08:00:00.000Z'),
+      latitude: 41.79,
+      longitude: 21.95,
+      status: 'VERIFIED',
+      upvotesCount: 30,
+      commentsCount: 9,
+      savesCount: 4,
+      sharesCount: 2,
+      reports: [
+        {
+          title: 'Far High',
+          description: 'Far High',
+          mediaUrls: [] as string[],
+          category: 'illegal',
+          createdAt: new Date('2026-03-27T08:00:00.000Z'),
+          reportNumber: 'R-2',
+        },
+      ],
+      votes: [],
+      saves: [],
+      _count: { reports: 1 },
+    };
+    const feedScore = jest.fn((input: any) => input.upvotesCount + input.commentsCount * 2);
+    const prismaMock = withVelocityPrisma({
+      site: {
+        findMany: jest.fn(async () => [siteNear, siteFarHighQuality]),
+        count: jest.fn(async () => 2),
+      },
+    }) as any;
+    const service = makeSitesService(prismaMock, {
+      feedRanking: {
+        score: feedScore,
+        scoreDetailed: jest.fn((input: any) => ({
+          score: feedScore(input),
+          reasonCodes: ['test'],
+          components: {},
+        })),
+      } as any,
+    });
+
+    const result = await service.findAll({
+      lat: 41.6086,
+      lng: 21.7453,
+      radiusKm: 50,
+      page: 1,
+      limit: 20,
+      sort: 'hybrid',
+    } as any);
+
+    expect(result.data[0].id).toBe('site_far_high');
+    expect(feedScore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        distanceKm: expect.any(Number),
+        radiusKm: 50,
+        reportCount: 1,
+      }),
+    );
+  });
+
+  it('keeps hybrid ordering deterministic when ranking ties', async () => {
+    const baseCreatedAt = new Date('2026-03-27T08:00:00.000Z');
+    const s1 = {
+      id: 'site_a',
+      createdAt: baseCreatedAt,
+      latitude: 41.61,
+      longitude: 21.75,
+      status: 'REPORTED',
+      upvotesCount: 0,
+      commentsCount: 0,
+      savesCount: 0,
+      sharesCount: 0,
+      reports: [
+        {
+          title: 'A',
+          description: 'A',
+          mediaUrls: [] as string[],
+          category: 'illegal',
+          createdAt: baseCreatedAt,
+          reportNumber: 'R-3',
+        },
+      ],
+      votes: [],
+      saves: [],
+      _count: { reports: 1 },
+    };
+    const s2 = {
+      ...s1,
+      id: 'site_b',
+      reports: [{ ...s1.reports[0], title: 'B' }],
+    };
+    const prismaMock = withVelocityPrisma({
+      site: {
+        findMany: jest.fn(async () => [s1, s2]),
+        count: jest.fn(async () => 2),
+      },
+    }) as any;
+    const service = makeSitesService(prismaMock, {
+      feedRanking: {
+        score: jest.fn(() => 1),
+        scoreDetailed: jest.fn(() => ({ score: 1, reasonCodes: ['test'], components: {} })),
+      } as any,
+    });
+
+    const first = await service.findAll({ page: 1, limit: 20, sort: 'hybrid' } as any);
+    const second = await service.findAll({ page: 1, limit: 20, sort: 'hybrid' } as any);
+
+    expect(first.data.map((s: any) => s.id)).toEqual(['site_b', 'site_a']);
+    expect(second.data.map((s: any) => s.id)).toEqual(['site_b', 'site_a']);
+  });
+
+  it('returns recent-first order when mode is latest', async () => {
+    const older = {
+      id: 'site_old',
+      createdAt: new Date('2026-03-25T08:00:00.000Z'),
+      latitude: 41.61,
+      longitude: 21.75,
+      status: 'REPORTED',
+      upvotesCount: 100,
+      commentsCount: 40,
+      savesCount: 10,
+      sharesCount: 8,
+      reports: [
+        {
+          title: 'Old',
+          description: 'Old',
+          mediaUrls: [] as string[],
+          category: 'illegal_waste',
+          createdAt: new Date('2026-03-25T08:00:00.000Z'),
+          reportNumber: 'R-11',
+        },
+      ],
+      votes: [],
+      saves: [],
+      _count: { reports: 1 },
+    };
+    const newer = {
+      ...older,
+      id: 'site_new',
+      createdAt: new Date('2026-03-27T08:00:00.000Z'),
+      reports: [{ ...older.reports[0], title: 'New', createdAt: new Date('2026-03-27T08:00:00.000Z') }],
+    };
+    const prismaMock = withVelocityPrisma({
+      site: {
+        findMany: jest.fn(async () => [older, newer]),
+        count: jest.fn(async () => 2),
+      },
+    }) as any;
+    const service = buildService(prismaMock);
+    const result = await service.findAll({
+      page: 1,
+      limit: 20,
+      sort: 'hybrid',
+      mode: 'latest',
+      explain: true,
+    } as any);
+    expect(result.data[0].id).toBe('site_new');
+    expect(result.data[0].rankingReasons).toContain('latest_mode');
+  });
+
+  it('findOne includes coReporterNames aggregated from report co-reporter rows', async () => {
+    const reportedAtEarly = new Date('2026-04-01T10:00:00.000Z');
+    const reportedAtLate = new Date('2026-04-03T10:00:00.000Z');
+    const prismaMock = {
+      site: {
+        findUnique: jest.fn(async () => ({
+          id: 'site_corep',
+          latitude: 41.6,
+          longitude: 21.7,
+          address: null,
+          description: 'Site',
+          status: 'REPORTED',
+          createdAt: new Date('2026-03-01'),
+          updatedAt: new Date('2026-03-01'),
+          upvotesCount: 0,
+          commentsCount: 0,
+          savesCount: 0,
+          sharesCount: 0,
+          reports: [
+            {
+              id: 'rep_primary',
+              createdAt: new Date('2026-04-01'),
+              reportNumber: 'R-100',
+              siteId: 'site_corep',
+              reporterId: 'user_primary',
+              title: 'Primary',
+              description: null,
+              mediaUrls: [] as string[],
+              category: 'illegal',
+              severity: null,
+              cleanupEffort: null,
+              status: 'APPROVED',
+              moderatedAt: null,
+              moderationReason: null,
+              moderatedById: null,
+              potentialDuplicateOfId: null,
+              mergedDuplicateChildCount: 0,
+              reporter: {
+                firstName: 'Pri',
+                lastName: 'Mary',
+                avatarObjectKey: null,
+              },
+              coReporters: [
+                {
+                  id: 'cr1',
+                  createdAt: reportedAtEarly,
+                  reportedAt: reportedAtLate,
+                  reportId: 'rep_primary',
+                  userId: 'user_ben',
+                  user: { firstName: 'Ben', lastName: 'Co', avatarObjectKey: null },
+                },
+                {
+                  id: 'cr2',
+                  createdAt: reportedAtEarly,
+                  reportedAt: reportedAtEarly,
+                  reportId: 'rep_primary',
+                  userId: 'user_ann',
+                  user: { firstName: '', lastName: '', avatarObjectKey: null },
+                },
+              ],
+            },
+          ],
+          events: [] as unknown[],
+        })),
+      },
+      siteVote: { findUnique: jest.fn(async () => null) },
+      siteSave: { findUnique: jest.fn(async () => null) },
+    } as any;
+
+    const service = makeSitesService(prismaMock, {
+      reportsUpload: {
+        signUrls: jest.fn(async (urls: string[]) => urls),
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+    });
+
+    const out = await service.findOne('site_corep', {
+      userId: 'mod-1',
+      email: 'mod@chisto.mk',
+      phoneNumber: '+38970000099',
+      role: 'ADMIN' as never,
+    });
+    expect(out.coReporterNames).toEqual(['Anonymous', 'Ben Co']);
+    expect(out.coReporterSummaries).toHaveLength(2);
+    expect(out.coReporterSummaries.map((s) => s.name)).toEqual(['Anonymous', 'Ben Co']);
+    expect(out.coReporterSummaries.map((s) => s.userId).sort()).toEqual(['user_ann', 'user_ben'].sort());
+    expect(out.mergedDuplicateChildCountTotal).toBe(0);
+  });
+
+  it('findOne exposes canonical hero fields from heroReport pointer', async () => {
+    const prismaMock = {
+      site: {
+        findUnique: jest.fn(async () => ({
+          id: 'site_canonical',
+          latitude: 41.6,
+          longitude: 21.7,
+          address: null,
+          description: null,
+          status: 'VERIFIED',
+          heroReportId: 'rep_old',
+          heroReport: {
+            id: 'rep_old',
+            reporterId: 'user_old',
+            mediaUrls: ['https://bucket.example/old.jpg'],
+            reporter: {
+              firstName: 'Alice',
+              lastName: 'Old',
+              avatarObjectKey: null,
+            },
+          },
+          createdAt: new Date('2026-03-01'),
+          updatedAt: new Date('2026-03-01'),
+          upvotesCount: 0,
+          commentsCount: 0,
+          savesCount: 0,
+          sharesCount: 0,
+          reports: [
+            {
+              id: 'rep_new',
+              createdAt: new Date('2026-05-20T12:00:00.000Z'),
+              reportNumber: 'R-2',
+              siteId: 'site_canonical',
+              reporterId: 'user_new',
+              title: 'Newest',
+              description: null,
+              mediaUrls: ['https://bucket.example/new.jpg'],
+              category: 'illegal',
+              severity: null,
+              cleanupEffort: null,
+              status: 'APPROVED',
+              moderatedAt: null,
+              moderationReason: null,
+              moderatedById: null,
+              potentialDuplicateOfId: null,
+              mergedDuplicateChildCount: 0,
+              reporter: {
+                firstName: 'New',
+                lastName: 'User',
+                avatarObjectKey: null,
+              },
+              coReporters: [],
+            },
+            {
+              id: 'rep_old',
+              createdAt: new Date('2026-01-10T08:00:00.000Z'),
+              reportNumber: 'R-1',
+              siteId: 'site_canonical',
+              reporterId: 'user_old',
+              title: 'Earliest',
+              description: null,
+              mediaUrls: ['https://bucket.example/old.jpg'],
+              category: 'illegal',
+              severity: null,
+              cleanupEffort: null,
+              status: 'APPROVED',
+              moderatedAt: null,
+              moderationReason: null,
+              moderatedById: null,
+              potentialDuplicateOfId: null,
+              mergedDuplicateChildCount: 0,
+              reporter: {
+                firstName: 'Alice',
+                lastName: 'Old',
+                avatarObjectKey: null,
+              },
+              coReporters: [],
+            },
+          ],
+          events: [] as unknown[],
+        })),
+      },
+      siteVote: { findUnique: jest.fn(async () => null) },
+      siteSave: { findUnique: jest.fn(async () => null) },
+    } as any;
+
+    const signUrls = jest.fn(async (urls: string[]) =>
+      urls.map((u) => `https://signed.example/${u.split('/').pop()}`),
+    );
+    const service = makeSitesService(prismaMock, {
+      reportsUpload: {
+        signUrls,
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+    });
+
+    const out = await service.findOne('site_canonical', {
+      userId: 'viewer-1',
+      email: 'v@x.com',
+      phoneNumber: '+38970123456',
+      role: 'USER' as never,
+    });
+
+    expect(out.canonicalReportId).toBe('rep_old');
+    expect(out.heroMediaUrls).toEqual(['https://signed.example/old.jpg']);
+    expect(out.heroReporter).toMatchObject({
+      displayLabel: 'Alice Old',
+      isSelf: false,
+      firstName: 'Alice',
+      lastName: 'Old',
+    });
+
+    const earliest = out.reports.find((r: { id: string }) => r.id === 'rep_old');
+    expect(earliest?.reporter).toMatchObject({
+      displayLabel: 'Alice Old',
+      isSelf: false,
+      firstName: 'Alice',
+      lastName: 'Old',
+    });
+  });
+
+  it('findOne returns 404 for REPORTED sites when viewer is not reporter or co-reporter', async () => {
+    const detailService = new SitesDetailService(
+      {
+        findByIdWithRelations: jest.fn(async () => ({
+          id: 'site_hidden',
+          status: 'REPORTED',
+          reports: [],
+          events: [],
+        })),
+        countReports: jest.fn(async () => 0),
+        countEvents: jest.fn(async () => 0),
+        findVoteBySiteAndUser: jest.fn(async () => null),
+        findSaveBySiteAndUser: jest.fn(async () => null),
+        viewerCanAccessReportedSite: jest.fn(async () => false),
+      } as any,
+      {
+        signUrls: jest.fn(async (v: string[]) => v),
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+      {
+        getViewerStatusBySiteIds: jest.fn(async () => new Map()),
+      } as any,
+    );
+
+    await expect(
+      detailService.findOne('site_hidden', {
+        userId: 'stranger',
+        email: 's@x.com',
+        phoneNumber: '+38970111111',
+        role: 'USER' as never,
+      }),
+    ).rejects.toMatchObject({
+      response: { code: 'SITE_NOT_FOUND' },
+    });
+  });
+
+  it('findOne exposes viewerResolutionStatus for authenticated viewer', async () => {
+    const prismaMock = {
+      site: {
+        findUnique: jest.fn(async () => ({
+          id: 'site_res',
+          latitude: 41.6,
+          longitude: 21.7,
+          address: null,
+          description: 'Site',
+          status: 'VERIFIED',
+          createdAt: new Date('2026-03-01'),
+          updatedAt: new Date('2026-03-01'),
+          upvotesCount: 0,
+          commentsCount: 0,
+          savesCount: 0,
+          sharesCount: 0,
+          reports: [],
+          events: [],
+        })),
+      },
+      siteVote: { findUnique: jest.fn(async () => null) },
+      siteSave: { findUnique: jest.fn(async () => null) },
+    } as any;
+
+    const { findOne, siteResolutionQuery } = makeSitesService(prismaMock, {
+      reportsUpload: {
+        signUrls: jest.fn(async (urls: string[]) => urls),
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+    });
+    (siteResolutionQuery.getViewerStatusBySiteIds as jest.Mock).mockResolvedValueOnce(
+      new Map([['site_res', 'pending']]),
+    );
+
+    const out = await findOne('site_res', { userId: 'user_1' });
+    expect(out.viewerResolutionStatus).toBe('pending');
+    expect(siteResolutionQuery.getViewerStatusBySiteIds).toHaveBeenCalledWith(
+      'user_1',
+      ['site_res'],
+    );
+  });
+});
