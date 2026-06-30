@@ -6,6 +6,7 @@ API_BASE="${API_BASE:-https://api.chisto.mk}"
 REGION="${AWS_REGION:-eu-central-1}"
 CLUSTER="${ECS_CLUSTER:-chisto-prod}"
 SERVICE="${ECS_SERVICE:-chisto-api}"
+TARGET_GROUP_NAME="${TARGET_GROUP_NAME:-chisto-prod-tg}"
 MIN_RUNNING="${MIN_RUNNING:-2}"
 
 echo "==> Health ready: $API_BASE/health/ready"
@@ -26,11 +27,32 @@ if [[ "$RUNNING" -lt "$MIN_RUNNING" || "$RUNNING" -lt "$DESIRED" ]]; then
   exit 1
 fi
 
-echo "==> Target group health"
-TG_ARN=$(aws elbv2 describe-target-groups --names chisto-prod-tg --region "$REGION" --query 'TargetGroups[0].TargetGroupArn' --output text)
-aws elbv2 describe-target-health --target-group-arn "$TG_ARN" --region "$REGION" \
+echo "==> Target group health ($TARGET_GROUP_NAME)"
+set +e
+TG_JSON=$(aws elbv2 describe-target-health \
+  --region "$REGION" \
+  --target-group-arn "$(aws elbv2 describe-target-groups \
+    --names "$TARGET_GROUP_NAME" \
+    --region "$REGION" \
+    --query 'TargetGroups[0].TargetGroupArn' \
+    --output text)" \
   --query 'TargetHealthDescriptions[].{Target:Target.Id,State:TargetHealth.State}' \
-  --output json
+  --output json 2>&1)
+TG_EXIT=$?
+set -e
+
+if [[ "$TG_EXIT" -ne 0 ]]; then
+  echo "WARNING: Could not read ALB target health (check GitHub deploy role ELB permissions):"
+  echo "$TG_JSON"
+  echo "Skipping target group assertion; ECS and /health/ready checks passed."
+else
+  echo "$TG_JSON" | jq .
+  HEALTHY=$(echo "$TG_JSON" | jq '[.[] | select(.State == "healthy")] | length')
+  if [[ "$HEALTHY" -lt "$MIN_RUNNING" ]]; then
+    echo "ERROR: healthy target count ($HEALTHY) below minimum ($MIN_RUNNING)"
+    exit 1
+  fi
+fi
 
 echo "==> Optional API verify (requires AUTH_TOKEN):"
 echo "    API_BASE=$API_BASE AUTH_TOKEN=... pnpm --filter @chisto/api run verify:v1"

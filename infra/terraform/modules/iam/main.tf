@@ -243,6 +243,16 @@ resource "aws_iam_role_policy" "github_deploy" {
           aws_iam_role.ecs_execution.arn,
           aws_iam_role.ecs_task.arn
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "elasticloadbalancing:DescribeTargetGroups",
+          "elasticloadbalancing:DescribeTargetHealth",
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:DescribeListeners"
+        ]
+        Resource = "*"
       }
     ]
   })
