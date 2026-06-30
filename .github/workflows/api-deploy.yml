@@ -285,6 +285,7 @@ jobs:
           API_BASE: ${{ secrets.PRODUCTION_API_BASE || 'https://api.chisto.mk' }}
           ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
           ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+          TARGET_GROUP_NAME: ${{ vars.PRODUCTION_TARGET_GROUP_NAME || 'chisto-prod-tg' }}
           AWS_REGION: ${{ env.AWS_REGION }}
         run: bash infra/terraform/scripts/verify-production.sh
       - name: verify:v1
