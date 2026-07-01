@@ -2,7 +2,11 @@
   "name": "chisto-mk",
   "version": "0.1.0",
   "private": true,
-  "description": "Chisto.mk — Civic environmental platform for pollution reporting and cleanup",
+  "description": "Chisto.mk civic environmental platform for pollution reporting and cleanup",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ivanmitkovski/chisto-mk.git"
+  },
   "scripts": {
     "dev": "pnpm -r --parallel --filter '!@chisto/mobile' run dev",
     "dev:api": "pnpm --filter @chisto/api dev",
@@ -22,6 +26,7 @@
     "db:studio": "pnpm --filter @chisto/api exec prisma studio",
     "ci:check": "pnpm --filter @chisto/api exec prisma generate && pnpm --filter @chisto/api exec prisma validate && pnpm build",
     "verify:contract": "node scripts/verify-contract.mjs",
+    "check:doc-links": "node scripts/check-doc-links.mjs",
     "lint": "pnpm -r --filter '!@chisto/mobile' run lint",
     "test": "pnpm -r --filter '!@chisto/mobile' run test",
     "prepare": "husky"

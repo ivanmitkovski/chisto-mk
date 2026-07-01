@@ -34,7 +34,7 @@ curl -s "http://chisto-dev-alb-1776277878.eu-central-1.elb.amazonaws.com/health/
 # {"status":"ok","redis":"ok","s3":"ok"}
 ```
 
-Repeatable setup: [`infra/scripts/configure-awsdev-redis.sh`](../../../infra/scripts/configure-awsdev-redis.sh).
+Repeatable setup: [`infra/scripts/configure-awsdev-redis.sh`](../../../../infra/scripts/configure-awsdev-redis.sh).
 
 ## Provision ElastiCache (AWS console or CLI)
 

@@ -1,5 +1,5 @@
 name: chisto_mobile
-repository: https://github.com/chisto-mk/chisto-mk
+repository: https://github.com/ivanmitkovski/chisto-mk
 
 packages:
   - .
