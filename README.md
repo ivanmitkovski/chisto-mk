@@ -31,15 +31,9 @@
 ## Product
 
 <p align="center">
-  <img src=".github/readme/product-preview-strip.png" alt="Chisto.mk app previews: snap, report, map, community, together." width="1200" />
-</p>
-
-<p align="center">
-  <img src=".github/readme/01-snap-report-clean.png" alt="Snap It. Report It. Clean It." width="220" />
-  <img src=".github/readme/02-capture-seconds.png" alt="Capture It In Seconds" width="220" />
-  <img src=".github/readme/03-real-impact-map.png" alt="See The Real Impact" width="220" />
-  <img src=".github/readme/04-location-community.png" alt="Your Location, Your Community" width="220" />
-  <img src=".github/readme/05-together-difference.png" alt="Together We Make A Difference" width="220" />
+  <img src=".github/readme/01-snap-report-clean.png" alt="Snap It. Report It. Clean It." width="280" />
+  <img src=".github/readme/02-capture-seconds.png" alt="Capture It In Seconds" width="280" />
+  <img src=".github/readme/03-real-impact-map.png" alt="See The Real Impact" width="280" />
 </p>
 
 ## Architecture
