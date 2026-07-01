@@ -31,9 +31,7 @@
 ## Product
 
 <p align="center">
-  <img src=".github/readme/01-snap-report-clean.png" alt="Snap It. Report It. Clean It." width="280" />
-  <img src=".github/readme/02-capture-seconds.png" alt="Capture It In Seconds" width="280" />
-  <img src=".github/readme/03-real-impact-map.png" alt="See The Real Impact" width="280" />
+  <img src=".github/readme/02-capture-seconds.png" alt="Capture It In Seconds" width="320" />
 </p>
 
 ## Architecture
