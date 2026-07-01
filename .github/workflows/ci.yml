@@ -18,6 +18,17 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+  doc-links:
+    name: Doc link check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check markdown links
+        run: node scripts/check-doc-links.mjs
+
   secret-scan:
     name: Secret Scan
     runs-on: ubuntu-latest
