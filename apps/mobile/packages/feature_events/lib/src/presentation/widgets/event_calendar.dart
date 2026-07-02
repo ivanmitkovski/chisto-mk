@@ -287,6 +287,9 @@ class _EventCalendarState extends State<EventCalendar> {
               selected: isSelected,
               label: context.l10n.eventsCalendarDaySemantic(date.day),
               child: InkWell(
+                key: ValueKey(
+                  'event-calendar-day-${date.year}-${date.month}-${date.day}',
+                ),
                 onTap: selectable
                     ? () {
                         widget.onDateSelected(date);
