@@ -12,10 +12,9 @@ Widget _calendarApp(EventCalendar calendar) {
   );
 }
 
-Finder _dayInCalendar(String dayLabel) {
-  return find.descendant(
-    of: find.byType(EventCalendar),
-    matching: find.text(dayLabel),
+Finder _dayInCalendar(DateTime date) {
+  return find.byKey(
+    ValueKey('event-calendar-day-${date.year}-${date.month}-${date.day}'),
   );
 }
 
@@ -75,7 +74,7 @@ void main() {
 
       expect(find.textContaining('January 2024'), findsOneWidget);
 
-      await tester.tap(_dayInCalendar('10'));
+      await tester.tap(_dayInCalendar(DateTime(2024, 1, 10)));
       await tester.pump();
 
       expect(picked, DateTime(2024, 1, 10));
@@ -101,11 +100,13 @@ void main() {
       ),
     );
 
-    await tester.tap(_dayInCalendar('${today.day - 1}'));
+    final DateTime yesterday = today.subtract(const Duration(days: 1));
+
+    await tester.tap(_dayInCalendar(yesterday));
     await tester.pump();
     expect(picked, isNull);
 
-    await tester.tap(_dayInCalendar('${today.day}'));
+    await tester.tap(_dayInCalendar(today));
     await tester.pump();
     expect(picked, today);
   });
