@@ -11,12 +11,15 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy 
 
   constructor() {
     const url = process.env.REDIS_URL?.trim();
-    this.redis = url ? new Redis(url, { maxRetriesPerRequest: 1, lazyConnect: true }) : null;
-    if (this.redis) {
-      void this.redis.connect().catch(() => {
-        // Fall back to in-memory behavior via thrown errors handled by guard
-      });
-    }
+    this.redis = url
+      ? new Redis(url, {
+          lazyConnect: true,
+          maxRetriesPerRequest: 1,
+          enableReadyCheck: false,
+          connectTimeout: 3_000,
+          retryStrategy: () => null,
+        })
+      : null;
   }
 
   async increment(
@@ -28,6 +31,9 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy 
   ): Promise<RecordEntry> {
     if (!this.redis) {
       return this.unavailableRecord(ttl, limit, blockDuration, throttlerName, key);
+    }
+    if (this.redis.status !== 'ready' && this.redis.status !== 'connecting') {
+      await this.redis.connect().catch(() => undefined);
     }
     const namespaced = `throttle:${throttlerName}:${key}`;
     try {
@@ -75,6 +81,7 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy 
     const client = this.redis;
     this.redis = null;
     await client.quit().catch(() => undefined);
+    client.disconnect();
   }
 
   private unavailableRecord(

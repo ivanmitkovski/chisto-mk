@@ -16,9 +16,8 @@ const redisUrl = process.env.REDIS_URL?.trim();
     await Promise.all([left.whenReady(), right.whenReady()]);
   });
 
-  afterAll(() => {
-    left.dispose();
-    right.dispose();
+  afterAll(async () => {
+    await Promise.all([left.disposeAsync(), right.disposeAsync()]);
   });
 
   it('delivers publish from one connection to a subscriber on another', async () => {
