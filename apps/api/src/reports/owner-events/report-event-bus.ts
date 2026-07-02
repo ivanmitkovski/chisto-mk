@@ -62,7 +62,12 @@ export class RedisReportEventBus extends ReportEventBus {
 
   constructor(redisUrl: string) {
     super();
-    const options: RedisOptions = { maxRetriesPerRequest: null, enableReadyCheck: true };
+    const options: RedisOptions = {
+      maxRetriesPerRequest: 1,
+      enableReadyCheck: false,
+      connectTimeout: 3_000,
+      retryStrategy: () => null,
+    };
     this.publisher = new Redis(redisUrl, options);
     this.subscriber = new Redis(redisUrl, options);
     this.subscriber.on('message', (channel: string, message: string) => {
@@ -107,10 +112,21 @@ export class RedisReportEventBus extends ReportEventBus {
   }
 
   override dispose(): void {
+    void this.disposeAsync();
+  }
+
+  async disposeAsync(): Promise<void> {
     this.inbound.complete();
-    void this.ready.finally(() => {
-      void this.subscriber.quit();
-      void this.publisher.quit();
-    });
+    try {
+      await this.ready;
+    } catch {
+      // subscribe may have failed; still tear down sockets
+    }
+    await Promise.all([
+      this.subscriber.quit().catch(() => undefined),
+      this.publisher.quit().catch(() => undefined),
+    ]);
+    this.subscriber.disconnect();
+    this.publisher.disconnect();
   }
 }
