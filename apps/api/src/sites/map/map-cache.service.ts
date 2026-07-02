@@ -17,9 +17,17 @@ export class MapCacheService implements OnModuleDestroy {
 
   constructor() {
     this.redis = MapCacheService.cfg.redisUrl
-      ? new Redis(MapCacheService.cfg.redisUrl, { lazyConnect: true })
+      ? new Redis(MapCacheService.cfg.redisUrl, MapCacheService.redisOptions)
       : null;
   }
+
+  private static readonly redisOptions = {
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableReadyCheck: false,
+    connectTimeout: 3_000,
+    retryStrategy: () => null,
+  } as const;
 
   getTtlMs(): number {
     return this.mapCacheTtlMs;
@@ -41,9 +49,8 @@ export class MapCacheService implements OnModuleDestroy {
   }
 
   async getFromRedis(cacheKey: string): Promise<MapResponse | null> {
-    if (!this.redis) return null;
+    if (!this.redis || !(await this.ensureRedisReady())) return null;
     try {
-      await this.redis.connect().catch(() => undefined);
       const raw = await this.redis.get(this.redisKey(cacheKey));
       if (!raw) return null;
       return JSON.parse(raw) as MapResponse;
@@ -64,9 +71,8 @@ export class MapCacheService implements OnModuleDestroy {
       if (oldestKey) this.removeMemoryKey(oldestKey);
     }
     ObservabilityStore.setMapCacheEntries(this.memoryCache.size);
-    if (!this.redis) return;
+    if (!this.redis || !(await this.ensureRedisReady())) return;
     try {
-      await this.redis.connect().catch(() => undefined);
       const redisKey = this.redisKey(cacheKey);
       await this.redis.set(redisKey, JSON.stringify(value), 'PX', this.mapCacheTtlMs);
       await this.redis.sadd(MapCacheService.REDIS_INDEX_KEY, redisKey);
@@ -96,9 +102,8 @@ export class MapCacheService implements OnModuleDestroy {
       this.memorySiteIndex.clear();
     }
     ObservabilityStore.setMapCacheEntries(this.memoryCache.size);
-    if (!this.redis) return;
+    if (!this.redis || !(await this.ensureRedisReady())) return;
     try {
-      await this.redis.connect().catch(() => undefined);
       let cursor = '0';
       do {
         const [nextCursor, keys] = await this.redis.scan(cursor, 'MATCH', this.redisKey('*'), 'COUNT', 200);
@@ -143,7 +148,26 @@ export class MapCacheService implements OnModuleDestroy {
     this.memoryCache.delete(cacheKey);
   }
 
+  private isRedisReady(): boolean {
+    return (this.redis?.status as string | undefined) === 'ready';
+  }
+
+  private async ensureRedisReady(): Promise<boolean> {
+    if (!this.redis) return false;
+    if (this.isRedisReady()) return true;
+    if (this.redis.status === 'connecting') return false;
+    try {
+      await this.redis.connect();
+    } catch (error) {
+      this.logger.warn(`redis map-cache connect failed: ${String(error)}`);
+      return false;
+    }
+    return this.isRedisReady();
+  }
+
   async onModuleDestroy(): Promise<void> {
-    await this.redis?.quit().catch(() => undefined);
+    if (!this.redis) return;
+    await this.redis.quit().catch(() => undefined);
+    this.redis.disconnect();
   }
 }
