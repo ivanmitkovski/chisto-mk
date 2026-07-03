@@ -1,5 +1,11 @@
 /// <reference types="jest" />
 
+import { mockMapConfigNoRedis } from '../helpers/mock-map-config';
+
+jest.mock('../../src/config/map.config', () => ({
+  loadMapConfig: () => mockMapConfigNoRedis,
+}));
+
 import { MapLifecycleCronService } from '../../src/sites/map/map-lifecycle-cron.service';
 
 describe('MapLifecycleCronService', () => {
@@ -24,5 +30,6 @@ describe('MapLifecycleCronService', () => {
     const svc = new MapLifecycleCronService(prisma as any);
     await (svc as any).refreshHotness();
     expect(prisma.$executeRaw).toHaveBeenCalled();
+    await svc.onModuleDestroy();
   });
 });

@@ -1,6 +1,7 @@
 import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ThrottlerStorage } from '@nestjs/throttler';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../redis/optional-lazy-redis-options';
 
 type RecordEntry = { totalHits: number; timeToExpire: number; isBlocked: boolean; timeToBlockExpire: number };
 
@@ -11,15 +12,7 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy 
 
   constructor() {
     const url = process.env.REDIS_URL?.trim();
-    this.redis = url
-      ? new Redis(url, {
-          lazyConnect: true,
-          maxRetriesPerRequest: 1,
-          enableReadyCheck: false,
-          connectTimeout: 3_000,
-          retryStrategy: () => null,
-        })
-      : null;
+    this.redis = url ? new Redis(url, optionalLazyRedisOptions) : null;
   }
 
   async increment(

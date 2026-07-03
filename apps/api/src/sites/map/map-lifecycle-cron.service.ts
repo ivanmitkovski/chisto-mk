@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import { loadMapConfig } from '../../config/map.config';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -14,7 +15,7 @@ export class MapLifecycleCronService implements OnModuleInit, OnModuleDestroy {
   private static readonly LEADER_LOCK_KEY = 'leader:map-lifecycle-cron';
   private static readonly LEADER_LOCK_TTL_SECONDS = 30;
   private readonly redis = MapLifecycleCronService.cfg.redisUrl
-    ? new Redis(MapLifecycleCronService.cfg.redisUrl, { lazyConnect: true })
+    ? new Redis(MapLifecycleCronService.cfg.redisUrl, optionalLazyRedisOptions)
     : null;
   private leaderRenewTimer: ReturnType<typeof setInterval> | null = null;
   private readonly leaderToken = `${process.pid}:${Math.random().toString(36).slice(2)}`;
@@ -49,6 +50,7 @@ export class MapLifecycleCronService implements OnModuleInit, OnModuleDestroy {
       this.leaderRenewTimer = null;
     }
     await this.releaseLeaderLock();
+    await this.redis?.quit().catch(() => undefined);
   }
 
   private async refreshHotness(): Promise<void> {
