@@ -20,7 +20,7 @@ import { ApiError } from '@/lib/api';
 import type { NewsLocale } from '../news-api-types';
 import { newsApiErrorMessage } from '../lib/news-api-messages';
 import {
-  newsMediaValidationMessageKey,
+  newsMediaValidationMessage,
   validateNewsMediaFile,
 } from '../lib/news-media-validation';
 import { validateNewsPostForm } from '../lib/news-post-policy';
@@ -331,7 +331,7 @@ export function useNewsPostMutations({
     async (file: File, kind: UploadKind) => {
       const validation = await validateNewsMediaFile(file, kind);
       if (!validation.ok) {
-        const message = t(newsMediaValidationMessageKey(validation.code));
+        const message = newsMediaValidationMessage(t, validation);
         setUploadValidationErrors((prev) => ({ ...prev, [kind]: message }));
         showToast({
           tone: 'warning',
@@ -395,7 +395,7 @@ export function useNewsPostMutations({
     async (blockIndex: number, file: File, kind: 'inline_image' | 'inline_video') => {
       const validation = await validateNewsMediaFile(file, kind);
       if (!validation.ok) {
-        const message = t(newsMediaValidationMessageKey(validation.code));
+        const message = newsMediaValidationMessage(t, validation);
         setUploadValidationErrors((prev) => ({ ...prev, [kind]: message }));
         showToast({
           tone: 'warning',
@@ -445,7 +445,7 @@ export function useNewsPostMutations({
     async (blockIndex: number, itemIndex: number, file: File) => {
       const validation = await validateNewsMediaFile(file, 'inline_image');
       if (!validation.ok) {
-        const message = t(newsMediaValidationMessageKey(validation.code));
+        const message = newsMediaValidationMessage(t, validation);
         setUploadValidationErrors((prev) => ({ ...prev, inline_image: message }));
         showToast({
           tone: 'warning',
@@ -494,7 +494,7 @@ export function useNewsPostMutations({
     async (file: File, kind: 'inline_image' | 'inline_video', insertIndex: number) => {
       const validation = await validateNewsMediaFile(file, kind);
       if (!validation.ok) {
-        const message = t(newsMediaValidationMessageKey(validation.code));
+        const message = newsMediaValidationMessage(t, validation);
         setUploadValidationErrors((prev) => ({ ...prev, [kind]: message }));
         showToast({
           tone: 'warning',

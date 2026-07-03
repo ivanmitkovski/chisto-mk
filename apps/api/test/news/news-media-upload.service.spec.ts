@@ -88,7 +88,7 @@ describe('NewsMediaUploadService', () => {
     expect(result.url).toBe('https://signed.example/a.jpg');
   });
 
-  it('rejects oversized images', async () => {
+  it('rejects oversized inline images', async () => {
     const { svc } = buildService();
     await expect(
       svc.upload({
@@ -99,6 +99,41 @@ describe('NewsMediaUploadService', () => {
           mimetype: 'image/jpeg',
           size: 11 * 1024 * 1024,
           originalname: 'big.jpg',
+        },
+      }),
+    ).rejects.toMatchObject({
+      response: { code: 'NEWS_IMAGE_TOO_LARGE' },
+    });
+  });
+
+  it('accepts cover images larger than the inline image cap', async () => {
+    const { svc, s3 } = buildService();
+    const result = await svc.upload({
+      postId: 'post-1',
+      kind: 'cover',
+      file: {
+        buffer: jpeg128,
+        mimetype: 'image/jpeg',
+        size: 15 * 1024 * 1024,
+        originalname: 'hero.jpg',
+      },
+    });
+
+    expect(s3.putObject).toHaveBeenCalled();
+    expect(result.url).toBe('https://signed.example/a.jpg');
+  });
+
+  it('rejects cover images above the cover cap', async () => {
+    const { svc } = buildService();
+    await expect(
+      svc.upload({
+        postId: 'post-1',
+        kind: 'cover',
+        file: {
+          buffer: jpeg128,
+          mimetype: 'image/jpeg',
+          size: 26 * 1024 * 1024,
+          originalname: 'huge.jpg',
         },
       }),
     ).rejects.toMatchObject({

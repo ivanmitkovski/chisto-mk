@@ -1,5 +1,6 @@
 /// <reference types="jest" />
-import { NewsImageProcessor, NEWS_SVG_MAX_BYTES } from '../../src/news/services/news-image-processor';
+import { NEWS_SVG_MAX_BYTES } from '@chisto/news-content';
+import { NewsImageProcessor } from '../../src/news/services/news-image-processor';
 
 const VALID_SVG = Buffer.from(
   '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100"><rect width="200" height="100" fill="#2FD788"/></svg>',

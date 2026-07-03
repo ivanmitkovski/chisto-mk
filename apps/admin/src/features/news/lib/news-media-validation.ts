@@ -1,6 +1,24 @@
-export const NEWS_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
-export const NEWS_SVG_MAX_BYTES = 2 * 1024 * 1024;
-export const NEWS_VIDEO_MAX_BYTES = 25 * 1024 * 1024;
+import {
+  NEWS_COVER_MAX_BYTES,
+  NEWS_INLINE_IMAGE_MAX_BYTES,
+  NEWS_SVG_MAX_BYTES,
+  NEWS_VIDEO_MAX_BYTES,
+  newsRasterImageMaxBytes,
+  newsRasterImageMaxMb,
+} from '@chisto/news-content';
+
+export {
+  NEWS_COVER_MAX_BYTES,
+  NEWS_INLINE_IMAGE_MAX_BYTES,
+  NEWS_SVG_MAX_BYTES,
+  NEWS_VIDEO_MAX_BYTES,
+  newsRasterImageMaxBytes,
+  newsRasterImageMaxMb,
+};
+
+/** @deprecated Use NEWS_INLINE_IMAGE_MAX_BYTES or newsRasterImageMaxBytes(kind). */
+export const NEWS_IMAGE_MAX_BYTES = NEWS_INLINE_IMAGE_MAX_BYTES;
+
 export const NEWS_IMAGE_MIN_DIMENSION = 128;
 
 const IMAGE_MIMES = new Set([
@@ -27,7 +45,7 @@ export type NewsMediaValidationCode =
 
 export type NewsMediaValidationResult =
   | { ok: true }
-  | { ok: false; code: NewsMediaValidationCode };
+  | { ok: false; code: NewsMediaValidationCode; maxMb?: number };
 
 export const NEWS_MEDIA_ACCEPT = {
   cover: 'image/jpeg,image/png,image/webp,image/heic,image/heif,image/svg+xml,.heic,.svg',
@@ -55,6 +73,10 @@ function isVideoFile(file: File): boolean {
   return ext === 'mp4' || ext === 'webm' || ext === 'mov';
 }
 
+function rasterMaxMb(kind: 'cover' | 'inline_image'): number {
+  return Math.round(newsRasterImageMaxBytes(kind) / (1024 * 1024));
+}
+
 export async function validateNewsMediaFile(
   file: File,
   kind: NewsMediaKind,
@@ -64,7 +86,11 @@ export async function validateNewsMediaFile(
       return { ok: false, code: 'invalidVideoType' };
     }
     if (file.size > NEWS_VIDEO_MAX_BYTES) {
-      return { ok: false, code: 'videoTooLarge' };
+      return {
+        ok: false,
+        code: 'videoTooLarge',
+        maxMb: Math.round(NEWS_VIDEO_MAX_BYTES / (1024 * 1024)),
+      };
     }
     return { ok: true };
   }
@@ -75,13 +101,18 @@ export async function validateNewsMediaFile(
 
   if (isSvgFile(file)) {
     if (file.size > NEWS_SVG_MAX_BYTES) {
-      return { ok: false, code: 'imageTooLarge' };
+      return {
+        ok: false,
+        code: 'imageTooLarge',
+        maxMb: Math.round(NEWS_SVG_MAX_BYTES / (1024 * 1024)),
+      };
     }
     return { ok: true };
   }
 
-  if (file.size > NEWS_IMAGE_MAX_BYTES) {
-    return { ok: false, code: 'imageTooLarge' };
+  const maxBytes = newsRasterImageMaxBytes(kind);
+  if (file.size > maxBytes) {
+    return { ok: false, code: 'imageTooLarge', maxMb: rasterMaxMb(kind) };
   }
 
   const heic =
@@ -123,4 +154,15 @@ function readImageDimensions(file: File): Promise<{ width: number; height: numbe
 
 export function newsMediaValidationMessageKey(code: NewsMediaValidationCode): string {
   return `mediaValidation.${code}`;
+}
+
+export function newsMediaValidationMessage(
+  translate: (key: string, values?: Record<string, number>) => string,
+  result: Extract<NewsMediaValidationResult, { ok: false }>,
+): string {
+  const key = newsMediaValidationMessageKey(result.code);
+  if (result.maxMb != null) {
+    return translate(key, { maxMb: result.maxMb });
+  }
+  return translate(key);
 }

@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { NEWS_SVG_MAX_BYTES } from '@chisto/news-content';
 import { imageSize } from 'image-size';
 import sharp from 'sharp';
 import { detectAllowedImageMimeFromBuffer } from '../../common/utils/detect-allowed-image-mime-from-buffer';
@@ -9,7 +10,6 @@ import { parseSvgDimensions, sanitizeSvgBuffer } from '../../common/utils/saniti
 const MIN_DIMENSION = 128;
 const MAX_DIMENSION = 8192;
 const HEIC_WEBP_QUALITY = 85;
-export const NEWS_SVG_MAX_BYTES = 2 * 1024 * 1024;
 
 export type NewsImageUploadFile = {
   buffer: Buffer;
