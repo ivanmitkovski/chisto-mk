@@ -1,5 +1,11 @@
 /// <reference types="jest" />
 
+import { mockMapConfigNoRedis } from '../helpers/mock-map-config';
+
+jest.mock('../../src/config/map.config', () => ({
+  loadMapConfig: () => mockMapConfigNoRedis,
+}));
+
 import type { ExecutionContext } from '@nestjs/common';
 import { HttpException } from '@nestjs/common';
 import { MapRateLimitGuard } from '../../src/sites/http/map-rate-limit.guard';
@@ -13,8 +19,14 @@ function contextForRequest(req: Record<string, unknown>): ExecutionContext {
 }
 
 describe('MapRateLimitGuard', () => {
+  let guard: MapRateLimitGuard;
+
+  afterEach(async () => {
+    await guard?.onModuleDestroy();
+  });
+
   it('allows request when redis is absent in non-production', async () => {
-    const guard = new MapRateLimitGuard();
+    guard = new MapRateLimitGuard();
     (guard as any).redis = null;
     await expect(
       guard.canActivate(
@@ -29,10 +41,11 @@ describe('MapRateLimitGuard', () => {
   });
 
   it('applies SSE route limit when accept header is event-stream', async () => {
-    const guard = new MapRateLimitGuard();
+    guard = new MapRateLimitGuard();
     const redisMock = {
       connect: jest.fn(async () => undefined),
       eval: jest.fn(async () => 121),
+      quit: jest.fn(async () => undefined),
     };
     (guard as any).redis = redisMock;
     await expect(

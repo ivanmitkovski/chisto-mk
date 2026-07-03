@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
 import { Subscription } from 'rxjs';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import { loadMapConfig } from '../../config/map.config';
 import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -21,7 +22,7 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
   private static readonly LEADER_LOCK_KEY = 'leader:map-projection-updater';
   private static readonly LEADER_LOCK_TTL_SECONDS = 30;
   private readonly redis = MapProjectionUpdaterService.cfg.redisUrl
-    ? new Redis(MapProjectionUpdaterService.cfg.redisUrl, { lazyConnect: true })
+    ? new Redis(MapProjectionUpdaterService.cfg.redisUrl, optionalLazyRedisOptions)
     : null;
   private leaderRenewTimer: ReturnType<typeof setInterval> | null = null;
   private readonly leaderToken = `${process.pid}:${Math.random().toString(36).slice(2)}`;
@@ -74,6 +75,7 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
     }
     this.refreshDebounceTimers.clear();
     await this.releaseLeaderLock();
+    await this.redis?.quit().catch(() => undefined);
   }
 
   async rebuildHotProjection(): Promise<void> {

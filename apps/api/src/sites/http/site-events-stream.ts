@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Observable, concat, defer, finalize, from, interval, map, merge, switchMap } from 'rxjs';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import { loadFeatureFlags } from '../../config/feature-flags';
 import { loadMapConfig } from '../../config/map.config';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
@@ -37,7 +38,7 @@ const cfg = loadMapConfig();
 const flags = loadFeatureFlags();
 const HEARTBEAT_INTERVAL_MS = cfg.sseHeartbeatIntervalMs;
 const MAX_SSE_CONNECTIONS_PER_USER = 4;
-const redis = cfg.redisUrl ? new Redis(cfg.redisUrl, { lazyConnect: true }) : null;
+const redis = cfg.redisUrl ? new Redis(cfg.redisUrl, optionalLazyRedisOptions) : null;
 const USER_CONNECTION_KEY_PREFIX = 'map:sse:connections:user';
 const USER_CONNECTION_KEY_TTL_SECONDS = Math.max(
   60,

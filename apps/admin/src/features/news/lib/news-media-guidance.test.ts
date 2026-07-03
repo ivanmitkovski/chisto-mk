@@ -20,12 +20,15 @@ describe('news-media-guidance', () => {
   });
 
   it('exposes upload limits aligned with validation', () => {
-    expect(NEWS_MEDIA_LIMITS.imageMaxMb).toBe(10);
+    expect(NEWS_MEDIA_LIMITS.coverMaxMb).toBe(25);
+    expect(NEWS_MEDIA_LIMITS.inlineImageMaxMb).toBe(10);
     expect(NEWS_MEDIA_LIMITS.videoMaxMb).toBe(25);
     expect(NEWS_MEDIA_LIMITS.imageMinPx).toBe(128);
   });
 
   it('returns params for each guidance kind', () => {
+    expect(getNewsMediaGuidanceParams('cover').maxMb).toBe(25);
+    expect(getNewsMediaGuidanceParams('inlineImage').maxMb).toBe(10);
     expect(getNewsMediaGuidanceParams('cover').aspect).toBe('21:9');
     expect(getNewsMediaGuidanceParams('galleryImage').aspect).toBe('4:3');
     expect(getNewsMediaGuidanceParams('video').recommendedWidth).toBe(1080);

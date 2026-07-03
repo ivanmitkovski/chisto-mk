@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { shouldUseUnoptimizedNewsImage } from "./news-image-optimization";
+import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "./news-image-optimization";
 
 describe("shouldUseUnoptimizedNewsImage", () => {
-  it("allows optimizer for local paths", () => {
+  it("always skips optimizer for SVG assets", () => {
+    expect(shouldUseUnoptimizedNewsImage("/news/cover.svg")).toBe(true);
+    expect(
+      shouldUseUnoptimizedNewsImage(
+        "https://bucket.s3.amazonaws.com/news/logo.svg?X-Amz-Signature=abc",
+      ),
+    ).toBe(true);
+  });
+
+  it("allows optimizer for local raster paths", () => {
     expect(shouldUseUnoptimizedNewsImage("/news/cover.png")).toBe(false);
   });
 
@@ -20,5 +29,15 @@ describe("shouldUseUnoptimizedNewsImage", () => {
 
   it("skips optimizer for unknown remote hosts", () => {
     expect(shouldUseUnoptimizedNewsImage("https://example.com/image.jpg")).toBe(true);
+  });
+});
+
+describe("newsImageObjectFitClass", () => {
+  it("uses object-contain for SVG", () => {
+    expect(newsImageObjectFitClass("/news/logo.svg")).toBe("object-contain");
+  });
+
+  it("uses object-cover for raster images", () => {
+    expect(newsImageObjectFitClass("/news/cover.jpg")).toBe("object-cover");
   });
 });

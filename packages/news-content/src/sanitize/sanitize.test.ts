@@ -11,6 +11,16 @@ describe('sanitizeInlineHtml', () => {
     expect(out).toContain('here');
   });
 
+  it('preserves target and rel on saved links', () => {
+    const out = sanitizeInlineHtml(
+      '<p><a href="https://chisto.mk" target="_blank" rel="noopener noreferrer">Chisto.mk</a></p>',
+    );
+    expect(out).toContain('href="https://chisto.mk"');
+    expect(out).toContain('target="_blank"');
+    expect(out).toContain('rel="noopener noreferrer"');
+    expect(out).toContain('Chisto.mk');
+  });
+
   it('strips script tags', () => {
     const out = sanitizeInlineHtml('<script>alert(1)</script><p>ok</p>');
     expect(out).not.toContain('script');

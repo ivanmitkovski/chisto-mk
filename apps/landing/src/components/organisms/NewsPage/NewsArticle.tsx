@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
+import { shouldUseUnoptimizedNewsImage, newsImageObjectFitClass } from "@/lib/images/news-image-optimization";
 import { Link, type AppLocale } from "@/i18n/routing";
 import type { ResolvedNewsPost } from "@/data/news-posts";
 import { Badge } from "@/components/atoms/Badge";
@@ -139,7 +139,7 @@ export function NewsArticle({
                 src={post.coverImage}
                 alt={post.coverAltText ?? post.title}
                 fill
-                className="object-cover"
+                className={newsImageObjectFitClass(post.coverImage)}
                 sizes="(min-width: 896px) 896px, 100vw"
                 priority
                 unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}

@@ -1,20 +1,9 @@
 /// <reference types="jest" />
 
+import { mockMapConfigNoRedis } from '../helpers/mock-map-config';
+
 jest.mock('../../src/config/map.config', () => ({
-  loadMapConfig: () => ({
-    redisUrl: null,
-    cacheTtlMs: 4_000,
-    sseHeartbeatIntervalMs: 30_000,
-    outboxPollIntervalMs: 5_000,
-    outboxBatchSize: 120,
-    outboxLeaseTtlMs: 20_000,
-    replayLimit: 240,
-    replayWindowMinutes: 5,
-    mapStrictBounds: false,
-    trustedProxyCidrs: [],
-    mapHttpRpsLimit: 480,
-    mapSseRpsLimit: 120,
-  }),
+  loadMapConfig: () => mockMapConfigNoRedis,
 }));
 
 import { MapCacheService } from '../../src/sites/map/map-cache.service';

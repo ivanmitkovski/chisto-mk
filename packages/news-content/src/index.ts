@@ -1,3 +1,4 @@
+export * from './media/is-svg-media-url';
 export * from './blocks-to-html';
 export * from './constants';
 export * from './types';

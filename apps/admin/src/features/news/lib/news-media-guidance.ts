@@ -1,8 +1,4 @@
-import {
-  NEWS_IMAGE_MAX_BYTES,
-  NEWS_IMAGE_MIN_DIMENSION,
-  NEWS_VIDEO_MAX_BYTES,
-} from './news-media-validation';
+import { NEWS_IMAGE_MIN_DIMENSION, NEWS_VIDEO_MAX_BYTES, newsRasterImageMaxMb } from './news-media-validation';
 
 /** Article hero on the landing site (`aspect-[21/9]`). */
 export const NEWS_COVER_ASPECT = '21:9' as const;
@@ -24,7 +20,8 @@ export const NEWS_VIDEO_RECOMMENDED_HEIGHT = 1080;
 export const NEWS_IMAGE_MAX_DIMENSION = 8192;
 
 export const NEWS_MEDIA_LIMITS = {
-  imageMaxMb: Math.round(NEWS_IMAGE_MAX_BYTES / (1024 * 1024)),
+  coverMaxMb: newsRasterImageMaxMb('cover'),
+  inlineImageMaxMb: newsRasterImageMaxMb('inline_image'),
   videoMaxMb: Math.round(NEWS_VIDEO_MAX_BYTES / (1024 * 1024)),
   imageMinPx: NEWS_IMAGE_MIN_DIMENSION,
   imageMaxPx: NEWS_IMAGE_MAX_DIMENSION,
@@ -33,7 +30,7 @@ export const NEWS_MEDIA_LIMITS = {
 export type NewsMediaGuidanceKind = 'cover' | 'inlineImage' | 'galleryImage' | 'video';
 
 export function getNewsMediaGuidanceParams(kind: NewsMediaGuidanceKind) {
-  const { imageMaxMb, videoMaxMb, imageMinPx } = NEWS_MEDIA_LIMITS;
+  const { coverMaxMb, inlineImageMaxMb, videoMaxMb, imageMinPx } = NEWS_MEDIA_LIMITS;
 
   switch (kind) {
     case 'cover':
@@ -41,7 +38,7 @@ export function getNewsMediaGuidanceParams(kind: NewsMediaGuidanceKind) {
         width: NEWS_COVER_RECOMMENDED_WIDTH,
         height: NEWS_COVER_RECOMMENDED_HEIGHT,
         aspect: NEWS_COVER_ASPECT,
-        maxMb: imageMaxMb,
+        maxMb: coverMaxMb,
         minPx: imageMinPx,
       };
     case 'inlineImage':
@@ -49,14 +46,14 @@ export function getNewsMediaGuidanceParams(kind: NewsMediaGuidanceKind) {
         recommendedWidth: NEWS_INLINE_IMAGE_RECOMMENDED_WIDTH,
         minPx: imageMinPx,
         maxPx: NEWS_IMAGE_MAX_DIMENSION,
-        maxMb: imageMaxMb,
+        maxMb: inlineImageMaxMb,
       };
     case 'galleryImage':
       return {
         width: NEWS_GALLERY_RECOMMENDED_WIDTH,
         height: NEWS_GALLERY_RECOMMENDED_HEIGHT,
         aspect: NEWS_GALLERY_ASPECT,
-        maxMb: imageMaxMb,
+        maxMb: inlineImageMaxMb,
         minPx: imageMinPx,
       };
     case 'video':
