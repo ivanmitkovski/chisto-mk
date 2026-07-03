@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import { loadMapConfig } from '../../config/map.config';
 import { MAP_RATE_LIMIT_INCR_SCRIPT } from './map-rate-limit-lua';
 
@@ -34,7 +35,7 @@ export class MapRateLimitGuard implements CanActivate, OnModuleDestroy {
       process.exit(1);
     }
     this.redis = MapRateLimitGuard.cfg.redisUrl
-      ? new Redis(MapRateLimitGuard.cfg.redisUrl, { lazyConnect: true })
+      ? new Redis(MapRateLimitGuard.cfg.redisUrl, optionalLazyRedisOptions)
       : null;
     this.trustedProxyCidrs = MapRateLimitGuard.cfg.trustedProxyCidrs;
     this.mapLimit = Math.max(120, MapRateLimitGuard.cfg.mapHttpRpsLimit);

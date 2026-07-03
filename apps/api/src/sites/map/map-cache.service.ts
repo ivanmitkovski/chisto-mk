@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import { loadMapConfig } from '../../config/map.config';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { MapResponse } from './map-types';
@@ -17,17 +18,9 @@ export class MapCacheService implements OnModuleDestroy {
 
   constructor() {
     this.redis = MapCacheService.cfg.redisUrl
-      ? new Redis(MapCacheService.cfg.redisUrl, MapCacheService.redisOptions)
+      ? new Redis(MapCacheService.cfg.redisUrl, optionalLazyRedisOptions)
       : null;
   }
-
-  private static readonly redisOptions = {
-    lazyConnect: true,
-    maxRetriesPerRequest: 1,
-    enableReadyCheck: false,
-    connectTimeout: 3_000,
-    retryStrategy: () => null,
-  } as const;
 
   getTtlMs(): number {
     return this.mapCacheTtlMs;

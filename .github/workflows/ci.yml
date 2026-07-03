@@ -256,11 +256,13 @@ jobs:
           flutter test test/
 
       - name: API unit tests (Jest) with coverage thresholds
-        run: pnpm --filter @chisto/api run test:cov
-
-      - name: API unit tests (open handles, main only)
-        if: github.ref == 'refs/heads/main'
-        run: pnpm --filter @chisto/api run test:cov:leaks
+        timeout-minutes: 20
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            pnpm --filter @chisto/api run test:cov:main
+          else
+            pnpm --filter @chisto/api run test:cov
+          fi
 
       - name: API per-area coverage gates
         run: pnpm --filter @chisto/api run test:cov:areas

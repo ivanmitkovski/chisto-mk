@@ -1,5 +1,9 @@
 /// <reference types="jest" />
 
+jest.mock('../../src/config/map.config', () => ({
+  loadMapConfig: () => require('../helpers/mock-map-config').mockMapConfigNoRedis(),
+}));
+
 import { Subject } from 'rxjs';
 import { SiteEventsService } from '../../src/admin-realtime/services/site-events.service';
 import type { SiteEvent } from '../../src/admin-realtime/types/site-events.types';

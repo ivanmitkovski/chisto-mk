@@ -1,5 +1,10 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { firstValueFrom, of, take, toArray } from 'rxjs';
+
+jest.mock('../../src/config/map.config', () => ({
+  loadMapConfig: () => require('../helpers/mock-map-config').mockMapConfigNoRedis(),
+}));
+
 import {
   buildSiteEventsStream,
   sanitizeSiteEventForPublicStream,
