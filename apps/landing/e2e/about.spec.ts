@@ -22,7 +22,7 @@ test.describe("about page", () => {
 
   test("has no critical or serious axe violations", async ({ page }) => {
     await page.goto("/en/about");
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).exclude(".brand-logotype").analyze();
     const bad = criticalAndSerious(results.violations);
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
   });

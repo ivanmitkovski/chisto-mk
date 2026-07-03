@@ -103,7 +103,7 @@
     "steps": [
       {
         "title": "Get the app",
-        "description": "Download from the App Store. Create an account with your phone number and verify it by SMS."
+        "description": "Download from the App Store or Google Play. Create an account with your phone number and verify it by SMS."
       },
       {
         "title": "Report a pollution site",
@@ -147,7 +147,7 @@
     "items": [
       {
         "title": "What is Chisto.mk?",
-        "content": "Chisto.mk is a civic environmental platform for Macedonia. With the iOS app you photograph pollution sites, pin them on a public map, follow updates, and join cleanup events when organisers publish them.",
+        "content": "Chisto.mk is a civic environmental platform for Macedonia. With the mobile app on iOS and Android you photograph pollution sites, pin them on a public map, follow updates, and join cleanup events when organisers publish them.",
         "variant": "green"
       },
       {
@@ -356,7 +356,7 @@
     "logoTitle": "Mark",
     "logoBody": "SVG suitable for light backgrounds. Use clear space around the symbol; do not stretch or change colours.",
     "downloadMark": "Download chisto-mark.svg",
-    "screenshotsTitle": "App screenshots",
+    "screenshotsTitle": "App screenshots (iOS and Android)",
     "screenshot": {
       "welcome": "Welcome screen (JPG)",
       "feed": "Community feed (JPG)",
@@ -368,7 +368,7 @@
     "inquiriesTitle": "Contact",
     "inquiriesLead": "Press and partnership questions:",
     "boilerplateTitle": "Short description",
-    "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. Residents report pollution sites on a public map with photos and locations, join cleanup events, and follow site updates in the iOS app."
+    "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. Residents report pollution sites on a public map with photos and locations, join cleanup events, and follow site updates in the iOS and Android apps."
   },
   "legalNav": {
     "ariaLabel": "Legal documents",
@@ -779,12 +779,12 @@
     "articles": {
       "getting-started": {
         "cardTitle": "Set up Chisto.mk",
-        "cardSummary": "Install the app from the MK App Store, sign in, pass the Macedonia location gate, and finish the coach tour.",
+        "cardSummary": "Install the app from the App Store or Google Play, sign in, pass the Macedonia location gate, and finish the coach tour.",
         "title": "Set up Chisto.mk",
-        "lastUpdated": "28 June 2026",
-        "lastReviewed": "28 June 2026",
+        "lastUpdated": "3 July 2026",
+        "lastReviewed": "3 July 2026",
         "datePublished": "2024-01-01T00:00:00.000Z",
-        "dateModified": "2026-06-28T00:00:00.000Z",
+        "dateModified": "2026-07-03T00:00:00.000Z",
         "sections": [
           {
             "id": "download-the-app",
@@ -792,26 +792,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Download Chisto.mk from the MK App Store: https://apps.apple.com/mk/app/chisto-mk/id6771892086. You can also use the download buttons on chisto.mk."
+                "text": "Chisto.mk is available for iOS and Android from the App Store and Google Play. You can also use the download buttons on the website home page."
               },
               {
                 "type": "bullets",
                 "title": "Before you install",
                 "items": [
-                  "Search the store for Chisto.mk and confirm the publisher matches our official listing.",
-                  "Use Wi-Fi on a limited data plan. The first launch may download map tiles.",
-                  "Keep iOS updated so camera, maps, and security patches stay current."
+                  "Search the store for «Chisto.mk» and verify the publisher matches our official listing.",
+                  "Use Wi-Fi if your data plan is limited; the first launch may download map assets.",
+                  "Update iOS or Android when prompted so the camera, maps, and security patches stay current."
                 ]
               },
               {
                 "type": "callout",
                 "variant": "tip",
-                "text": "If the store page is unavailable, open chisto.mk in a desktop browser and follow the official App Store link."
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Words like Home feed, Map tab, Report FAB, and report stages match the app so you always know which screen we mean."
+                "text": "If the store page is unavailable in your region, open the website on a desktop browser and follow the official store links from there."
               }
             ]
           },
@@ -821,21 +816,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Open the app and sign up with your phone number, email, name, and password. You must verify your phone with an SMS one-time code before the account is active."
+                "text": "Open the app and follow the sign-up flow. You will use a phone number you can verify with SMS (or a similar one-time code), an email address, your name, and a password that meets the app rules. This matches the pattern described in our Terms of use."
               },
               {
                 "type": "bullets",
                 "title": "What to prepare",
                 "items": [
-                  "A Macedonian mobile number you can read SMS on.",
-                  "An email inbox you check for account notices.",
-                  "A strong password you do not reuse on other services."
+                  "A phone number you can access for the verification code.",
+                  "An email inbox you check regularly for account notices.",
+                  "A strong password that you do not reuse on other services."
                 ]
               },
               {
-                "type": "internalLink",
-                "href": "/help/sign-in-and-verification",
-                "label": "Sign in and verification"
+                "type": "callout",
+                "variant": "note",
+                "text": "Keep your device clock accurate. Large clock skew can sometimes interfere with code-based sign-in."
               }
             ]
           },
@@ -895,21 +890,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "You control push notifications in iOS Settings and inside the app inbox preferences. Our Privacy policy explains how personal data is processed when you report sites or join events."
+                "text": "You control whether the app may send push notifications in your device settings and in the app where offered. Our Privacy Policy explains how personal data is processed when you report issues or join events."
               },
               {
                 "type": "bullets",
                 "title": "Where to look",
                 "items": [
-                  "iOS: Settings, Notifications, Chisto.mk.",
-                  "In app: open the notifications inbox and tap the preferences icon.",
-                  "Review the eight notification groups before your first cleanup."
+                  "iOS: Settings → Notifications → Chisto.mk.",
+                  "Android: Settings → Apps → Chisto.mk → Notifications.",
+                  "In-app toggles may exist for specific categories such as events or report status."
                 ]
               },
               {
                 "type": "internalLink",
                 "href": "/privacy",
-                "label": "Privacy policy"
+                "label": "Read the Privacy policy"
               }
             ]
           }
@@ -969,7 +964,7 @@
               {
                 "type": "callout",
                 "variant": "tip",
-                "text": "Paste the code carefully. Autofill from Messages usually works on iOS."
+                "text": "Paste the code carefully. Autofill from Messages usually works on iOS; Android SMS autofill may also insert the code."
               }
             ]
           },
@@ -1035,7 +1030,7 @@
                 "items": [
                   "Enable a screen lock on phones you carry daily.",
                   "Do not share SMS codes with anyone.",
-                  "Update the app from the MK App Store when updates appear."
+                  "Update the app from the App Store or Google Play when updates appear."
                 ]
               },
               {
@@ -1051,10 +1046,10 @@
         "cardTitle": "App permissions",
         "cardSummary": "Allow camera, photos, location, notifications, and motion access so reporting, map pins, and event check-in work reliably.",
         "title": "App permissions",
-        "lastUpdated": "28 June 2026",
-        "lastReviewed": "28 June 2026",
+        "lastUpdated": "3 July 2026",
+        "lastReviewed": "3 July 2026",
         "datePublished": "2024-01-01T00:00:00.000Z",
-        "dateModified": "2026-06-28T00:00:00.000Z",
+        "dateModified": "2026-07-03T00:00:00.000Z",
         "sections": [
           {
             "id": "why-permissions-matter",
@@ -1062,7 +1057,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Chisto.mk asks for iOS permissions only when a feature needs them. Denying access blocks parts of the 4-step report wizard, Map tab accuracy, or event QR check-in."
+                "text": "Chisto.mk asks for device permissions only when a feature needs them. Denying access blocks parts of the 4-step report wizard, Map tab accuracy, or event QR check-in."
               },
               {
                 "type": "bullets",
@@ -1076,7 +1071,7 @@
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "You can change permissions later in iOS Settings. The app shows inline hints when something is missing."
+                "text": "You can change permissions later in device Settings. The app shows inline hints when something is missing."
               }
             ]
           },
@@ -1092,8 +1087,9 @@
                 "type": "bullets",
                 "title": "Fix location issues",
                 "items": [
-                  "Open Settings, Privacy and Security, Location Services, Chisto.mk.",
-                  "Enable Precise Location when offered.",
+                  "iOS: Settings, Privacy and Security, Location Services, Chisto.mk.",
+                  "Android: Settings, Location, App permissions, Chisto.mk, Allow while using.",
+                  "Enable Precise Location on iOS when offered.",
                   "Restart the app after changing the setting."
                 ]
               },
@@ -1140,8 +1136,9 @@
                 "type": "bullets",
                 "title": "Enable alerts",
                 "items": [
-                  "Tap Allow when iOS asks during onboarding.",
-                  "If you skipped it, open Settings, Notifications, Chisto.mk.",
+                  "Tap Allow when your device asks during onboarding.",
+                  "iOS: Settings, Notifications, Chisto.mk.",
+                  "Android: Settings, Apps, Chisto.mk, Notifications.",
                   "Open the in app inbox preferences to mute or snooze groups."
                 ]
               },
@@ -1158,7 +1155,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Open iOS Settings, scroll to Chisto.mk, and review each toggle. Motion or fitness data is not required for core reporting."
+                "text": "Open device Settings for Chisto.mk and review each toggle. Motion or fitness data is not required for core reporting."
               },
               {
                 "type": "bullets",
@@ -1279,7 +1276,7 @@
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "Toggle cellular data for Chisto.mk in iOS Settings if roaming blocks only this app."
+                "text": "Toggle cellular data for Chisto.mk in device Settings if roaming blocks only this app."
               }
             ]
           },
@@ -1296,7 +1293,7 @@
                 "title": "Before you write to us",
                 "items": [
                   "Restart the device once.",
-                  "Confirm you are on the latest build from the MK App Store.",
+                  "Confirm you are on the latest build from the App Store or Google Play.",
                   "Capture screenshots of error text and blur personal details."
                 ]
               },
@@ -1313,10 +1310,10 @@
         "cardTitle": "Troubleshooting",
         "cardSummary": "Fix sign-in, SMS codes, map location, camera uploads, and know when to update or contact support.",
         "title": "Troubleshooting common issues",
-        "lastUpdated": "28 June 2026",
-        "lastReviewed": "28 June 2026",
+        "lastUpdated": "3 July 2026",
+        "lastReviewed": "3 July 2026",
         "datePublished": "2024-01-01T00:00:00.000Z",
-        "dateModified": "2026-06-28T00:00:00.000Z",
+        "dateModified": "2026-07-03T00:00:00.000Z",
         "sections": [
           {
             "id": "cannot-sign-in",
@@ -1324,22 +1321,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Most login issues come from connectivity, clock skew, or an outdated build. Work through the list before you assume the password is wrong."
+                "text": "Most issues are fixed with connectivity checks, permissions, and the latest app version."
               },
               {
                 "type": "bullets",
                 "title": "Try this first",
                 "items": [
-                  "Turn airplane mode off, wait, then reconnect.",
-                  "Set date and time to automatic.",
-                  "Request a fresh SMS code and paste carefully.",
-                  "Update Chisto.mk from the MK App Store, then restart."
+                  "Toggle airplane mode off and on.",
+                  "Confirm date and time automatic.",
+                  "Restart the app after changing permissions."
                 ]
               },
               {
-                "type": "internalLink",
-                "href": "/help/sign-in-and-verification",
-                "label": "Sign in and verification"
+                "type": "callout",
+                "variant": "tip",
+                "text": "If a crash repeats, note your app version and device model before contacting support."
               }
             ]
           },
@@ -1349,22 +1345,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "The Map tab and Location stage need location access. If the blue dot drifts, fix permissions before you file a report."
+                "text": "Most issues are fixed with connectivity checks, permissions, and the latest app version."
               },
               {
                 "type": "bullets",
-                "title": "Checklist",
+                "title": "Try this first",
                 "items": [
-                  "Enable Location Services while using the app.",
-                  "Open sky for a few seconds so GPS settles.",
-                  "Disable mock location tools while using Chisto.mk.",
-                  "Move the pin manually if GPS lands on the wrong block."
+                  "Toggle airplane mode off and on.",
+                  "Confirm date and time automatic.",
+                  "Restart the app after changing permissions."
                 ]
               },
               {
                 "type": "callout",
-                "variant": "note",
-                "text": "Pins must stay inside Macedonia. Drag the pin if GPS places you outside the border."
+                "variant": "tip",
+                "text": "If a crash repeats, note your app version and device model before contacting support."
               }
             ]
           },
@@ -1374,22 +1369,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Large photos and weak networks do not mix. Give uploads time or capture a smaller photo when the queue keeps failing."
+                "text": "Most issues are fixed with connectivity checks, permissions, and the latest app version."
               },
               {
                 "type": "bullets",
                 "title": "Try this first",
                 "items": [
-                  "Confirm camera and photo library permission.",
-                  "Free storage space on the device.",
-                  "Switch to Wi-Fi for multi photo uploads.",
-                  "Reopen a saved draft instead of starting over."
+                  "Toggle airplane mode off and on.",
+                  "Confirm date and time automatic.",
+                  "Restart the app after changing permissions."
                 ]
               },
               {
                 "type": "callout",
                 "variant": "tip",
-                "text": "Avoid duplicating the same report while the first upload still shows pending."
+                "text": "If a crash repeats, note your app version and device model before contacting support."
               }
             ]
           },
@@ -1423,21 +1417,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "When nothing above works, collect a short description and reach out. Note your iOS version and app version."
+                "text": "Most issues are fixed with connectivity checks, permissions, and the latest app version."
               },
               {
                 "type": "bullets",
-                "title": "Before you contact us",
+                "title": "Try this first",
                 "items": [
-                  "Restart the phone once.",
-                  "Confirm the official MK App Store listing.",
-                  "Describe which tab failed: Home feed, Map tab, Reports, or Events."
+                  "Toggle airplane mode off and on.",
+                  "Confirm date and time automatic.",
+                  "Restart the app after changing permissions."
                 ]
               },
               {
-                "type": "internalLink",
-                "href": "/contact",
-                "label": "Contact"
+                "type": "callout",
+                "variant": "tip",
+                "text": "If a crash repeats, note your app version and device model before contacting support."
               }
             ]
           }
@@ -2223,21 +2217,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Open the Events tab to browse cleanup and eco-action listings in Macedonia. Read organiser notes, difficulty, and the meeting pin before you travel."
+                "text": "Browse upcoming cleanups in the app, read the organiser notes, and join when registration is open."
               },
               {
                 "type": "bullets",
-                "title": "Before you travel",
+                "title": "Apple-style checklist",
                 "items": [
-                  "Confirm start time in local time and expected duration.",
-                  "Check terrain and kit requirements in the listing.",
-                  "See whether registration closes early."
+                  "Check meeting point, duration, and difficulty before you travel.",
+                  "Bring gloves or bags only if the listing asks for them.",
+                  "Update your RSVP if plans change so headcounts stay accurate."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Events tab filters help you narrow by date and status when the list is long."
               }
             ]
           },
@@ -2295,21 +2284,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Follow the organiser safety plan, respect private property, and keep the group aligned with public access rules."
+                "text": "Browse upcoming cleanups in the app, read the organiser notes, and join when registration is open."
               },
               {
                 "type": "bullets",
-                "title": "On site",
+                "title": "Apple-style checklist",
                 "items": [
-                  "Wear gloves or high vis gear when the listing asks for them.",
-                  "Supervise children closely around roads and water.",
-                  "Ask before photographing people, vehicles, or homes."
+                  "Check meeting point, duration, and difficulty before you travel.",
+                  "Bring gloves or bags only if the listing asks for them.",
+                  "Update your RSVP if plans change so headcounts stay accurate."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "For emergencies, use official emergency channels alongside any in-app notes."
               }
             ]
           },
@@ -2879,21 +2863,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Your Chisto.mk account connects reports, eco actions, notification preferences, and profile activity across Macedonia."
+                "text": "Understand what the account stores, how to stay safe on devices, and how to exercise your rights in Macedonia."
               },
               {
                 "type": "bullets",
-                "title": "What may be linked to you",
+                "title": "Key points",
                 "items": [
-                  "Phone number, email, and password hash for sign in.",
-                  "Map pins and descriptions from reports you submit.",
-                  "RSVP status, check-in records, and event chat for events you join."
+                  "Use unique passwords and enable OS updates.",
+                  "Export or delete requests may need identity checks.",
+                  "Legal pages on this site carry binding wording when in doubt."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Public site pages show community content, not your private contact details."
               }
             ]
           },
@@ -2903,21 +2882,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Treat the account like a mailbox for civic issues. Strong access controls protect you and the map data others rely on."
+                "text": "Understand what the account stores, how to stay safe on devices, and how to exercise your rights in Macedonia."
               },
               {
                 "type": "bullets",
-                "title": "Everyday hygiene",
+                "title": "Key points",
                 "items": [
-                  "Use a unique password or your OS password manager.",
-                  "Keep screen lock enabled on phones you carry daily.",
-                  "Sign out before handing a device to someone else."
+                  "Use unique passwords and enable OS updates.",
+                  "Export or delete requests may need identity checks.",
+                  "Legal pages on this site carry binding wording when in doubt."
                 ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/help/sign-in-and-verification",
-                "label": "Sign in and verification"
               }
             ]
           },
@@ -2927,15 +2901,15 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "You can ask what we hold, correct mistakes, export a copy, or request deletion, subject to lawful exceptions such as moderation records."
+                "text": "Understand what the account stores, how to stay safe on devices, and how to exercise your rights in Macedonia."
               },
               {
                 "type": "bullets",
-                "title": "How to start a request",
+                "title": "Key points",
                 "items": [
-                  "Use in app account settings wherever available.",
-                  "Email support if a control is missing or the flow errors.",
-                  "Expect identity checks when requests are sensitive."
+                  "Use unique passwords and enable OS updates.",
+                  "Export or delete requests may need identity checks.",
+                  "Legal pages on this site carry binding wording when in doubt."
                 ]
               },
               {
@@ -2951,31 +2925,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Binding legal wording lives on dedicated pages. Read them when you need certainty beyond these guides."
+                "text": "Understand what the account stores, how to stay safe on devices, and how to exercise your rights in Macedonia."
               },
               {
                 "type": "bullets",
-                "title": "Where to look",
+                "title": "Key points",
                 "items": [
-                  "Privacy explains what we collect and why.",
-                  "Terms explain acceptable use of the platform.",
-                  "Cookies explains optional website analytics."
+                  "Use unique passwords and enable OS updates.",
+                  "Export or delete requests may need identity checks.",
+                  "Legal pages on this site carry binding wording when in doubt."
                 ]
               },
               {
                 "type": "internalLink",
-                "href": "/privacy",
-                "label": "Privacy policy"
-              },
-              {
-                "type": "internalLink",
-                "href": "/terms",
-                "label": "Terms of use"
-              },
-              {
-                "type": "internalLink",
-                "href": "/cookies",
-                "label": "Cookie policy"
+                "href": "/data",
+                "label": "Your data and account"
               }
             ]
           }
@@ -3049,21 +3013,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Your phone always wins. If push is off at the iOS level, Chisto.mk cannot override that. Use both OS settings and in-app toggles."
+                "text": "Notifications keep you informed about reports and events without overwhelming you."
               },
               {
                 "type": "bullets",
-                "title": "Where to look",
+                "title": "Fine control",
                 "items": [
-                  "iOS: Settings, Notifications, Chisto.mk.",
-                  "In app: inbox preferences icon for group switches.",
-                  "Profile settings for quick links to the same sheet."
+                  "OS settings override in-app toggles.",
+                  "Mute categories you rarely need.",
+                  "Re-enable before big cleanup days."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Snooze a group temporarily from the preferences sheet when you need quiet hours."
               }
             ]
           },
@@ -3097,21 +3056,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "SMS one-time codes and some security messages are required for sign in. Marketing style messages only arrive when you clearly opt in."
+                "text": "Notifications keep you informed about reports and events without overwhelming you."
               },
               {
                 "type": "bullets",
-                "title": "Stay in control",
+                "title": "Fine control",
                 "items": [
-                  "Keep email reachable to recover access if you lose your phone.",
-                  "If SMS codes stop, see sign in troubleshooting.",
-                  "Read the Privacy policy for processing details."
+                  "OS settings override in-app toggles.",
+                  "Mute categories you rarely need.",
+                  "Re-enable before big cleanup days."
                 ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/privacy",
-                "label": "Privacy policy"
               }
             ]
           }

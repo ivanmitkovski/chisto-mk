@@ -1,12 +1,12 @@
 {
   "getting-started": {
     "cardTitle": "Set up Chisto.mk",
-    "cardSummary": "Install the app from the MK App Store, sign in, pass the Macedonia location gate, and finish the coach tour.",
+    "cardSummary": "Install the app from the App Store or Google Play, sign in, pass the Macedonia location gate, and finish the coach tour.",
     "title": "Set up Chisto.mk",
-    "lastUpdated": "28 June 2026",
-    "lastReviewed": "28 June 2026",
+    "lastUpdated": "3 July 2026",
+    "lastReviewed": "3 July 2026",
     "datePublished": "2024-01-01T00:00:00.000Z",
-    "dateModified": "2026-06-28T00:00:00.000Z",
+    "dateModified": "2026-07-03T00:00:00.000Z",
     "sections": [
       {
         "id": "download-the-app",
@@ -14,7 +14,7 @@
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Download Chisto.mk from the MK App Store: https://apps.apple.com/mk/app/chisto-mk/id6771892086. You can also use the download buttons on chisto.mk."
+            "text": "Chisto.mk is available for iOS and Android from the App Store and Google Play. App Store: https://apps.apple.com/mk/app/chisto-mk/id6771892086. Google Play: https://play.google.com/store/apps/details?id=mk.chisto.app. You can also use the download buttons on chisto.mk."
           },
           {
             "type": "bullets",
@@ -22,13 +22,13 @@
             "items": [
               "Search the store for Chisto.mk and confirm the publisher matches our official listing.",
               "Use Wi-Fi on a limited data plan. The first launch may download map tiles.",
-              "Keep iOS updated so camera, maps, and security patches stay current."
+              "Keep iOS or Android updated so camera, maps, and security patches stay current."
             ]
           },
           {
             "type": "callout",
             "variant": "tip",
-            "text": "If the store page is unavailable, open chisto.mk in a desktop browser and follow the official App Store link."
+            "text": "If the store page is unavailable, open chisto.mk in a desktop browser and follow the official store links."
           },
           {
             "type": "callout",
@@ -191,7 +191,7 @@
           {
             "type": "callout",
             "variant": "tip",
-            "text": "Paste the code carefully. Autofill from Messages usually works on iOS."
+            "text": "Paste the code carefully. Autofill from Messages usually works on iOS; Android SMS autofill may also insert the code."
           }
         ]
       },
@@ -257,7 +257,7 @@
             "items": [
               "Enable a screen lock on phones you carry daily.",
               "Do not share SMS codes with anyone.",
-              "Update the app from the MK App Store when updates appear."
+              "Update the app from the App Store or Google Play when updates appear."
             ]
           },
           {
@@ -273,10 +273,10 @@
     "cardTitle": "App permissions",
     "cardSummary": "Allow camera, photos, location, notifications, and motion access so reporting, map pins, and event check-in work reliably.",
     "title": "App permissions",
-    "lastUpdated": "28 June 2026",
-    "lastReviewed": "28 June 2026",
+    "lastUpdated": "3 July 2026",
+    "lastReviewed": "3 July 2026",
     "datePublished": "2024-01-01T00:00:00.000Z",
-    "dateModified": "2026-06-28T00:00:00.000Z",
+    "dateModified": "2026-07-03T00:00:00.000Z",
     "sections": [
       {
         "id": "why-permissions-matter",
@@ -284,7 +284,7 @@
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Chisto.mk asks for iOS permissions only when a feature needs them. Denying access blocks parts of the 4-step report wizard, Map tab accuracy, or event QR check-in."
+            "text": "Chisto.mk asks for device permissions only when a feature needs them. Denying access blocks parts of the 4-step report wizard, Map tab accuracy, or event QR check-in."
           },
           {
             "type": "bullets",
@@ -298,7 +298,7 @@
           {
             "type": "callout",
             "variant": "note",
-            "text": "You can change permissions later in iOS Settings. The app shows inline hints when something is missing."
+            "text": "You can change permissions later in device Settings. The app shows inline hints when something is missing."
           }
         ]
       },
@@ -314,8 +314,9 @@
             "type": "bullets",
             "title": "Fix location issues",
             "items": [
-              "Open Settings, Privacy and Security, Location Services, Chisto.mk.",
-              "Enable Precise Location when offered.",
+              "iOS: Settings, Privacy and Security, Location Services, Chisto.mk.",
+              "Android: Settings, Location, App permissions, Chisto.mk, Allow while using.",
+              "Enable Precise Location on iOS when offered.",
               "Restart the app after changing the setting."
             ]
           },
@@ -362,8 +363,9 @@
             "type": "bullets",
             "title": "Enable alerts",
             "items": [
-              "Tap Allow when iOS asks during onboarding.",
-              "If you skipped it, open Settings, Notifications, Chisto.mk.",
+              "Tap Allow when your device asks during onboarding.",
+              "iOS: Settings, Notifications, Chisto.mk.",
+              "Android: Settings, Apps, Chisto.mk, Notifications.",
               "Open the in app inbox preferences to mute or snooze groups."
             ]
           },
@@ -380,7 +382,7 @@
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Open iOS Settings, scroll to Chisto.mk, and review each toggle. Motion or fitness data is not required for core reporting."
+            "text": "Open device Settings for Chisto.mk and review each toggle. Motion or fitness data is not required for core reporting."
           },
           {
             "type": "bullets",
@@ -501,7 +503,7 @@
           {
             "type": "callout",
             "variant": "note",
-            "text": "Toggle cellular data for Chisto.mk in iOS Settings if roaming blocks only this app."
+            "text": "Toggle cellular data for Chisto.mk in device Settings if roaming blocks only this app."
           }
         ]
       },
@@ -518,7 +520,7 @@
             "title": "Before you write to us",
             "items": [
               "Restart the device once.",
-              "Confirm you are on the latest build from the MK App Store.",
+              "Confirm you are on the latest build from the App Store or Google Play.",
               "Capture screenshots of error text and blur personal details."
             ]
           },
@@ -535,10 +537,10 @@
     "cardTitle": "Troubleshooting",
     "cardSummary": "Fix sign-in, SMS codes, map location, camera uploads, and know when to update or contact support.",
     "title": "Troubleshooting common issues",
-    "lastUpdated": "28 June 2026",
-    "lastReviewed": "28 June 2026",
+    "lastUpdated": "3 July 2026",
+    "lastReviewed": "3 July 2026",
     "datePublished": "2024-01-01T00:00:00.000Z",
-    "dateModified": "2026-06-28T00:00:00.000Z",
+    "dateModified": "2026-07-03T00:00:00.000Z",
     "sections": [
       {
         "id": "cannot-sign-in",
@@ -555,7 +557,7 @@
               "Turn airplane mode off, wait, then reconnect.",
               "Set date and time to automatic.",
               "Request a fresh SMS code and paste carefully.",
-              "Update Chisto.mk from the MK App Store, then restart."
+              "Update Chisto.mk from the App Store or Google Play, then restart."
             ]
           },
           {
@@ -645,14 +647,14 @@
         "blocks": [
           {
             "type": "paragraph",
-            "text": "When nothing above works, collect a short description and reach out. Note your iOS version and app version."
+            "text": "When nothing above works, collect a short description and reach out. Note your device OS version and app version."
           },
           {
             "type": "bullets",
             "title": "Before you contact us",
             "items": [
               "Restart the phone once.",
-              "Confirm the official MK App Store listing.",
+              "Confirm the official App Store or Google Play listing.",
               "Describe which tab failed: Home feed, Map tab, Reports, or Events."
             ]
           },
@@ -2271,13 +2273,14 @@
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Your phone always wins. If push is off at the iOS level, Chisto.mk cannot override that. Use both OS settings and in-app toggles."
+            "text": "Your phone always wins. If push is off at the OS level, Chisto.mk cannot override that. Use both OS settings and in-app toggles."
           },
           {
             "type": "bullets",
             "title": "Where to look",
             "items": [
               "iOS: Settings, Notifications, Chisto.mk.",
+              "Android: Settings, Apps, Chisto.mk, Notifications.",
               "In app: inbox preferences icon for group switches.",
               "Profile settings for quick links to the same sheet."
             ]

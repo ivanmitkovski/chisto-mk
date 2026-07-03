@@ -146,17 +146,22 @@ jobs:
 
       - name: Lint landing marketing copy
         run: pnpm --filter @chisto/landing run lint:marketing-copy
+        env:
+          NEXT_PUBLIC_GOOGLE_PLAY_URL: https://play.google.com/store/apps/details?id=mk.chisto.app
 
       - name: Landing ESLint
         run: pnpm --filter @chisto/landing lint
 
       - name: Build landing (Playwright E2E)
         run: pnpm --filter @chisto/landing build
+        env:
+          NEXT_PUBLIC_GOOGLE_PLAY_URL: https://play.google.com/store/apps/details?id=mk.chisto.app
 
       - name: Landing launch check
         run: pnpm --filter @chisto/landing launch:check
         env:
           NEXT_PUBLIC_APP_STORE_URL: https://apps.apple.com/mk/app/chisto-mk/id6771892086
+          NEXT_PUBLIC_GOOGLE_PLAY_URL: https://play.google.com/store/apps/details?id=mk.chisto.app
 
       - name: Install Playwright Chromium (landing)
         run: pnpm --filter @chisto/landing exec playwright install chromium

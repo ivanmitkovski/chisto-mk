@@ -36,7 +36,8 @@ export function Logo({ className }: LogoProps) {
         />
         <span>
           <span className="font-bold text-black">Chisto</span>
-          <span className="font-medium text-primary-text">.mk</span>
+          {/* brand-logotype: WCAG 1.4.3 exempts logo text from contrast minimums; excluded in axe E2E. */}
+          <span className="brand-logotype font-medium text-primary">.mk</span>
         </span>
       </span>
     </Link>

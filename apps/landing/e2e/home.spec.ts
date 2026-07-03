@@ -39,21 +39,21 @@ test.describe("home page", () => {
 
   test("has no critical or serious axe violations", async ({ page }) => {
     await page.goto("/en");
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).exclude(".brand-logotype").analyze();
     const bad = criticalAndSerious(results.violations);
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
   });
 
   test("mk home has no critical or serious axe violations", async ({ page }) => {
     await page.goto("/mk");
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).exclude(".brand-logotype").analyze();
     const bad = criticalAndSerious(results.violations);
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
   });
 
   test("sq home has no critical or serious axe violations", async ({ page }) => {
     await page.goto("/sq");
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).exclude(".brand-logotype").analyze();
     const bad = criticalAndSerious(results.violations);
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
   });

@@ -3,6 +3,8 @@ import {
   APP_STORE_APP_ID,
   APP_STORE_LISTING_SLUG,
   APP_STORE_URL_DEFAULT,
+  GOOGLE_PLAY_PACKAGE_ID,
+  GOOGLE_PLAY_URL_DEFAULT,
   getAppStoreUrl,
   getGooglePlayUrl,
   hasStoreDownloadLinks,
@@ -32,10 +34,17 @@ describe("store-links", () => {
     expect(getAppStoreUrl()).toBe(APP_STORE_URL_DEFAULT);
   });
 
-  it("returns Google Play only when configured", () => {
-    expect(getGooglePlayUrl()).toBeNull();
-    vi.stubEnv("NEXT_PUBLIC_GOOGLE_PLAY_URL", "https://play.google.com/store/apps/details?id=mk.chisto");
-    expect(getGooglePlayUrl()).toBe("https://play.google.com/store/apps/details?id=mk.chisto");
+  it("returns the live Google Play URL by default", () => {
+    expect(getGooglePlayUrl()).toBe(GOOGLE_PLAY_URL_DEFAULT);
+    expect(GOOGLE_PLAY_URL_DEFAULT).toBe(
+      `https://play.google.com/store/apps/details?id=${GOOGLE_PLAY_PACKAGE_ID}`,
+    );
+    expect(hasStoreDownloadLinks()).toBe(true);
+  });
+
+  it("allows env override for Google Play URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_PLAY_URL", "https://play.google.com/store/apps/details?id=example");
+    expect(getGooglePlayUrl()).toBe("https://play.google.com/store/apps/details?id=example");
   });
 
   it("builds locale-aware home download anchors", () => {

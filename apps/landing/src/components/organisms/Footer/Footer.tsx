@@ -65,7 +65,7 @@ export function Footer() {
     <footer className="hairline-t mesh-footer relative overflow-hidden">
       <Container className="py-12 md:py-16">
         <div className="grid gap-12 md:grid-cols-12 md:gap-10 lg:gap-12">
-          <div className="md:col-span-12 lg:col-span-3 lg:max-w-xs">
+          <div className="md:col-span-12 lg:col-span-4">
             <Logo />
             <div className="mt-5 space-y-1 text-sm leading-relaxed text-gray-600">
               <p className="font-medium text-gray-900">{legalEntityName}</p>
@@ -89,7 +89,7 @@ export function Footer() {
             {hasStoreDownloadLinks() && (
               <div className="mt-6">
                 <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{t("downloadApp")}</p>
-                <StoreDownloadButtons analyticsSource="footer" />
+                <StoreDownloadButtons align="start" analyticsSource="footer" />
               </div>
             )}
           </div>
@@ -201,7 +201,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="md:col-span-12 lg:col-span-5">
+          <div className="md:col-span-12 lg:col-span-4">
             <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{t("newsletter")}</h4>
             <p className="mb-4 text-sm text-gray-500">{t("stayUpToDate")}</p>
             <form onSubmit={handleSubscribe} className="w-full max-w-[20.4rem] space-y-2" aria-busy={status === "loading"}>

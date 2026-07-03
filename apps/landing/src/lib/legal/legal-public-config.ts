@@ -48,7 +48,7 @@ export const LEGAL_PUBLIC_DEFAULTS = {
   adProvider: "Not used",
   adPurpose: "Not used",
   appStoreUrl: "https://apps.apple.com/mk/app/chisto-mk/id6771892086",
-  googlePlayUrl: "",
+  googlePlayUrl: "https://play.google.com/store/apps/details?id=mk.chisto.app",
   facebookUrl: "https://www.facebook.com/profile.php?id=61590541866009",
   instagramUrl: "https://www.instagram.com/chisto.mk/",
   linkedinUrl: "https://www.linkedin.com/company/chisto-mk/",

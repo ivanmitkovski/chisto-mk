@@ -56,7 +56,7 @@ function newsArticleJsonLd(opts: {
 }): string {
   const pageUrl = `${opts.siteUrl}/${opts.locale}/news/${opts.slug}`;
   const image = coverImageForMeta(opts.coverImage);
-  const logoUrl = `${opts.siteUrl}/brand/chisto-mark-green.svg`;
+  const logoUrl = `${opts.siteUrl}/icon.png`;
   const inLanguage = schemaLanguage(opts.locale);
 
   const article: Record<string, unknown> = {
