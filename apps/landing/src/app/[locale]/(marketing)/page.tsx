@@ -7,7 +7,7 @@ import { Features } from "@/components/organisms/Features";
 import { FAQ } from "@/components/organisms/FAQ";
 import { CTASection } from "@/components/organisms/CTASection";
 import { LatestNewsSection } from "@/components/organisms/NewsPage";
-import { getAppStoreUrl } from "@/lib/store-links";
+import { getAppStoreUrl, getGooglePlayUrl } from "@/lib/store-links";
 import { getSocialProfileUrls } from "@/lib/social-links";
 import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 import { LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
@@ -33,6 +33,7 @@ export default async function HomePage({ params }: Props) {
   const siteName = tMeta("siteName");
   const tFaq = await getTranslations({ locale, namespace: "faq" });
   const appStoreUrl = getAppStoreUrl();
+  const googlePlayUrl = getGooglePlayUrl();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || LEGAL_PUBLIC_DEFAULTS.siteUrl;
 
   const faqItems = tFaq.raw("items") as { title: string; content: string }[];
@@ -51,7 +52,7 @@ export default async function HomePage({ params }: Props) {
       "@type": "Organization",
       name: LEGAL_PUBLIC_DEFAULTS.legalEntityName,
       url: siteUrl,
-      logo: `${siteUrl}/brand/chisto-mark-green.svg`,
+      logo: `${siteUrl}/icon.png`,
       ...(socialProfileUrls.length > 0 ? { sameAs: socialProfileUrls } : {}),
       contactPoint: {
         "@type": "ContactPoint",
@@ -83,6 +84,18 @@ export default async function HomePage({ params }: Props) {
       applicationCategory: "LifestyleApplication",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       downloadUrl: appStoreUrl,
+    });
+  }
+
+  if (googlePlayUrl) {
+    jsonLdBlocks.push({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: siteName,
+      operatingSystem: "ANDROID",
+      applicationCategory: "LifestyleApplication",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      downloadUrl: googlePlayUrl,
     });
   }
 

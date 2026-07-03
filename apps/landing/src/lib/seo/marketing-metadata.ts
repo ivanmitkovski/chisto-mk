@@ -27,12 +27,24 @@ export function buildMarketingMetadata({
       `${base}/${l}${normalizedPath === "/" ? "" : normalizedPath}`,
     ]),
   ) as Record<string, string>;
+  languages["x-default"] = `${base}/${routing.defaultLocale}${normalizedPath === "/" ? "" : normalizedPath}`;
 
   const ogLocale = locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US";
 
   return {
     title,
     description,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
     alternates: {
       canonical,
       languages,

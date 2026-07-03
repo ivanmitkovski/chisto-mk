@@ -12,12 +12,17 @@ export const APP_STORE_LISTING_SLUG = "chisto-mk";
  */
 export const APP_STORE_URL_DEFAULT = `https://apps.apple.com/mk/app/${APP_STORE_LISTING_SLUG}/id${APP_STORE_APP_ID}`;
 
+/** Google Play package for mk.chisto.app (Chisto.mk). */
+export const GOOGLE_PLAY_PACKAGE_ID = "mk.chisto.app";
+
+export const GOOGLE_PLAY_URL_DEFAULT = `https://play.google.com/store/apps/details?id=${GOOGLE_PLAY_PACKAGE_ID}`;
+
 export function getAppStoreUrl(): string | null {
   return getPublicOptionalUrl(process.env.NEXT_PUBLIC_APP_STORE_URL) ?? APP_STORE_URL_DEFAULT;
 }
 
 export function getGooglePlayUrl(): string | null {
-  return getPublicOptionalUrl(process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL);
+  return getPublicOptionalUrl(process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL) ?? GOOGLE_PLAY_URL_DEFAULT;
 }
 
 export function hasStoreDownloadLinks(): boolean {

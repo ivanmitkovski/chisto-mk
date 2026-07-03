@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { hasStoreDownloadLinks } from "@/components/molecules/StoreDownloadButtons";
 import { MarketingPhoneRow } from "@/components/molecules/MarketingPhoneRow";
-import { fadeInUp, staggerContainer } from "@/lib/animations/variants";
 import {
   DOWNLOAD_SECTION_ID,
   scheduleScrollToDownloadSection,
@@ -45,33 +43,23 @@ export function Hero() {
     <Section className="relative overflow-x-clip mesh-hero !pb-20 !pt-7 md:!pb-28 md:!pt-12 lg:!pb-32 lg:!pt-14">
       <HeroAtmosphere />
 
+      {/* CSS entrance (not Framer) so the LCP headline is visible in server HTML and paints immediately. */}
       <Container className="relative z-20">
-        <motion.div
-          className="mx-auto text-center"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.h1
-            className="text-hero font-bold tracking-tight text-gray-900 text-balance"
-            variants={fadeInUp}
-          >
+        <div className="mx-auto text-center">
+          <h1 className="text-hero font-bold tracking-tight text-gray-900 text-balance motion-safe:animate-slide-up motion-safe:[animation-fill-mode:both]">
             {t("title")}
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            className="mx-auto mt-6 max-w-2xl text-balance text-base font-semibold leading-relaxed text-gray-800 [text-shadow:0_1px_14px_rgba(255,255,255,0.85),0_0_1px_rgba(255,255,255,0.6)] md:text-lg md:leading-relaxed"
-            variants={fadeInUp}
-          >
+          <p className="mx-auto mt-6 max-w-2xl text-balance text-base font-semibold leading-relaxed text-gray-800 [text-shadow:0_1px_14px_rgba(255,255,255,0.85),0_0_1px_rgba(255,255,255,0.6)] md:text-lg md:leading-relaxed motion-safe:animate-slide-up motion-safe:[animation-delay:110ms] motion-safe:[animation-fill-mode:both]">
             {t("subtitle")}
-          </motion.p>
+          </p>
 
           {hasStoreDownloadLinks() ? (
-            <motion.div variants={fadeInUp} className="mt-10">
+            <div className="mt-10 motion-safe:animate-slide-up motion-safe:[animation-delay:200ms] motion-safe:[animation-fill-mode:both]">
               <HeroDownloadSection />
-            </motion.div>
+            </div>
           ) : null}
-        </motion.div>
+        </div>
 
         <div className="relative mx-auto mt-12 max-w-5xl overflow-visible md:mt-16">
           <div

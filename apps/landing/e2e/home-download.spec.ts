@@ -16,7 +16,11 @@ async function expectDownloadBadgesVisible(page: import("@playwright/test").Page
   const appStoreLink = downloadRegion.getByRole("link", {
     name: /download on the app store/i,
   });
+  const googlePlayLink = downloadRegion.getByRole("link", {
+    name: /get it on google play/i,
+  });
   await expect(appStoreLink).toBeVisible();
+  await expect(googlePlayLink).toBeVisible();
 
   const headerBottom = await page.locator("header").evaluate((el) => {
     const rect = el.getBoundingClientRect();

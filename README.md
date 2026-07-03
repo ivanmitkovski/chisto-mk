@@ -24,6 +24,7 @@
 | API | [api.chisto.mk](https://api.chisto.mk) |
 | Admin | [admin.chisto.mk](https://admin.chisto.mk) |
 | iOS (MK App Store) | [chisto-mk](https://apps.apple.com/mk/app/chisto-mk/id6771892086) |
+| Android (Google Play) | [Chisto.mk](https://play.google.com/store/apps/details?id=mk.chisto.app) |
 | Facebook | [facebook.com](https://www.facebook.com/profile.php?id=61590541866009) |
 | Instagram | [@chisto.mk](https://www.instagram.com/chisto.mk/) |
 | LinkedIn | [Chisto.mk](https://www.linkedin.com/company/chisto-mk/) |
@@ -41,7 +42,7 @@ flowchart LR
   subgraph clients [Clients]
     Landing[Landing Next.js]
     Admin[Admin Next.js]
-    Mobile[Flutter iOS]
+    Mobile[Flutter iOS and Android]
   end
 
   subgraph aws [AWS eu-central-1]

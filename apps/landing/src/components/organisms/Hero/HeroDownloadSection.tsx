@@ -13,7 +13,7 @@ export function HeroDownloadSection() {
       aria-label={t("downloadRegionLabel")}
       className="mx-auto flex max-w-lg flex-col items-center rounded-2xl px-3 py-2 sm:px-4"
     >
-      <StoreDownloadButtons className="justify-center" analyticsSource="hero" />
+      <StoreDownloadButtons align="center" analyticsSource="hero" />
     </section>
   );
 }

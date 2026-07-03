@@ -7,6 +7,11 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - dependencies
+    ignore:
+      # NestJS 10 is pinned via pnpm overrides in the root package.json;
+      # major bumps break the frozen lockfile until we migrate deliberately.
+      - dependency-name: "@nestjs/*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
@@ -16,8 +21,9 @@ updates:
     labels:
       - dependencies
 
+  # Dockerfiles live under apps/api, not the repo root.
   - package-ecosystem: docker
-    directory: /
+    directory: /apps/api
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

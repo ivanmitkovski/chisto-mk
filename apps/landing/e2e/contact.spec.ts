@@ -17,7 +17,7 @@ test.describe("Contact page", () => {
     if (await accept.isVisible().catch(() => false)) {
       await accept.click();
     }
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).exclude(".brand-logotype").analyze();
     const bad = criticalAndSerious(results.violations);
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
   });

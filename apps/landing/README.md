@@ -19,7 +19,9 @@ pnpm dev:landing
 
 Copy `apps/landing/.env.example`. Key public URLs:
 
-- `NEXT_PUBLIC_*`: App Store, social links, legal overrides
+- `NEXT_PUBLIC_APP_STORE_URL` — live MK App Store listing
+- `NEXT_PUBLIC_GOOGLE_PLAY_URL` — live Google Play listing (`mk.chisto.app`)
+- Other `NEXT_PUBLIC_*`: social links, legal overrides
 - Defaults in [`src/lib/legal/legal-public-config.ts`](src/lib/legal/legal-public-config.ts)
 
 ## Content

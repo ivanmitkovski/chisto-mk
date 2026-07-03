@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const siteUrl = getSiteUrl().replace(/\/$/, "");
   const canonical = `${siteUrl}/${locale}/news`;
 
-  let ogImageUrl = `${siteUrl}/brand/chisto-mark-green.svg`;
+  let ogImageUrl = `${siteUrl}/icon.png`;
   try {
     const { items } = await getNewsPosts(locale, { limit: 1 });
     const featured = items.find((p) => p.featured) ?? items[0];
