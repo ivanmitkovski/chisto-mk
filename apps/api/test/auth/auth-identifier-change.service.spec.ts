@@ -3,11 +3,16 @@ import { createHash } from 'node:crypto';
 import { AuthIdentifierChangeService } from '../../src/auth/services/auth-identifier-change.service';
 
 describe('AuthIdentifierChangeService', () => {
+  afterEach(async () => {
+    delete process.env.REDIS_URL;
+  });
+
   function makeSvc(overrides: {
     prisma?: Record<string, unknown>;
     sessionRevocation?: { revokeAllForUser: jest.Mock };
     redisGet?: string | null;
   } = {}) {
+    delete process.env.REDIS_URL;
     const prisma = {
       user: {
         findFirst: jest.fn().mockResolvedValue(null),

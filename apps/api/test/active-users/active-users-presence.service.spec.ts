@@ -56,6 +56,10 @@ describe('ActiveUsersPresenceService', () => {
     );
   });
 
+  afterEach(async () => {
+    await realtime?.onModuleDestroy();
+  });
+
   it('marks foreground heartbeat as online', async () => {
     await presence.heartbeat(user, {
       screen: 'Feed',

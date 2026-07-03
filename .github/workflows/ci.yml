@@ -256,7 +256,7 @@ jobs:
           flutter test test/
 
       - name: API unit tests (Jest) with coverage thresholds
-        timeout-minutes: 20
+        timeout-minutes: 15
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             pnpm --filter @chisto/api run test:cov:main

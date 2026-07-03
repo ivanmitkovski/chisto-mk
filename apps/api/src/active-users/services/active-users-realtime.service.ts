@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import { Observable, Subject } from 'rxjs';
 import {
   PRESENCE_REDIS_KEYS,
@@ -30,8 +31,8 @@ export class ActiveUsersRealtimeService implements OnModuleDestroy {
 
   constructor() {
     if (this.redisUrl) {
-      this.publisher = new Redis(this.redisUrl, { lazyConnect: true });
-      this.subscriber = new Redis(this.redisUrl, { lazyConnect: true });
+      this.publisher = new Redis(this.redisUrl, optionalLazyRedisOptions);
+      this.subscriber = new Redis(this.redisUrl, optionalLazyRedisOptions);
       void this.subscriber
         .subscribe(ActiveUsersRealtimeService.REDIS_CHANNEL)
         .then(() => {

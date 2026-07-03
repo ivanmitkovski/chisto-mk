@@ -16,7 +16,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest --passWithNoTests",
     "test:cov": "jest --coverage --coverageReporters=text-summary --passWithNoTests",
-    "test:cov:main": "jest --coverage --coverageReporters=text-summary --passWithNoTests --detectOpenHandles --runInBand --openHandlesTimeout=30000",
+    "test:cov:main": "jest --coverage --coverageReporters=text-summary --passWithNoTests --detectOpenHandles --runInBand --openHandlesTimeout=30000 --forceExit",
     "test:cov:leaks": "jest --passWithNoTests --detectOpenHandles --runInBand --openHandlesTimeout=30000",
     "test:cov:areas": "node scripts/check-coverage-areas.mjs",
     "check:god-services": "node scripts/check-no-god-services.mjs",
