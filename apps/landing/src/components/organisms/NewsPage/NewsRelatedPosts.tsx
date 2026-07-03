@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
+import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import type { ResolvedNewsPost } from "@/data/news-posts";
 import { NewsRelatedAnalyticsLink } from "./NewsRelatedAnalyticsLink";
 
@@ -36,7 +36,7 @@ export function NewsRelatedPosts({ posts, title, categoryLabel, fromSlug }: News
                     src={post.coverImage}
                     alt={post.title}
                     fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                    className={`${newsImageObjectFitClass(post.coverImage)} transition-transform duration-300 group-hover:scale-[1.02]`}
                     sizes="96px"
                     unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
                   />

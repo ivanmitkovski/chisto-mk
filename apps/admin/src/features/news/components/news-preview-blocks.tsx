@@ -1,5 +1,6 @@
 'use client';
 
+import { isSvgMediaUrl } from '@chisto/news-content';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { RenderNewsBlocks, resolvePreviewBlocks as resolveSharedBlocks } from '@chisto/news-content/render';
@@ -47,7 +48,7 @@ export function NewsPreviewBlocks({ body }: NewsPreviewBlocksProps) {
             src={src}
             alt={alt}
             {...(fill !== undefined ? { fill } : {})}
-            className="object-cover"
+            className={isSvgMediaUrl(src) ? 'object-contain' : 'object-cover'}
             sizes="(min-width: 768px) 768px, 100vw"
             {...(loading ? { loading } : {})}
             {...(unoptimized !== undefined ? { unoptimized } : { unoptimized: true })}

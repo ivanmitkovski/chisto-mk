@@ -1,10 +1,26 @@
 import { BadRequestException } from '@nestjs/common';
+import {
+  NEWS_COVER_MAX_BYTES,
+  NEWS_INLINE_IMAGE_MAX_BYTES,
+  NEWS_SVG_MAX_BYTES,
+  NEWS_VIDEO_MAX_BYTES,
+  newsRasterImageMaxBytes,
+} from '@chisto/news-content';
 import type { NewsMediaKind } from '../../prisma-client';
 import { NewsImageProcessor } from './news-image-processor';
 import { assertNewsVideoFile } from './news-video-validator';
 
-export const NEWS_MAX_IMAGE_BYTES = 10 * 1024 * 1024;
-export const NEWS_MAX_VIDEO_BYTES = 25 * 1024 * 1024;
+export {
+  NEWS_COVER_MAX_BYTES,
+  NEWS_INLINE_IMAGE_MAX_BYTES,
+  NEWS_SVG_MAX_BYTES,
+  NEWS_VIDEO_MAX_BYTES,
+  newsRasterImageMaxBytes,
+};
+
+/** @deprecated Use NEWS_INLINE_IMAGE_MAX_BYTES or newsRasterImageMaxBytes(kind). */
+export const NEWS_MAX_IMAGE_BYTES = NEWS_INLINE_IMAGE_MAX_BYTES;
+export const NEWS_MAX_VIDEO_BYTES = NEWS_VIDEO_MAX_BYTES;
 
 const VIDEO_MIMES = new Set(['video/mp4', 'video/quicktime', 'video/webm']);
 
@@ -52,7 +68,8 @@ export async function validateAndProcessNewsMediaFile(
     };
   }
 
-  const image = await imageProcessor.process(file, NEWS_MAX_IMAGE_BYTES);
+  const maxBytes = newsRasterImageMaxBytes(kind);
+  const image = await imageProcessor.process(file, maxBytes);
   return {
     body: image.buffer,
     mime: image.mime,

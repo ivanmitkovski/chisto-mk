@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
+import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { getTranslations } from "next-intl/server";
 import { Link, type AppLocale } from "@/i18n/routing";
 import { Badge } from "@/components/atoms/Badge";
@@ -111,7 +111,7 @@ export async function LatestNewsSection({ locale }: LatestNewsSectionProps) {
                       src={post.coverImage}
                       alt={post.title}
                       fill
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                      className={`${newsImageObjectFitClass(post.coverImage)} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
                     />

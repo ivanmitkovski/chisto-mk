@@ -5,6 +5,9 @@ module.exports = {
   rootDir: '.',
   testMatch: ['<rootDir>/test/**/*.spec.ts', '<rootDir>/test/**/*.test.ts'],
   moduleFileExtensions: ['js', 'json', 'ts'],
+  moduleNameMapper: {
+    '^isomorphic-dompurify$': '<rootDir>/test/__mocks__/isomorphic-dompurify.ts',
+  },
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   collectCoverageFrom: [
     'src/**/*.ts',
