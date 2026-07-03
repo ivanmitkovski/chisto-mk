@@ -33,6 +33,8 @@ export function RichTextLinkDialog({
   const t = useTranslations('news');
   const { showToast } = useToast();
   const snapshotRef = useRef<LinkSelectionSnapshot | null>(null);
+  const linkTextInputRef = useRef<HTMLInputElement | null>(null);
+  const linkUrlInputRef = useRef<HTMLInputElement | null>(null);
   const [linkUrl, setLinkUrl] = useState('https://');
   const [linkText, setLinkText] = useState('');
   const [linkNewTab, setLinkNewTab] = useState(true);
@@ -106,19 +108,31 @@ export function RichTextLinkDialog({
       ? t('form.linkDialogDescriptionWithText', { text: linkText.trim() })
       : t('form.linkDialogDescription');
 
+  const initialFocusRef = selectionWasEmpty ? linkTextInputRef : linkUrlInputRef;
+
   return (
-    <Modal open={open} title={t('form.linkDialogTitle')} description={description} onClose={handleClose}>
+    <Modal
+      open={open}
+      title={t('form.linkDialogTitle')}
+      description={description}
+      onClose={handleClose}
+      initialFocusRef={initialFocusRef}
+    >
       <div className={dialogClassName ?? styles.linkDialog}>
         <div className={styles.linkTextPreview} aria-live="polite">
-          <span className={styles.linkTextLabel}>{t('form.linkText')}</span>
+          <span className={styles.linkTextLabel} id="rich-text-link-text-label">
+            {t('form.linkText')}
+          </span>
           {selectionWasEmpty ? (
             <input
+              ref={linkTextInputRef}
+              id="rich-text-link-text"
               type="text"
               className={styles.linkTextInput}
               value={linkText}
               onChange={(event) => setLinkText(event.target.value)}
               placeholder={t('form.linkTextPlaceholder')}
-              autoFocus
+              aria-labelledby="rich-text-link-text-label"
             />
           ) : linkText.trim() ? (
             <p className={styles.linkTextValue}>{linkText.trim()}</p>
@@ -126,14 +140,18 @@ export function RichTextLinkDialog({
             <p className={styles.linkTextEmpty}>{t('form.linkTextEmpty')}</p>
           )}
         </div>
-        <label className={styles.linkField}>
+        <label className={styles.linkField} htmlFor="rich-text-link-url">
           <span>{t('form.linkUrl')}</span>
           <input
-            type="url"
+            ref={linkUrlInputRef}
+            id="rich-text-link-url"
+            type="text"
+            inputMode="url"
+            autoComplete="url"
+            spellCheck={false}
             value={linkUrl}
             onChange={(event) => setLinkUrl(event.target.value)}
             placeholder="https://"
-            autoFocus={!selectionWasEmpty}
           />
         </label>
         <label className={styles.checkboxRow}>

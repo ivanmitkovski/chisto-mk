@@ -164,9 +164,9 @@ export function NewsDocumentToolbar({
   const openLinkDialog = useCallback(() => {
     if (!activeEditor) return;
     setLinkSnapshot(captureLinkDialogState(activeEditor));
-    retainEditorFocus();
+    activeEditor.commands.blur();
     setLinkOpen(true);
-  }, [activeEditor, retainEditorFocus]);
+  }, [activeEditor]);
 
   const closeLinkDialog = useCallback(() => {
     setLinkOpen(false);
@@ -194,6 +194,7 @@ export function NewsDocumentToolbar({
   if (readOnly) return null;
 
   return (
+    <>
     <div
       className={styles.root}
       role="toolbar"
@@ -335,6 +336,8 @@ export function NewsDocumentToolbar({
         }}
       />
 
+    </div>
+
       <RichTextLinkDialog
         editor={activeEditor}
         snapshot={linkSnapshot}
@@ -343,7 +346,7 @@ export function NewsDocumentToolbar({
         onApplied={() => notifyToolbarChange()}
         dialogClassName={styles.linkDialog}
       />
-    </div>
+    </>
   );
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { Modal } from './modal';
 
@@ -31,5 +32,17 @@ describe('Modal keyboard interaction', () => {
     await user.keyboard('{Escape}');
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('focuses initialFocusRef when provided', async () => {
+    const inputRef = createRef<HTMLInputElement>();
+    renderModal({
+      initialFocusRef: inputRef,
+      children: <input ref={inputRef} aria-label="Target field" defaultValue="" />,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Target field')).toHaveFocus();
+    });
   });
 });
