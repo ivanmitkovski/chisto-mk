@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -12,14 +12,23 @@ import "../globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   manifest: "/manifest.webmanifest",
-  icons: {
-    icon: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
+  applicationName: "Chisto.mk",
+  appleWebApp: {
+    capable: true,
+    title: "Chisto.mk",
+    statusBarStyle: "default",
   },
+  formatDetection: { telephone: false },
   itunes: {
     appId: APP_STORE_APP_ID,
     appArgument: getSiteUrl(),
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2FD788",
+  width: "device-width",
+  initialScale: 1,
 };
 
 const inter = Inter({

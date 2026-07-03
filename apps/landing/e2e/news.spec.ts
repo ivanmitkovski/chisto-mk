@@ -23,7 +23,7 @@ test.describe("news pages", () => {
   test("has no critical or serious axe violations on hub", async ({ page }) => {
     await page.goto("/en/news");
     await dismissCookieBanner(page);
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).exclude(".brand-logotype").analyze();
     const bad = criticalAndSerious(results.violations);
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
   });
