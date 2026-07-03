@@ -25,7 +25,7 @@ export default async function NewsHubLoading() {
           <div>
             <SkeletonBar className="h-4 w-24" />
             <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200/90 md:grid md:grid-cols-2">
-              <SkeletonBar className="aspect-[4/3] rounded-none md:aspect-auto md:min-h-[280px]" />
+              <SkeletonBar className="aspect-[21/9] rounded-none" />
               <div className="space-y-4 p-8 md:p-10">
                 <SkeletonBar className="h-5 w-32" />
                 <SkeletonBar className="h-8 w-full" />
@@ -38,7 +38,7 @@ export default async function NewsHubLoading() {
           <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <li key={i} className="overflow-hidden rounded-2xl border border-gray-200/90">
-                <SkeletonBar className="aspect-[16/10] rounded-none" />
+                <SkeletonBar className="aspect-[21/9] rounded-none" />
                 <div className="space-y-3 p-6">
                   <SkeletonBar className="h-4 w-28" />
                   <SkeletonBar className="h-5 w-full" />

@@ -3,7 +3,10 @@ import { ActiveUsersRealtimeService } from '../../src/active-users/services/acti
 
 describe('UserActivityService', () => {
   it('publishes feed item after persist', async () => {
-    const realtime = new ActiveUsersRealtimeService();
+    const realtime = {
+      publishActivityEvent: jest.fn(),
+      recordDau: jest.fn(),
+    } as unknown as ActiveUsersRealtimeService;
     const publish = jest.spyOn(realtime, 'publishActivityEvent');
     const prisma = {
       userActivityEvent: {

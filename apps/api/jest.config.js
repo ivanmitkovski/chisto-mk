@@ -20,6 +20,7 @@ module.exports = {
     '<rootDir>/src/generated/',
   ],
   coverageDirectory: './coverage',
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
   coverageThreshold: {
     global: {
       statements: 54,

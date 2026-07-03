@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import {
   PRESENCE_CONFIG,
   PRESENCE_REDIS_KEYS,
@@ -21,9 +22,7 @@ export class PresenceStoreService implements OnModuleDestroy {
   private readonly memory = new Map<string, MemoryEntry>();
 
   constructor() {
-    this.redis = this.redisUrl
-      ? new Redis(this.redisUrl, { maxRetriesPerRequest: 1, lazyConnect: true })
-      : null;
+    this.redis = this.redisUrl ? new Redis(this.redisUrl, optionalLazyRedisOptions) : null;
     if (!this.redisUrl) {
       this.logger.log('Active users presence using in-memory store (REDIS_URL unset)');
     }
