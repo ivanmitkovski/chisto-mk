@@ -1,7 +1,9 @@
 /// <reference types="jest" />
 
+import { mockMapConfigNoRedis } from '../helpers/mock-map-config';
+
 jest.mock('../../src/config/map.config', () => ({
-  loadMapConfig: () => require('../helpers/mock-map-config').mockMapConfigNoRedis(),
+  loadMapConfig: () => mockMapConfigNoRedis,
 }));
 
 import { MapLifecycleCronService } from '../../src/sites/map/map-lifecycle-cron.service';
