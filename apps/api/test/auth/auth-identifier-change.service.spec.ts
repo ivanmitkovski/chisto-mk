@@ -8,6 +8,7 @@ describe('AuthIdentifierChangeService', () => {
     sessionRevocation?: { revokeAllForUser: jest.Mock };
     redisGet?: string | null;
   } = {}) {
+    delete process.env.REDIS_URL;
     const prisma = {
       user: {
         findFirst: jest.fn().mockResolvedValue(null),
