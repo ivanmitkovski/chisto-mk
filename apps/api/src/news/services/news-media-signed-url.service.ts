@@ -4,7 +4,13 @@ import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { S3StorageClient } from '../../storage/util/s3-storage.client';
-import { presignedUrlExpiresAtMs } from '../../storage/services/report-media-signed-url.service';
+import {
+  cacheEntryExpiresAtMs,
+  effectivePresignTtlSeconds,
+  isCachedNewsSignedUrlStillValid,
+  parseCachedNewsSignedUrl,
+  serializeCachedNewsSignedUrl,
+} from './news-media-signed-url.cache';
 
 const DEFAULT_NEWS_MEDIA_SIGNED_URL_TTL_SECONDS = 60 * 60;
 const REDIS_CACHE_PREFIX = 'signedurl:news:';
@@ -13,7 +19,10 @@ const CACHE_SKEW_MS = 30_000;
 @Injectable()
 export class NewsMediaSignedUrlService implements OnModuleDestroy {
   private readonly logger = new Logger(NewsMediaSignedUrlService.name);
-  private readonly memoryCache = new Map<string, { url: string; expiresAt: number }>();
+  private readonly memoryCache = new Map<
+    string,
+    { url: string; expiresAt: number; credentialExpiresAt: number | null }
+  >();
   private readonly inFlight = new Map<string, Promise<string | null>>();
   private readonly redis: Redis | null;
   private readonly ttlSeconds: number;
@@ -65,22 +74,6 @@ export class NewsMediaSignedUrlService implements OnModuleDestroy {
     return `${REDIS_CACHE_PREFIX}${key}`;
   }
 
-  private isUrlStillValid(url: string, nowMs: number): boolean {
-    const expiry = presignedUrlExpiresAtMs(url);
-    if (expiry == null) {
-      return false;
-    }
-    return expiry > nowMs + CACHE_SKEW_MS;
-  }
-
-  private cacheExpiresAtMs(url: string, fallbackMs: number): number {
-    const urlExpiry = presignedUrlExpiresAtMs(url);
-    if (urlExpiry != null) {
-      return urlExpiry - CACHE_SKEW_MS;
-    }
-    return fallbackMs;
-  }
-
   private async resolveSignedGetUrl(objectKey: string, nowMs: number): Promise<string | null> {
     const client = this.s3.getClientOrNull();
     const bucket = this.s3.bucket;
@@ -89,8 +82,11 @@ export class NewsMediaSignedUrlService implements OnModuleDestroy {
     }
 
     const mem = this.memoryCache.get(objectKey);
-    if (mem && mem.expiresAt > nowMs && this.isUrlStillValid(mem.url, nowMs)) {
-      return mem.url;
+    if (mem && mem.expiresAt > nowMs) {
+      const cachedEntry = { url: mem.url, credentialExpiresAt: mem.credentialExpiresAt };
+      if (isCachedNewsSignedUrlStillValid(cachedEntry, nowMs, CACHE_SKEW_MS)) {
+        return mem.url;
+      }
     }
     if (mem) {
       this.memoryCache.delete(objectKey);
@@ -99,12 +95,20 @@ export class NewsMediaSignedUrlService implements OnModuleDestroy {
     if (this.redis) {
       try {
         const hit = await this.redis.get(this.cacheKeyForObjectKey(objectKey));
-        if (hit && this.isUrlStillValid(hit, nowMs)) {
+        const cachedEntry = hit ? parseCachedNewsSignedUrl(hit) : null;
+        if (cachedEntry && isCachedNewsSignedUrlStillValid(cachedEntry, nowMs, CACHE_SKEW_MS)) {
           this.memoryCache.set(objectKey, {
-            url: hit,
-            expiresAt: this.cacheExpiresAtMs(hit, nowMs + this.ttlSeconds * 1000),
+            url: cachedEntry.url,
+            credentialExpiresAt: cachedEntry.credentialExpiresAt,
+            expiresAt: cacheEntryExpiresAtMs(
+              cachedEntry.url,
+              cachedEntry.credentialExpiresAt,
+              nowMs,
+              this.ttlSeconds,
+              CACHE_SKEW_MS,
+            ),
           });
-          return hit;
+          return cachedEntry.url;
         }
       } catch {
         // Redis optional
@@ -112,6 +116,13 @@ export class NewsMediaSignedUrlService implements OnModuleDestroy {
     }
 
     try {
+      const credentialExpiresAtMs = await this.resolveCredentialExpiresAtMs(client);
+      const expiresIn = effectivePresignTtlSeconds(
+        this.ttlSeconds,
+        credentialExpiresAtMs,
+        nowMs,
+        CACHE_SKEW_MS,
+      );
       const signed = await getSignedUrl(
         client,
         new GetObjectCommand({
@@ -120,19 +131,53 @@ export class NewsMediaSignedUrlService implements OnModuleDestroy {
           ResponseContentDisposition: 'inline',
           ResponseContentType: NewsMediaSignedUrlService.contentTypeForKey(objectKey),
         }),
-        { expiresIn: this.ttlSeconds },
+        { expiresIn },
       );
-      const expiresAt = this.cacheExpiresAtMs(signed, nowMs + this.ttlSeconds * 1000);
-      this.memoryCache.set(objectKey, { url: signed, expiresAt });
+      const cacheEntry = {
+        url: signed,
+        credentialExpiresAt: credentialExpiresAtMs,
+      };
+      const expiresAt = cacheEntryExpiresAtMs(
+        signed,
+        credentialExpiresAtMs,
+        nowMs,
+        expiresIn,
+        CACHE_SKEW_MS,
+      );
+      this.memoryCache.set(objectKey, {
+        url: signed,
+        credentialExpiresAt: credentialExpiresAtMs,
+        expiresAt,
+      });
       if (this.redis) {
-        const redisTtl = Math.max(60, this.ttlSeconds - 60);
+        const redisTtlSeconds = Math.max(60, Math.ceil((expiresAt - nowMs) / 1000));
         void this.redis
-          .set(this.cacheKeyForObjectKey(objectKey), signed, 'EX', redisTtl)
+          .set(
+            this.cacheKeyForObjectKey(objectKey),
+            serializeCachedNewsSignedUrl(cacheEntry),
+            'EX',
+            redisTtlSeconds,
+          )
           .catch(() => undefined);
       }
       return signed;
     } catch (err) {
       this.logger.warn(`news_media.sign_failed key=${objectKey} err=${(err as Error).message}`);
+      return null;
+    }
+  }
+
+  private async resolveCredentialExpiresAtMs(
+    client: NonNullable<ReturnType<S3StorageClient['getClientOrNull']>>,
+  ): Promise<number | null> {
+    try {
+      const provider = client.config.credentials;
+      if (!provider) {
+        return null;
+      }
+      const credentials = await provider();
+      return credentials.expiration?.getTime() ?? null;
+    } catch {
       return null;
     }
   }
