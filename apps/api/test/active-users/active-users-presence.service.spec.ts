@@ -125,4 +125,8 @@ describe('ActiveUsersPresenceService', () => {
     const counts = await presence.countByStatus();
     expect(counts.total).toBe(0);
   });
+
+  afterEach(async () => {
+    await realtime?.onModuleDestroy();
+  });
 });

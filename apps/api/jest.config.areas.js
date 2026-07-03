@@ -8,6 +8,7 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   coverageDirectory: './coverage-area-runs',
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
   verbose: true,
   // Area gates run many suites back-to-back; timers/SSE mocks may keep handles open.
   forceExit: true,

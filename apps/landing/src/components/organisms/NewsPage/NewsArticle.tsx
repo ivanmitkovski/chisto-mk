@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { NEWS_COVER_FRAME_SURFACE } from "@/lib/images/news-cover-display";
 import { shouldUseUnoptimizedNewsImage, newsImageObjectFitClass } from "@/lib/images/news-image-optimization";
 import { Link, type AppLocale } from "@/i18n/routing";
 import type { ResolvedNewsPost } from "@/data/news-posts";
@@ -134,12 +135,12 @@ export function NewsArticle({
           <NewsShareBar title={post.title} excerpt={post.excerpt} copy={copy.share} />
 
           {post.coverImage ? (
-            <div className="relative mt-10 aspect-[21/9] max-w-4xl overflow-hidden rounded-2xl border border-gray-200/90 bg-gray-100 shadow-sm">
+            <div className={`relative mt-10 aspect-[21/9] max-w-4xl overflow-hidden rounded-2xl border border-gray-200/90 ${NEWS_COVER_FRAME_SURFACE} shadow-sm`}>
               <Image
                 src={post.coverImage}
                 alt={post.coverAltText ?? post.title}
                 fill
-                className={newsImageObjectFitClass(post.coverImage)}
+                className={newsImageObjectFitClass(post.coverImage, "cover")}
                 sizes="(min-width: 896px) 896px, 100vw"
                 priority
                 unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}

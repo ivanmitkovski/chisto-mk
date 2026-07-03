@@ -12,6 +12,9 @@ updates:
       # major bumps break the frozen lockfile until we migrate deliberately.
       - dependency-name: "@nestjs/*"
         update-types: ["version-update:semver-major"]
+      # TipTap v3 requires upgrading @tiptap/* packages together and editor API changes.
+      - dependency-name: "@tiptap/*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /

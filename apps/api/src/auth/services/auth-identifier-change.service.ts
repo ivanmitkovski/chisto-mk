@@ -1,6 +1,7 @@
 import { BadRequestException, Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { createHash, randomInt } from 'node:crypto';
 import Redis from 'ioredis';
+import { optionalLazyRedisOptions } from '../../common/redis/optional-lazy-redis-options';
 import { NotificationType } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EmailService } from '../../email/services/email.service';
@@ -53,7 +54,7 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
   ) {
     const url = process.env.REDIS_URL?.trim();
-    this.redis = url ? new Redis(url, { maxRetriesPerRequest: 1, lazyConnect: true }) : null;
+    this.redis = url ? new Redis(url, optionalLazyRedisOptions) : null;
     if (this.redis) void this.redis.connect().catch(() => undefined);
   }
 

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { PageLoadingSkeleton } from "@/components/molecules/PageLoadingSkeleton";
 import Image from "next/image";
+import { newsCoverFrameClass } from "@/lib/images/news-cover-display";
 import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { Link, type AppLocale } from "@/i18n/routing";
 import type { NewsCategory, ResolvedNewsPost } from "@/data/news-posts";
@@ -78,7 +79,7 @@ function PostGridCard({
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/90 bg-white/80 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-sm transition-[border-color,box-shadow,ring-color] duration-300 hover:border-primary/25 hover:shadow-lg hover:ring-primary/15">
       <Link
         href={`/news/${post.slug}`}
-        className="relative block aspect-[16/10] shrink-0 overflow-hidden bg-gray-100"
+        className={newsCoverFrameClass("shrink-0")}
         aria-label={post.title}
       >
         {post.coverImage ? (
@@ -86,7 +87,7 @@ function PostGridCard({
             src={post.coverImage}
             alt={post.title}
             fill
-            className={`${newsImageObjectFitClass(post.coverImage)} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
+            className={`${newsImageObjectFitClass(post.coverImage, "cover")} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
           />
@@ -185,7 +186,7 @@ export function NewsLanding({
               <article className="group mt-4 overflow-hidden rounded-2xl border border-gray-200/90 bg-white/80 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-sm transition-[border-color,box-shadow,ring-color] duration-300 hover:border-primary/25 hover:shadow-lg hover:ring-primary/20 md:grid md:grid-cols-2 md:gap-0">
                 <Link
                   href={`/news/${featuredPost.slug}`}
-                  className="relative block aspect-[4/3] overflow-hidden bg-gray-100 md:aspect-auto md:min-h-[280px]"
+                  className={newsCoverFrameClass()}
                   aria-label={featuredPost.title}
                 >
                   {featuredPost.coverImage ? (
@@ -193,7 +194,7 @@ export function NewsLanding({
                       src={featuredPost.coverImage}
                       alt={featuredPost.title}
                       fill
-                      className={`${newsImageObjectFitClass(featuredPost.coverImage)} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
+                      className={`${newsImageObjectFitClass(featuredPost.coverImage, "cover")} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
                       sizes="(min-width: 768px) 50vw, 100vw"
                       unoptimized={shouldUseUnoptimizedNewsImage(featuredPost.coverImage)}
                     />

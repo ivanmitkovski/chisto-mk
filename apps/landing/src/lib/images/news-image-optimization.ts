@@ -3,8 +3,17 @@ import { isSvgMediaUrl } from "@chisto/news-content";
 /** Remote hosts allowed in next.config `images.remotePatterns`. */
 const OPTIMIZABLE_REMOTE_SUFFIXES = [".amazonaws.com", ".cloudfront.net"];
 
-export function newsImageObjectFitClass(src: string): string {
-  return isSvgMediaUrl(src) ? "object-contain" : "object-cover";
+export type NewsImageRole = "cover" | "inline";
+
+/** Cover art fills a 21:9 frame; SVG logos stay fully visible. Inline photos fill their frame. */
+export function newsImageObjectFitClass(src: string, role: NewsImageRole = "inline"): string {
+  if (isSvgMediaUrl(src)) {
+    return "object-contain object-center";
+  }
+  if (role === "cover") {
+    return "object-cover object-center";
+  }
+  return "object-cover object-center";
 }
 
 /**

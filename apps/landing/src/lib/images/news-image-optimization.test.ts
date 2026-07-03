@@ -34,10 +34,14 @@ describe("shouldUseUnoptimizedNewsImage", () => {
 
 describe("newsImageObjectFitClass", () => {
   it("uses object-contain for SVG", () => {
-    expect(newsImageObjectFitClass("/news/logo.svg")).toBe("object-contain");
+    expect(newsImageObjectFitClass("/news/logo.svg")).toBe("object-contain object-center");
   });
 
-  it("uses object-cover for raster images", () => {
-    expect(newsImageObjectFitClass("/news/cover.jpg")).toBe("object-cover");
+  it("uses object-cover for cover images", () => {
+    expect(newsImageObjectFitClass("/news/cover.jpg", "cover")).toBe("object-cover object-center");
+  });
+
+  it("uses object-cover for inline raster images", () => {
+    expect(newsImageObjectFitClass("/news/inline.jpg")).toBe("object-cover object-center");
   });
 });
