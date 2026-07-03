@@ -3,10 +3,13 @@ import { imageSize } from 'image-size';
 import sharp from 'sharp';
 import { detectAllowedImageMimeFromBuffer } from '../../common/utils/detect-allowed-image-mime-from-buffer';
 import { detectHeicFromBuffer, isHeicMime } from '../../common/utils/detect-heic-from-buffer';
+import { detectSvgFromBuffer } from '../../common/utils/detect-svg-from-buffer';
+import { parseSvgDimensions, sanitizeSvgBuffer } from '../../common/utils/sanitize-svg-buffer';
 
 const MIN_DIMENSION = 128;
 const MAX_DIMENSION = 8192;
 const HEIC_WEBP_QUALITY = 85;
+export const NEWS_SVG_MAX_BYTES = 2 * 1024 * 1024;
 
 export type NewsImageUploadFile = {
   buffer: Buffer;
@@ -19,8 +22,8 @@ export type ProcessedNewsImage = {
   buffer: Buffer;
   mime: string;
   ext: string;
-  width: number;
-  height: number;
+  width: number | null;
+  height: number | null;
 };
 
 @Injectable()
@@ -41,6 +44,12 @@ export class NewsImageProcessor {
 
     const declared = (file.mimetype || '').toLowerCase();
     const sample = file.buffer.subarray(0, Math.min(file.buffer.length, 4096));
+    const isSvg = detectSvgFromBuffer(sample);
+
+    if (isSvg) {
+      return this.processSvg(file);
+    }
+
     const isHeic = isHeicMime(declared) || detectHeicFromBuffer(sample);
 
     if (isHeic) {
@@ -51,7 +60,7 @@ export class NewsImageProcessor {
     if (!detected) {
       throw new BadRequestException({
         code: 'NEWS_INVALID_IMAGE_TYPE',
-        message: 'Image must be JPEG, PNG, WebP, or HEIC',
+        message: 'Image must be JPEG, PNG, WebP, HEIC, or SVG',
       });
     }
 
@@ -80,6 +89,41 @@ export class NewsImageProcessor {
       buffer: file.buffer,
       mime: detected,
       ext,
+      width,
+      height,
+    };
+  }
+
+  private processSvg(file: NewsImageUploadFile): ProcessedNewsImage {
+    if (file.size > NEWS_SVG_MAX_BYTES) {
+      throw new BadRequestException({
+        code: 'NEWS_IMAGE_TOO_LARGE',
+        message: `SVG exceeds ${Math.round(NEWS_SVG_MAX_BYTES / (1024 * 1024))}MB limit`,
+      });
+    }
+
+    const declared = (file.mimetype || '').toLowerCase();
+    if (
+      declared &&
+      declared !== 'application/octet-stream' &&
+      declared !== 'image/svg+xml' &&
+      declared !== 'text/xml' &&
+      declared !== 'application/xml'
+    ) {
+      throw new BadRequestException({
+        code: 'NEWS_IMAGE_TYPE_MISMATCH',
+        message: 'File content does not match the declared type',
+      });
+    }
+
+    const sanitized = sanitizeSvgBuffer(file.buffer);
+    const svgText = sanitized.toString('utf8');
+    const { width, height } = parseSvgDimensions(svgText);
+
+    return {
+      buffer: sanitized,
+      mime: 'image/svg+xml',
+      ext: 'svg',
       width,
       height,
     };

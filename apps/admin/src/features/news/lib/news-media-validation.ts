@@ -1,4 +1,5 @@
 export const NEWS_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+export const NEWS_SVG_MAX_BYTES = 2 * 1024 * 1024;
 export const NEWS_VIDEO_MAX_BYTES = 25 * 1024 * 1024;
 export const NEWS_IMAGE_MIN_DIMENSION = 128;
 
@@ -9,6 +10,7 @@ const IMAGE_MIMES = new Set([
   'image/webp',
   'image/heic',
   'image/heif',
+  'image/svg+xml',
 ]);
 
 const VIDEO_MIMES = new Set(['video/mp4', 'video/quicktime', 'video/webm']);
@@ -28,16 +30,22 @@ export type NewsMediaValidationResult =
   | { ok: false; code: NewsMediaValidationCode };
 
 export const NEWS_MEDIA_ACCEPT = {
-  cover: 'image/jpeg,image/png,image/webp,image/heic,image/heif,.heic',
-  inline_image: 'image/jpeg,image/png,image/webp,image/heic,image/heif,.heic',
+  cover: 'image/jpeg,image/png,image/webp,image/heic,image/heif,image/svg+xml,.heic,.svg',
+  inline_image: 'image/jpeg,image/png,image/webp,image/heic,image/heif,image/svg+xml,.heic,.svg',
   inline_video: 'video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov',
 } as const;
+
+function isSvgFile(file: File): boolean {
+  const mime = file.type.toLowerCase();
+  if (mime === 'image/svg+xml') return true;
+  return file.name.split('.').pop()?.toLowerCase() === 'svg';
+}
 
 function isImageFile(file: File): boolean {
   const mime = file.type.toLowerCase();
   if (IMAGE_MIMES.has(mime)) return true;
   const ext = file.name.split('.').pop()?.toLowerCase();
-  return ext === 'heic' || ext === 'heif';
+  return ext === 'heic' || ext === 'heif' || ext === 'svg';
 }
 
 function isVideoFile(file: File): boolean {
@@ -64,6 +72,14 @@ export async function validateNewsMediaFile(
   if (!isImageFile(file)) {
     return { ok: false, code: 'invalidImageType' };
   }
+
+  if (isSvgFile(file)) {
+    if (file.size > NEWS_SVG_MAX_BYTES) {
+      return { ok: false, code: 'imageTooLarge' };
+    }
+    return { ok: true };
+  }
+
   if (file.size > NEWS_IMAGE_MAX_BYTES) {
     return { ok: false, code: 'imageTooLarge' };
   }
