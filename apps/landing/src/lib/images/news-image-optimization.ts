@@ -5,10 +5,13 @@ const OPTIMIZABLE_REMOTE_SUFFIXES = [".amazonaws.com", ".cloudfront.net"];
 
 export type NewsImageRole = "cover" | "inline";
 
-/** Cover art and SVG assets stay fully visible; inline photos fill their frame. */
+/** Cover art fills a 21:9 frame; SVG logos stay fully visible. Inline photos fill their frame. */
 export function newsImageObjectFitClass(src: string, role: NewsImageRole = "inline"): string {
-  if (role === "cover" || isSvgMediaUrl(src)) {
+  if (isSvgMediaUrl(src)) {
     return "object-contain object-center";
+  }
+  if (role === "cover") {
+    return "object-cover object-center";
   }
   return "object-cover object-center";
 }

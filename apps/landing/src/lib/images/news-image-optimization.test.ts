@@ -37,8 +37,8 @@ describe("newsImageObjectFitClass", () => {
     expect(newsImageObjectFitClass("/news/logo.svg")).toBe("object-contain object-center");
   });
 
-  it("uses object-contain for cover images", () => {
-    expect(newsImageObjectFitClass("/news/cover.jpg", "cover")).toBe("object-contain object-center");
+  it("uses object-cover for cover images", () => {
+    expect(newsImageObjectFitClass("/news/cover.jpg", "cover")).toBe("object-cover object-center");
   });
 
   it("uses object-cover for inline raster images", () => {

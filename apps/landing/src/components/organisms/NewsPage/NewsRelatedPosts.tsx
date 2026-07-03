@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { NEWS_COVER_THUMB_FRAME_CLASS, NEWS_COVER_FRAME_SURFACE } from "@/lib/images/news-cover-display";
 import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import type { ResolvedNewsPost } from "@/data/news-posts";
 import { NewsRelatedAnalyticsLink } from "./NewsRelatedAnalyticsLink";
@@ -31,7 +32,7 @@ export function NewsRelatedPosts({ posts, title, categoryLabel, fromSlug }: News
               className="group flex h-full gap-4 rounded-2xl border border-gray-200/90 bg-white/90 p-4 shadow-sm transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-md md:p-5"
             >
               {post.coverImage ? (
-                <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-gray-100 md:h-[4.5rem] md:w-24">
+                <div className={`${NEWS_COVER_THUMB_FRAME_CLASS} ${NEWS_COVER_FRAME_SURFACE}`}>
                   <Image
                     src={post.coverImage}
                     alt={post.title}

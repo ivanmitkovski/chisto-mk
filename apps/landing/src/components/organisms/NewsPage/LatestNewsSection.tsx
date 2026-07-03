@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { newsCoverFrameClass } from "@/lib/images/news-cover-display";
 import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { getTranslations } from "next-intl/server";
 import { Link, type AppLocale } from "@/i18n/routing";
@@ -103,7 +104,7 @@ export async function LatestNewsSection({ locale }: LatestNewsSectionProps) {
               <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/90 bg-white/80 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-sm transition-[border-color,box-shadow,ring-color] duration-300 hover:border-primary/25 hover:shadow-lg hover:ring-primary/15">
                 <Link
                   href={`/news/${post.slug}`}
-                  className="relative block aspect-[16/10] shrink-0 overflow-hidden bg-gray-100"
+                  className={newsCoverFrameClass("shrink-0")}
                   aria-label={post.title}
                 >
                   {post.coverImage ? (
