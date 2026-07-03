@@ -5,7 +5,7 @@ export type LinkSelectionSnapshot = {
   to: number;
   empty: boolean;
   hadLink: boolean;
-  href?: string;
+  href?: string | undefined;
   target?: string | null;
 };
 
