@@ -36,7 +36,7 @@ export function NewsRelatedPosts({ posts, title, categoryLabel, fromSlug }: News
                     src={post.coverImage}
                     alt={post.title}
                     fill
-                    className={`${newsImageObjectFitClass(post.coverImage)} transition-transform duration-300 group-hover:scale-[1.02]`}
+                    className={`${newsImageObjectFitClass(post.coverImage, "cover")} transition-transform duration-300 group-hover:scale-[1.02]`}
                     sizes="96px"
                     unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
                   />

@@ -139,7 +139,7 @@ export function NewsArticle({
                 src={post.coverImage}
                 alt={post.coverAltText ?? post.title}
                 fill
-                className={newsImageObjectFitClass(post.coverImage)}
+                className={newsImageObjectFitClass(post.coverImage, "cover")}
                 sizes="(min-width: 896px) 896px, 100vw"
                 priority
                 unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { CTASection } from "@/components/organisms/CTASection";
 import { Container } from "@/components/layout/Container";
@@ -107,6 +107,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Not found" };
   }
   const { locale, slug } = await params;
+  setRequestLocale(locale);
   const tMeta = await getTranslations({ locale, namespace: "metadata" });
   const siteName = tMeta("siteName");
 
@@ -164,7 +165,8 @@ export default async function NewsArticlePage({ params }: Props) {
     notFound();
   }
   const { locale, slug } = await params;
-  const t = await getTranslations("newsPage");
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "newsPage" });
 
   let post;
   try {

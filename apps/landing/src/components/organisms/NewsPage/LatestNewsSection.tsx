@@ -111,7 +111,7 @@ export async function LatestNewsSection({ locale }: LatestNewsSectionProps) {
                       src={post.coverImage}
                       alt={post.title}
                       fill
-                      className={`${newsImageObjectFitClass(post.coverImage)} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
+                      className={`${newsImageObjectFitClass(post.coverImage, "cover")} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
                     />
