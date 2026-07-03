@@ -8,10 +8,12 @@ import StarterKit from '@tiptap/starter-kit';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { sanitizeInlineHtml, stripHtmlToPlainText } from '@chisto/news-content';
-import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/modal';
+import { RichTextLinkDialog } from '@/components/ui/rich-text-editor/rich-text-link-dialog';
 import { useOptionalNewsDocumentEditor } from '@/features/news/context/news-document-editor-context';
-import { getLinkSelectionText } from '@/lib/rich-text/get-link-selection-text';
+import {
+  captureLinkDialogState,
+  type LinkSelectionSnapshot,
+} from '@/lib/rich-text/apply-editor-link';
 import styles from './rich-text-editor.module.css';
 
 const MAX_PLAIN_LENGTH = 10_000;
@@ -64,9 +66,7 @@ export function RichTextEditor({
   const t = useTranslations('news');
   const documentContext = useOptionalNewsDocumentEditor();
   const [linkOpen, setLinkOpen] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
-  const [linkText, setLinkText] = useState('');
-  const [linkNewTab, setLinkNewTab] = useState(true);
+  const [linkSnapshot, setLinkSnapshot] = useState<LinkSelectionSnapshot | null>(null);
   const valueRef = useRef(value);
   valueRef.current = value;
   const suppressUpdateRef = useRef(true);
@@ -222,38 +222,14 @@ export function RichTextEditor({
 
   const openLinkDialog = useCallback(() => {
     if (!editor) return;
-    const previous = editor.getAttributes('link').href as string | undefined;
-    setLinkUrl(previous ?? 'https://');
-    setLinkText(getLinkSelectionText(editor));
-    setLinkNewTab(editor.getAttributes('link').target === '_blank' || !previous);
+    setLinkSnapshot(captureLinkDialogState(editor));
     setLinkOpen(true);
   }, [editor]);
 
-  const applyLink = useCallback(() => {
-    if (!editor || !linkText.trim()) return;
-    const url = linkUrl.trim();
-    if (!url) {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      setLinkOpen(false);
-      return;
-    }
-    editor
-      .chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({
-        href: url,
-        target: linkNewTab ? '_blank' : null,
-        rel: 'noopener noreferrer',
-      })
-      .run();
+  const closeLinkDialog = useCallback(() => {
     setLinkOpen(false);
-  }, [editor, linkNewTab, linkText, linkUrl]);
-
-  const removeLink = useCallback(() => {
-    editor?.chain().focus().extendMarkRange('link').unsetLink().run();
-    setLinkOpen(false);
-  }, [editor]);
+    setLinkSnapshot(null);
+  }, []);
 
   if (!editor) return null;
 
@@ -335,53 +311,12 @@ export function RichTextEditor({
       ) : null}
 
       {showInlineToolbar ? (
-        <Modal
+        <RichTextLinkDialog
+          editor={editor}
+          snapshot={linkSnapshot}
           open={linkOpen}
-          title={t('form.linkDialogTitle')}
-          description={
-            linkText.trim()
-              ? t('form.linkDialogDescriptionWithText', { text: linkText.trim() })
-              : t('form.linkDialogDescription')
-          }
-          onClose={() => setLinkOpen(false)}
-        >
-          <div className={styles.linkDialog}>
-            <div className={styles.linkTextPreview} aria-live="polite">
-              <span className={styles.linkTextLabel}>{t('form.linkText')}</span>
-              {linkText.trim() ? (
-                <p className={styles.linkTextValue}>{linkText.trim()}</p>
-              ) : (
-                <p className={styles.linkTextEmpty}>{t('form.linkTextEmpty')}</p>
-              )}
-            </div>
-            <label className={styles.linkField}>
-              <span>{t('form.linkUrl')}</span>
-              <input
-                type="url"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                placeholder="https://"
-                autoFocus
-              />
-            </label>
-            <label className={styles.checkboxRow}>
-              <input
-                type="checkbox"
-                checked={linkNewTab}
-                onChange={(e) => setLinkNewTab(e.target.checked)}
-              />
-              {t('form.linkOpenNewTab')}
-            </label>
-            <div className={styles.linkActions}>
-              <Button type="button" variant="ghost" onClick={removeLink}>
-                {t('form.removeLink')}
-              </Button>
-              <Button type="button" onClick={applyLink} disabled={!linkText.trim()}>
-                {t('form.applyLink')}
-              </Button>
-            </div>
-          </div>
-        </Modal>
+          onClose={closeLinkDialog}
+        />
       ) : null}
     </div>
   );

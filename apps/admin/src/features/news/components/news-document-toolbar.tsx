@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon, Modal } from '@/components/ui';
+import { Icon } from '@/components/ui';
+import { RichTextLinkDialog } from '@/components/ui/rich-text-editor/rich-text-link-dialog';
+import type { LinkSelectionSnapshot } from '@/lib/rich-text/apply-editor-link';
+import { captureLinkDialogState } from '@/lib/rich-text/apply-editor-link';
 import type { NewsBodyBlock } from '../news-api-types';
 import { useNewsDocumentEditor } from '../context/news-document-editor-context';
 import { insertBlockAt } from '../lib/news-block-factory';
@@ -15,7 +18,6 @@ import {
 import { MAX_BODY_BLOCKS } from '../lib/news-post-policy';
 import { NEWS_MEDIA_ACCEPT } from '../lib/news-media-validation';
 import { useNewsMediaGuidanceText } from '../hooks/use-news-media-guidance';
-import { getLinkSelectionText } from '@/lib/rich-text/get-link-selection-text';
 import {
   NewsBlockInsertMenuPanel,
   type NewsBlockInsertMenuSection,
@@ -53,9 +55,7 @@ export function NewsDocumentToolbar({
 
   const [insertOpen, setInsertOpen] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('https://');
-  const [linkText, setLinkText] = useState('');
-  const [linkNewTab, setLinkNewTab] = useState(true);
+  const [linkSnapshot, setLinkSnapshot] = useState<LinkSelectionSnapshot | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -163,41 +163,15 @@ export function NewsDocumentToolbar({
 
   const openLinkDialog = useCallback(() => {
     if (!activeEditor) return;
+    setLinkSnapshot(captureLinkDialogState(activeEditor));
     retainEditorFocus();
-    const previous = activeEditor.getAttributes('link').href as string | undefined;
-    setLinkUrl(previous ?? 'https://');
-    setLinkText(getLinkSelectionText(activeEditor));
-    setLinkNewTab(activeEditor.getAttributes('link').target === '_blank' || !previous);
     setLinkOpen(true);
   }, [activeEditor, retainEditorFocus]);
 
-  const applyLink = useCallback(() => {
-    if (!activeEditor || !linkText.trim()) return;
-    const url = linkUrl.trim();
-    if (!url) {
-      activeEditor.chain().focus().extendMarkRange('link').unsetLink().run();
-      setLinkOpen(false);
-      return;
-    }
-    activeEditor
-      .chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({
-        href: url,
-        target: linkNewTab ? '_blank' : null,
-        rel: 'noopener noreferrer',
-      })
-      .run();
+  const closeLinkDialog = useCallback(() => {
     setLinkOpen(false);
-    notifyToolbarChange();
-  }, [activeEditor, linkNewTab, linkText, linkUrl, notifyToolbarChange]);
-
-  const removeLink = useCallback(() => {
-    activeEditor?.chain().focus().extendMarkRange('link').unsetLink().run();
-    setLinkOpen(false);
-    notifyToolbarChange();
-  }, [activeEditor, notifyToolbarChange]);
+    setLinkSnapshot(null);
+  }, []);
 
   const handleToolbarMouseDown = useCallback(
     (event: React.MouseEvent) => {
@@ -361,49 +335,14 @@ export function NewsDocumentToolbar({
         }}
       />
 
-      <Modal
+      <RichTextLinkDialog
+        editor={activeEditor}
+        snapshot={linkSnapshot}
         open={linkOpen}
-        title={t('form.linkDialogTitle')}
-        description={
-          linkText.trim()
-            ? t('form.linkDialogDescriptionWithText', { text: linkText.trim() })
-            : t('form.linkDialogDescription')
-        }
-        onClose={() => setLinkOpen(false)}
-      >
-        <div className={styles.linkDialog}>
-          <div className={styles.linkTextPreview} aria-live="polite">
-            <span className={styles.linkTextLabel}>{t('form.linkText')}</span>
-            {linkText.trim() ? (
-              <p className={styles.linkTextValue}>{linkText.trim()}</p>
-            ) : (
-              <p className={styles.linkTextEmpty}>{t('form.linkTextEmpty')}</p>
-            )}
-          </div>
-          <label className={styles.linkField}>
-            <span>{t('form.linkUrl')}</span>
-            <input
-              type="url"
-              value={linkUrl}
-              onChange={(event) => setLinkUrl(event.target.value)}
-              placeholder="https://"
-              autoFocus
-            />
-          </label>
-          <label className={styles.checkboxRow}>
-            <input type="checkbox" checked={linkNewTab} onChange={(event) => setLinkNewTab(event.target.checked)} />
-            {t('form.linkOpenNewTab')}
-          </label>
-          <div className={styles.linkActions}>
-            <Button type="button" variant="ghost" onClick={removeLink}>
-              {t('form.removeLink')}
-            </Button>
-            <Button type="button" onClick={applyLink} disabled={!linkText.trim()}>
-              {t('form.applyLink')}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        onClose={closeLinkDialog}
+        onApplied={() => notifyToolbarChange()}
+        dialogClassName={styles.linkDialog}
+      />
     </div>
   );
 }
