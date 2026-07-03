@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
+import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { RenderNewsBlocks } from "@chisto/news-content/render";
 import type { ResolvedNewsBodyBlock } from "@/lib/news/fetch-news";
 import { NewsGalleryCarousel } from "./NewsGalleryCarousel";
@@ -39,7 +39,7 @@ export function NewsArticleBlocks({
           src={src}
           alt={alt}
           fill
-          className="object-cover"
+          className={newsImageObjectFitClass(src)}
           sizes="(min-width: 768px) 768px, 100vw"
           {...(loading ? { loading } : {})}
           {...(unoptimized !== undefined ? { unoptimized } : { unoptimized: shouldUseUnoptimizedNewsImage(src) })}

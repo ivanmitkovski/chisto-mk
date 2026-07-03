@@ -1,11 +1,21 @@
+import { isSvgMediaUrl } from "@chisto/news-content";
+
 /** Remote hosts allowed in next.config `images.remotePatterns`. */
 const OPTIMIZABLE_REMOTE_SUFFIXES = [".amazonaws.com", ".cloudfront.net"];
+
+export function newsImageObjectFitClass(src: string): string {
+  return isSvgMediaUrl(src) ? "object-contain" : "object-cover";
+}
 
 /**
  * Next.js image optimizer can fail on presigned S3/CloudFront URLs.
  * Local and stable public URLs are safe to optimize.
  */
 export function shouldUseUnoptimizedNewsImage(src: string): boolean {
+  if (isSvgMediaUrl(src)) {
+    return true;
+  }
+
   if (!src.startsWith("http://") && !src.startsWith("https://")) {
     return false;
   }
