@@ -124,7 +124,7 @@
     "linkDialogDescriptionWithText": "Add a URL for “{text}”.",
     "linkText": "Link text",
     "linkTextPlaceholder": "e.g. Read more",
-    "linkTextEmpty": "No text highlighted — type link text above or select words in the paragraph.",
+    "linkTextEmpty": "No text highlighted. Type link text above or select words in the paragraph.",
     "linkUrl": "URL",
     "linkOpenNewTab": "Open in new tab",
     "linkInvalidUrl": "Enter a valid http(s) or mailto URL.",

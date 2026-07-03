@@ -124,7 +124,7 @@
     "linkDialogDescriptionWithText": "Додајте URL за „{text}“.",
     "linkText": "Текст на линкот",
     "linkTextPlaceholder": "на пр. Прочитај повеќе",
-    "linkTextEmpty": "Нема означен текст — внесете текст за линк погоре или означете зборови во пасусот.",
+    "linkTextEmpty": "Нема означен текст. Внесете текст за линк погоре или означете зборови во пасусот.",
     "linkUrl": "URL",
     "linkOpenNewTab": "Отвори во нов таб",
     "linkInvalidUrl": "Внесете важечки http(s) или mailto URL.",

@@ -124,7 +124,7 @@
     "linkDialogDescriptionWithText": "Shtoni URL për “{text}”.",
     "linkText": "Teksti i lidhjes",
     "linkTextPlaceholder": "p.sh. Lexo më shumë",
-    "linkTextEmpty": "Asnjë tekst i theksuar — shkruani tekstin e lidhjes më sipër ose zgjidhni fjalë në paragraf.",
+    "linkTextEmpty": "Asnjë tekst i theksuar. Shkruani tekstin e lidhjes më sipër ose zgjidhni fjalë në paragraf.",
     "linkUrl": "URL",
     "linkOpenNewTab": "Hap në skedë të re",
     "linkInvalidUrl": "Vendosni një URL të vlefshme http(s) ose mailto.",
