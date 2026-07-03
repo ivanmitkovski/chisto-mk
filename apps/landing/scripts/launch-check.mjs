@@ -33,9 +33,15 @@ if (!appStore.startsWith("https://")) {
   pass("App Store URL configured");
 }
 
-const googlePlay = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL?.trim();
-if (googlePlay && !googlePlay.startsWith("https://")) {
-  fail("Google Play URL must be HTTPS when set");
+const googlePlay =
+  process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL?.trim() ||
+  "https://play.google.com/store/apps/details?id=mk.chisto.app";
+if (!googlePlay.startsWith("https://")) {
+  fail("Google Play URL must be HTTPS");
+} else if (!googlePlay.includes("id=mk.chisto.app")) {
+  fail("Google Play URL should reference package mk.chisto.app");
+} else {
+  pass("Google Play URL configured");
 }
 
 const screenshotDir = join(root, "public/screenshots/ios");

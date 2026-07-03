@@ -103,7 +103,7 @@
     "steps": [
       {
         "title": "Merrni aplikacionin",
-        "description": "Shkarkoni nga App Store. Krijoni një llogari me numrin e telefonit dhe verifikojeni me SMS."
+        "description": "Shkarkoni nga App Store ose Google Play. Krijoni një llogari me numrin e telefonit dhe verifikojeni me SMS."
       },
       {
         "title": "Raportoni një vend ndotjeje",
@@ -147,7 +147,7 @@
     "items": [
       {
         "title": "Çfarë është Chisto.mk?",
-        "content": "Chisto.mk është një platformë qytetare mjedisore për Maqedoninë. Me aplikacionin për iOS fotografoni vende ndotjeje, i vendosni në një hartë publike, ndiqni përditësimet dhe bashkoheni në aksione pastrimi kur organizatorët i publikojnë.",
+        "content": "Chisto.mk është një platformë qytetare mjedisore për Maqedoninë. Me aplikacionin celular në iOS dhe Android fotografoni vende ndotjeje, i vendosni në një hartë publike, ndiqni përditësimet dhe bashkoheni në aksione pastrimi kur organizatorët i publikojnë.",
         "variant": "green"
       },
       {
@@ -356,7 +356,7 @@
     "logoTitle": "Shenja",
     "logoBody": "SVG për sfonde të çelëta. Lini hapësirë rreth simbolit; mos e zgjatni dhe mos i ndryshoni ngjyrat.",
     "downloadMark": "Shkarko chisto-mark.svg",
-    "screenshotsTitle": "Pamje nga aplikacioni",
+    "screenshotsTitle": "Pamje nga aplikacioni (iOS dhe Android)",
     "screenshot": {
       "welcome": "Ekrani i mirëseardhjes (JPG)",
       "feed": "Feed komunitar (JPG)",
@@ -368,7 +368,7 @@
     "inquiriesTitle": "Kontakt",
     "inquiriesLead": "Pyetje për shtyp dhe partneritet:",
     "boilerplateTitle": "Përshkrim i shkurtër",
-    "boilerplate": "Chisto.mk është një platformë qytetare mjedisore në Maqedoni. Banorët raportojnë vende ndotjeje në një hartë publike me foto dhe vendndodhje, bashkohen në aksione pastrimi dhe ndjekin përditësimet në aplikacionin për iOS."
+    "boilerplate": "Chisto.mk është një platformë qytetare mjedisore në Maqedoni. Banorët raportojnë vende ndotjeje në një hartë publike me foto dhe vendndodhje, bashkohen në aksione pastrimi dhe ndjekin përditësimet në aplikacionet për iOS dhe Android."
   },
   "legalNav": {
     "ariaLabel": "Dokumente ligjore",
@@ -779,12 +779,12 @@
     "articles": {
       "getting-started": {
         "cardTitle": "Konfiguroni Chisto.mk",
-        "cardSummary": "Instaloni aplikacionin nga MK App Store, hyni, kaloni portën e vendndodhjes për Maqedoninë dhe përfundoni coach tour.",
+        "cardSummary": "Instaloni aplikacionin nga App Store ose Google Play, hyni, kaloni portën e vendndodhjes për Maqedoninë dhe përfundoni coach tour.",
         "title": "Konfiguroni Chisto.mk",
-        "lastUpdated": "28 qershor 2026",
-        "lastReviewed": "28 qershor 2026",
+        "lastUpdated": "3 korrik 2026",
+        "lastReviewed": "3 korrik 2026",
         "datePublished": "2024-01-01T00:00:00.000Z",
-        "dateModified": "2026-06-28T00:00:00.000Z",
+        "dateModified": "2026-07-03T00:00:00.000Z",
         "sections": [
           {
             "id": "download-the-app",
@@ -792,26 +792,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Shkarkoni Chisto.mk nga MK App Store: https://apps.apple.com/mk/app/chisto-mk/id6771892086. Mund të përdorni edhe butonat e shkarkimit në chisto.mk."
+                "text": "Chisto.mk ofrohet për iOS dhe Android në App Store dhe Google Play. Mund të përdorni edhe butonat e shkarkimit në faqen kryesore të sajtit."
               },
               {
                 "type": "bullets",
                 "title": "Para instalimit",
                 "items": [
-                  "Kërkoni në dyqan Chisto.mk dhe konfirmoni që botuesi përputhet me listimin tonë zyrtar.",
-                  "Përdorni Wi-Fi nëse keni plan të kufizuar të dhënash. Hapja e parë mund të shkarkojë pllaka harte.",
-                  "Mbajeni iOS të përditësuar që kamera, hartat dhe arnimet e sigurisë të mbeten aktuale."
+                  "Kërkoni «Chisto.mk» dhe verifikoni që botuesi përputhet me listimin zyrtar.",
+                  "Përdorni Wi-Fi nëse keni plan të kufizuar; hapja e parë mund të shkarkojë asete harte.",
+                  "Përditësoni iOS ose Android kur kërkohet, për kamerë, harta dhe siguri më të mira."
                 ]
               },
               {
                 "type": "callout",
                 "variant": "tip",
-                "text": "Nëse faqja e dyqanit nuk është e disponueshme, hapni chisto.mk në shfletues desktopi dhe ndiqni lidhjen zyrtare drejt App Store."
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Fjalë si Home feed, Map tab, Report FAB dhe fazat e raportit përputhen me aplikacionin, që të dini gjithmonë cilin ekran kemi parasysh."
+                "text": "Nëse dyqani nuk hapet në rajonin tuaj, hapni sajtin në kompjuter dhe ndiqni lidhjet zyrtare drejt dyqaneve."
               }
             ]
           },
@@ -821,21 +816,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Hapni aplikacionin dhe regjistrohuni me numrin e telefonit, email-in, emrin dhe fjalëkalimin. Duhet të verifikoni telefonin me një kod njëpërdorimësh SMS para se llogaria të bëhet aktive."
+                "text": "Hapni aplikacionin dhe ndiqni regjistrimin. Do të përdorni telefon për verifikim me SMS (ose kod të ngjashëm), email, emër dhe fjalëkalim sipas rregullave të aplikacionit. Modeli përshkruhet në Kushtet e përdorimit."
               },
               {
                 "type": "bullets",
                 "title": "Çfarë të përgatisni",
                 "items": [
-                  "Një numër celular maqedonas ku mund të lexoni SMS.",
-                  "Një inbox email që e kontrolloni për njoftime llogarie.",
-                  "Një fjalëkalim i fortë që nuk e përsërisni në shërbime të tjera."
+                  "Numër telefoni ku arrini kodin e verifikimit.",
+                  "Email që e kontrolloni shpesh për njoftime llogarie.",
+                  "Fjalëkalim të fortë që nuk e përsërisni në shërbime të tjera."
                 ]
               },
               {
-                "type": "internalLink",
-                "href": "/help/sign-in-and-verification",
-                "label": "Hyrja dhe verifikimi"
+                "type": "callout",
+                "variant": "note",
+                "text": "Mbajeni orën e pajisjes të saktë. Devijime të mëdha ndonjëherë prishin hyrjen me kod."
               }
             ]
           },
@@ -895,21 +890,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Ju kontrolloni njoftimet push në Settings të iOS dhe brenda preferencave të inbox-it në aplikacion. Politika jonë e privatësisë shpjegon si përpunohen të dhënat personale kur raportoni vende ose bashkoheni në ngjarje."
+                "text": "Kontrolloni njoftimet push nga cilësimet e pajisjes dhe nga aplikacioni ku ofrohet. Politika e privatësisë shpjegon përpunimin kur raportoni ose bashkoheni në ngjarje."
               },
               {
                 "type": "bullets",
                 "title": "Ku të shikoni",
                 "items": [
-                  "iOS: Cilësimet → Njoftimet → Chisto.mk.",
-                  "Në aplikacion: hapni inbox-in e njoftimeve dhe prekni ikonën e preferencave.",
-                  "Rishikoni të tetë grupet e njoftimeve para pastrimit tuaj të parë."
+                  "iOS: Settings → Notifications → Chisto.mk.",
+                  "Android: Settings → Apps → Chisto.mk → Notifications.",
+                  "Në aplikacion mund të ketë çelësa për ngjarje ose status raportesh."
                 ]
               },
               {
                 "type": "internalLink",
                 "href": "/privacy",
-                "label": "Politika e privatësisë"
+                "label": "Lexoni Politikën e privatësisë"
               }
             ]
           }
@@ -969,7 +964,7 @@
               {
                 "type": "callout",
                 "variant": "tip",
-                "text": "Ngjitni kodin me kujdes. Autofill nga Messages zakonisht funksionon në iOS."
+                "text": "Ngjitni kodin me kujdes. Autofill nga Messages zakonisht funksionon në iOS; autofill SMS në Android gjithashtu mund ta futë kodin."
               }
             ]
           },
@@ -1035,7 +1030,7 @@
                 "items": [
                   "Aktivizoni kyçjen e ekranit në telefonat që mbartni çdo ditë.",
                   "Mos ndani kodet SMS me askënd.",
-                  "Përditësoni aplikacionin nga MK App Store kur shfaqen përditësime."
+                  "Përditësoni aplikacionin nga App Store ose Google Play kur shfaqen përditësime."
                 ]
               },
               {
@@ -1062,7 +1057,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Chisto.mk kërkon leje iOS vetëm kur një funksion i ka nevojë. Refuzimi bllokon pjesë të magjistari të raportit me 4 hapa, saktësinë e Map tab ose check-in me QR të ngjarjes."
+                "text": "Chisto.mk kërkon leje të pajisjes vetëm kur një funksion i ka nevojë. Refuzimi bllokon pjesë të magjistari të raportit me 4 hapa, saktësinë e Map tab ose check-in me QR të ngjarjes."
               },
               {
                 "type": "bullets",
@@ -1076,7 +1071,7 @@
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "Mund t'i ndryshoni lejet më vonë në Settings të iOS. Aplikacioni shfaq sugjerime brenda ekranit kur diçka mungon."
+                "text": "Mund t'i ndryshoni lejet më vonë në cilësimet e pajisjes. Aplikacioni shfaq sugjerime brenda ekranit kur diçka mungon."
               }
             ]
           },
@@ -1092,8 +1087,9 @@
                 "type": "bullets",
                 "title": "Rregulloni problemet e vendndodhjes",
                 "items": [
-                  "Hapni Settings, Privacy and Security, Location Services, Chisto.mk.",
-                  "Aktivizoni Precise Location kur ofrohet.",
+                  "iOS: Cilësimet, Privatësia dhe siguria, Shërbimet e vendndodhjes, Chisto.mk.",
+                  "Android: Cilësimet, Vendndodhja, Lejet e aplikacionit, Chisto.mk, Lejo gjatë përdorimit.",
+                  "Aktivizoni Precise Location në iOS kur ofrohet.",
                   "Rinisni aplikacionin pas ndryshimit të cilësimit."
                 ]
               },
@@ -1140,8 +1136,9 @@
                 "type": "bullets",
                 "title": "Aktivizoni njoftimet",
                 "items": [
-                  "Prekni Allow kur iOS kërkon gjatë onboarding.",
-                  "Nëse e keni kaluar, hapni Settings, Notifications, Chisto.mk.",
+                  "Prekni Allow kur pajisja kërkon gjatë onboarding.",
+                  "iOS: Cilësimet, Njoftimet, Chisto.mk.",
+                  "Android: Cilësimet, Aplikacionet, Chisto.mk, Njoftimet.",
                   "Hapni preferencat e inbox-it në aplikacion për të heshtur ose shtyrë grupe."
                 ]
               },
@@ -1158,7 +1155,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Hapni Settings të iOS, rrëshqitni te Chisto.mk dhe rishikoni çdo çelës. Të dhënat e lëvizjes ose fitnesit nuk kërkohen për raportimin bazë."
+                "text": "Hapni cilësimet e pajisjes për Chisto.mk dhe rishikoni çdo çelës. Të dhënat e lëvizjes ose fitnesit nuk kërkohen për raportimin bazë."
               },
               {
                 "type": "bullets",
@@ -1279,7 +1276,7 @@
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "Ndryshoni të dhënat celulare për Chisto.mk në Settings të iOS nëse roamingu bllokon vetëm këtë aplikacion."
+                "text": "Ndryshoni të dhënat celulare për Chisto.mk në cilësimet e pajisjes nëse roamingu bllokon vetëm këtë aplikacion."
               }
             ]
           },
@@ -1296,7 +1293,7 @@
                 "title": "Para se të na shkruani",
                 "items": [
                   "Rinisni pajisjen një herë.",
-                  "Konfirmoni që jeni në versionin më të fundit nga MK App Store.",
+                  "Konfirmoni që jeni në versionin më të fundit nga App Store ose Google Play.",
                   "Kapni screenshot të tekstit të gabimit dhe turbulloni detajet personale."
                 ]
               },
@@ -1324,22 +1321,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Shumica e problemeve të hyrjes vijnë nga lidhja, devijimi i orës ose një version i vjetër. Kaloni nëpër listën para se të supozoni se fjalëkalimi është gabim."
+                "text": "Shumica e problemeve zgjidhen me rrjet, leje dhe versionin më të fundit të aplikacionit."
               },
               {
                 "type": "bullets",
-                "title": "Provoni fillimisht",
+                "title": "Provoni së pari",
                 "items": [
-                  "Fikni modalitetin avion, prisni, pastaj rilidhu.",
-                  "Vendosni datën dhe orën në automatike.",
-                  "Kërkoni një kod SMS të ri dhe ngjitni me kujdes.",
-                  "Përditësoni Chisto.mk nga MK App Store, pastaj rinisni."
+                  "Fikni/ndizni modalitetin e aeroplanit.",
+                  "Konfirmoni orën automatike.",
+                  "Rinisni aplikacionin pas ndryshimit të lejeve."
                 ]
               },
               {
-                "type": "internalLink",
-                "href": "/help/sign-in-and-verification",
-                "label": "Hyrja dhe verifikimi"
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse përplaset përsëri, shënoni versionin dhe modelin para kontaktit."
               }
             ]
           },
@@ -1349,22 +1345,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Map tab dhe faza Location kanë nevojë për qasje në vendndodhje. Nëse pika blu lëviz, rregulloni lejet para se të parashtroni një raport."
+                "text": "Shumica e problemeve zgjidhen me rrjet, leje dhe versionin më të fundit të aplikacionit."
               },
               {
                 "type": "bullets",
-                "title": "Lista kontrolluese",
+                "title": "Provoni së pari",
                 "items": [
-                  "Aktivizoni Location Services ndërsa përdorni aplikacionin.",
-                  "Dilni në hapësirë të hapur disa sekonda që GPS të stabilizohet.",
-                  "Çaktivizoni mjetet e vendndodhjes së rreme ndërsa përdorni Chisto.mk.",
-                  "Zhvendosni pinin manualisht nëse GPS vendoset në bllokun e gabuar."
+                  "Fikni/ndizni modalitetin e aeroplanit.",
+                  "Konfirmoni orën automatike.",
+                  "Rinisni aplikacionin pas ndryshimit të lejeve."
                 ]
               },
               {
                 "type": "callout",
-                "variant": "note",
-                "text": "Pinat duhet të mbeten brenda Maqedonisë. Tërhiqni pinin nëse GPS ju vendos jashtë kufirit."
+                "variant": "tip",
+                "text": "Nëse përplaset përsëri, shënoni versionin dhe modelin para kontaktit."
               }
             ]
           },
@@ -1374,22 +1369,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Fotot e mëdha dhe rrjeti i dobët nuk përputhen. Jepuni kohë ngarkimeve ose kapni një foto më të vogël kur radha vazhdon të dështojë."
+                "text": "Shumica e problemeve zgjidhen me rrjet, leje dhe versionin më të fundit të aplikacionit."
               },
               {
                 "type": "bullets",
-                "title": "Provoni fillimisht",
+                "title": "Provoni së pari",
                 "items": [
-                  "Konfirmoni lejen e kamerës dhe bibliotekës së fotove.",
-                  "Lironi hapësirë ruajtjeje në pajisje.",
-                  "Kalo në Wi-Fi për ngarkime me shumë foto.",
-                  "Rihapni një skicë të ruajtur në vend që të filloni nga e para."
+                  "Fikni/ndizni modalitetin e aeroplanit.",
+                  "Konfirmoni orën automatike.",
+                  "Rinisni aplikacionin pas ndryshimit të lejeve."
                 ]
               },
               {
                 "type": "callout",
                 "variant": "tip",
-                "text": "Shmangni dublikimin e të njëjtit raport ndërsa ngarkimi i parë ende shfaqet si në pritje."
+                "text": "Nëse përplaset përsëri, shënoni versionin dhe modelin para kontaktit."
               }
             ]
           },
@@ -1423,21 +1417,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Kur asgjë më sipër nuk funksionon, mblidhni një përshkrim të shkurtër dhe na kontaktoni. Shënoni versionin e iOS dhe versionin e aplikacionit."
+                "text": "Shumica e problemeve zgjidhen me rrjet, leje dhe versionin më të fundit të aplikacionit."
               },
               {
                 "type": "bullets",
-                "title": "Para se të na kontaktoni",
+                "title": "Provoni së pari",
                 "items": [
-                  "Rinisni telefonin një herë.",
-                  "Konfirmoni listimin zyrtar në MK App Store.",
-                  "Përshkruani cila skedë dështoi: Home feed, Map tab, Reports ose Events."
+                  "Fikni/ndizni modalitetin e aeroplanit.",
+                  "Konfirmoni orën automatike.",
+                  "Rinisni aplikacionin pas ndryshimit të lejeve."
                 ]
               },
               {
-                "type": "internalLink",
-                "href": "/contact",
-                "label": "Kontakt"
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse përplaset përsëri, shënoni versionin dhe modelin para kontaktit."
               }
             ]
           }
@@ -2223,21 +2217,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Hapni skedën Events për të shfletuar listat e pastrimit dhe veprimeve ekologjike në Maqedoni. Lexoni shënimet e organizatorit, vështirësinë dhe pinin e takimit para se të udhëtoni."
+                "text": "Shfletoni aksionet në aplikacion, lexoni shënimet e organizatorit dhe bashkohuni kur regjistrimi është i hapur."
               },
               {
                 "type": "bullets",
-                "title": "Para se të udhëtoni",
+                "title": "Lista e shkurtër",
                 "items": [
-                  "Konfirmoni orën e fillimit në kohën lokale dhe kohëzgjatjen e pritur.",
-                  "Kontrolloni terrenin dhe kërkesat për pajisje te listimi.",
-                  "Shihni nëse regjistrimi mbyllet herët."
+                  "Kontrolloni pikën e takimit, kohëzgjatjen dhe vështirësinë para udhëtimit.",
+                  "Sillni doreza ose çanta vetëm nëse kërkohen.",
+                  "Përditësoni RSVP nëse ndryshoni planet që numri të qëndrojë i saktë."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Filtrat e skedës Events ju ndihmojnë të ngushtoni sipas datës dhe statusit kur lista është e gjatë."
               }
             ]
           },
@@ -2295,21 +2284,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Ndiqni planin e sigurisë së organizatorit, respektoni pronën private dhe qëndroni brenda rregullave të aksesit publik."
+                "text": "Shfletoni aksionet në aplikacion, lexoni shënimet e organizatorit dhe bashkohuni kur regjistrimi është i hapur."
               },
               {
                 "type": "bullets",
-                "title": "Në vend",
+                "title": "Lista e shkurtër",
                 "items": [
-                  "Vishni doreza ose veshje me dukshmëri të lartë kur listimi e kërkon.",
-                  "Mbikëqyrni fëmijët nga afër pranë rrugëve dhe ujit.",
-                  "Pyetni para se të fotografoni njerëz, automjete ose shtëpi."
+                  "Kontrolloni pikën e takimit, kohëzgjatjen dhe vështirësinë para udhëtimit.",
+                  "Sillni doreza ose çanta vetëm nëse kërkohen.",
+                  "Përditësoni RSVP nëse ndryshoni planet që numri të qëndrojë i saktë."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Për emergjenca, përdorni kanalet zyrtare të emergjencës përveç çdo shënimi në aplikacion."
               }
             ]
           },
@@ -2879,21 +2863,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Llogaria juaj Chisto.mk lidh raportet, veprimet ekologjike, preferencat e njoftimeve dhe aktivitetin e profilit në të gjithë Maqedoninë."
+                "text": "Kuptoni çfarë ruan llogaria, si të jeni të sigurt në pajisje dhe si të ushtroni të drejtat në Maqedoni."
               },
               {
                 "type": "bullets",
-                "title": "Çfarë mund të lidhet me ju",
+                "title": "Pika kryesore",
                 "items": [
-                  "Numri i telefonit, emaili dhe hash i fjalëkalimit për hyrje.",
-                  "Pinat e hartës dhe përshkrimet nga raportet që parashtroni.",
-                  "Statusi RSVP, regjistrat e check-in dhe biseda e ngjarjes për ngjarjet ku merrni pjesë."
+                  "Fjalëkalim unik dhe përditësime OS.",
+                  "Kërkesat për eksport ose fshirje mund të kërkojnë verifikim identiteti.",
+                  "Faqet ligjore mbajnë tekst zyrtar kur ka dyshim."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Faqet publike të vendeve tregojnë përmbajtjen e komunitetit, jo të dhënat tuaja private të kontaktit."
               }
             ]
           },
@@ -2903,21 +2882,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Trajtoni llogarinë si një kutë postare për çështje qytetare. Kontrollet e forta të aksesit ju mbrojnë juve dhe të dhënat e hartës nga të cilët varen të tjerët."
+                "text": "Kuptoni çfarë ruan llogaria, si të jeni të sigurt në pajisje dhe si të ushtroni të drejtat në Maqedoni."
               },
               {
                 "type": "bullets",
-                "title": "Higjienë e përditshme",
+                "title": "Pika kryesore",
                 "items": [
-                  "Përdorni fjalëkalim unik ose menaxher fjalëkalimesh të sistemit operativ.",
-                  "Mbajeni aktiv kyçjen e ekranit në telefonat që mbani çdo ditë.",
-                  "Dilni nga llogaria para se t'i jepni pajisjen dikujt tjetër."
+                  "Fjalëkalim unik dhe përditësime OS.",
+                  "Kërkesat për eksport ose fshirje mund të kërkojnë verifikim identiteti.",
+                  "Faqet ligjore mbajnë tekst zyrtar kur ka dyshim."
                 ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/help/sign-in-and-verification",
-                "label": "Hyrja dhe verifikimi"
               }
             ]
           },
@@ -2927,15 +2901,15 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Mund të kërkoni çfarë mbajmë, të korrigjoni gabime, të eksportoni një kopje ose të kërkoni fshirje, me përjashtime ligjore si regjistrat e moderimit."
+                "text": "Kuptoni çfarë ruan llogaria, si të jeni të sigurt në pajisje dhe si të ushtroni të drejtat në Maqedoni."
               },
               {
                 "type": "bullets",
-                "title": "Si të nisni një kërkesë",
+                "title": "Pika kryesore",
                 "items": [
-                  "Përdorni cilësimet e llogarisë në aplikacion kur janë të disponueshme.",
-                  "Dërgoni email mbështetjes nëse mungon një kontroll ose rrjedha jep gabim.",
-                  "Pritni verifikim identiteti kur kërkesat janë të ndjeshme."
+                  "Fjalëkalim unik dhe përditësime OS.",
+                  "Kërkesat për eksport ose fshirje mund të kërkojnë verifikim identiteti.",
+                  "Faqet ligjore mbajnë tekst zyrtar kur ka dyshim."
                 ]
               },
               {
@@ -2951,31 +2925,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Teksti ligjor zyrtar qëndron në faqe të dedikuara. Lexojini kur ju duhet siguri përtej këtyre udhëzuesve."
+                "text": "Kuptoni çfarë ruan llogaria, si të jeni të sigurt në pajisje dhe si të ushtroni të drejtat në Maqedoni."
               },
               {
                 "type": "bullets",
-                "title": "Ku të shikoni",
+                "title": "Pika kryesore",
                 "items": [
-                  "Privatësia shpjegon çfarë mbledhim dhe pse.",
-                  "Kushtet shpjegojnë përdorimin e lejuar të platformës.",
-                  "Cookies shpjegon analitikën opsionale të faqes web."
+                  "Fjalëkalim unik dhe përditësime OS.",
+                  "Kërkesat për eksport ose fshirje mund të kërkojnë verifikim identiteti.",
+                  "Faqet ligjore mbajnë tekst zyrtar kur ka dyshim."
                 ]
               },
               {
                 "type": "internalLink",
-                "href": "/privacy",
-                "label": "Politika e privatësisë"
-              },
-              {
-                "type": "internalLink",
-                "href": "/terms",
-                "label": "Kushtet e përdorimit"
-              },
-              {
-                "type": "internalLink",
-                "href": "/cookies",
-                "label": "Politika e cookies"
+                "href": "/data",
+                "label": "Të dhënat dhe llogaria juaj"
               }
             ]
           }
@@ -3049,21 +3013,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Telefoni gjithmonë fiton. Nëse push është i fikur në nivel iOS, Chisto.mk nuk mund ta anashkalojë atë. Përdorni njëkohësisht cilësimet OS dhe ato në aplikacion."
+                "text": "Njoftimet ju mbajnë të informuar pa ju mbingarkuar."
               },
               {
                 "type": "bullets",
-                "title": "Ku të shikoni",
+                "title": "Kontroll i imët",
                 "items": [
-                  "iOS: Cilësimet → Njoftimet → Chisto.mk.",
-                  "Në aplikacion: ikona e preferencave inbox për çelësat e grupeve.",
-                  "Cilësimet e profilit për lidhje të shpejta te e njëjta fletë."
+                  "Cilësimet e OS kanë përparësi.",
+                  "Çaktivizoni kategori që i përdorni rrallë.",
+                  "Riativizoni para ditëve të mëdha të pastrimit."
                 ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Snooze një grup përkohësisht nga fleta e preferencave kur ju duhen orë qetësie."
               }
             ]
           },
@@ -3097,21 +3056,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Kodet SMS njëpërdorimësh dhe disa mesazhe sigurie kërkohen për hyrje. Mesazhet marketingu arrijnë vetëm kur pranoni qartë."
+                "text": "Njoftimet ju mbajnë të informuar pa ju mbingarkuar."
               },
               {
                 "type": "bullets",
-                "title": "Mbajeni kontrollin",
+                "title": "Kontroll i imët",
                 "items": [
-                  "Mbajeni email-in të arritshëm për të rikuperuar qasjen nëse humbisni telefonin.",
-                  "Nëse kodet SMS ndalojnë, shihni zgjidhjen e problemeve të hyrjes.",
-                  "Lexoni Politikën e privatësisë për detaje përpunimi."
+                  "Cilësimet e OS kanë përparësi.",
+                  "Çaktivizoni kategori që i përdorni rrallë.",
+                  "Riativizoni para ditëve të mëdha të pastrimit."
                 ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/privacy",
-                "label": "Politika e privatësisë"
               }
             ]
           }

@@ -61,11 +61,8 @@ export function CTASection() {
               {t("subtitle")}
             </motion.p>
             {hasStoreDownloadLinks() ? (
-              <motion.div
-                className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
-                variants={fadeInUp}
-              >
-                <StoreDownloadButtons analyticsSource="cta_section" />
+              <motion.div className="mt-10" variants={fadeInUp}>
+                <StoreDownloadButtons align="start" analyticsSource="cta_section" />
               </motion.div>
             ) : null}
           </motion.div>

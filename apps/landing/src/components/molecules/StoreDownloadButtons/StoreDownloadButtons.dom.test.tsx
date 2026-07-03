@@ -24,6 +24,7 @@ describe("StoreDownloadButtons", () => {
     hasStoreDownloadLinks.mockReturnValue(true);
     render(<StoreDownloadButtons />);
     expect(screen.getByRole("link", { name: "App Store" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Google Play" })).toBeInTheDocument();
   });
 
   it("returns null when no store URLs are configured", () => {
