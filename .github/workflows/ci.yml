@@ -217,9 +217,10 @@ jobs:
           flutter --version
 
       - name: Flutter mobile tests
+        timeout-minutes: 12
         run: |
           cd apps/mobile
-          flutter test packages/design_system/test/
+          flutter test packages/design_system/test/ --reporter expanded
           dart run tool/check_haptics_usage.dart
           dart run tool/check_app_bootstrap_reads.dart
           dart run tool/check_screen_size.dart
@@ -253,7 +254,9 @@ jobs:
           dart run tool/check_no_empty_catch.dart
           dart run tool/check_no_readasbytes_in_upload_paths.dart
           dart run tool/check_loading_empty_error_triple.dart
-          flutter test test/
+          # Expanded reporter streams logs so the Actions UI can open the step while running.
+          # Concurrency 1 avoids intermittent VM hangs observed on shared CI runners.
+          flutter test test/ --reporter expanded --concurrency=1
 
       - name: API unit tests (Jest) with coverage thresholds
         timeout-minutes: 20
