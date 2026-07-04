@@ -1,13 +1,13 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-6);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .previewToggle {
@@ -16,11 +16,11 @@
 
 .readOnlyBanner {
   margin: 0;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-warning) 18%, transparent);
   color: var(--color-status-warning-fg);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .editorGrid {

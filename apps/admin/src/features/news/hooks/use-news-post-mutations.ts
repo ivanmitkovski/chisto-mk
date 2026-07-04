@@ -88,6 +88,7 @@ export function useNewsPostMutations({
   const [unpublishOpen, setUnpublishOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [liveMediaPending, setLiveMediaPending] = useState(false);
 
   const formValuesRef = useRef(form.values);
   formValuesRef.current = form.values;
@@ -144,8 +145,9 @@ export function useNewsPostMutations({
     async (options?: { silent?: boolean }): Promise<boolean> => {
       if (saveInFlightRef.current) return false;
 
+      const isPublished = post.status === 'published';
       const validationError = validateNewsPostForm(form.values, {
-        mode: 'save',
+        mode: isPublished ? 'publish' : 'save',
         hasCover: Boolean(post.coverMediaId),
       });
       if (validationError) {
@@ -184,6 +186,7 @@ export function useNewsPostMutations({
           category: payload.category,
           translations: payload.translations,
           featured: payload.featured,
+          expectedUpdatedAt: post.updatedAt,
           ...(scheduledChanged ? { scheduledAt: nextScheduledAt } : {}),
         });
         onPostChange(updated);
@@ -212,7 +215,20 @@ export function useNewsPostMutations({
         setSaving(false);
       }
     },
-    [flushBeforeAction, form, onPostChange, post.id, post.updatedAt, refresh, reloadLatest, showError, showToast, t],
+    [
+      flushBeforeAction,
+      form,
+      onPostChange,
+      post.coverMediaId,
+      post.id,
+      post.status,
+      post.updatedAt,
+      refresh,
+      reloadLatest,
+      showError,
+      showToast,
+      t,
+    ],
   );
 
   const saveIfDirty = useCallback(async (): Promise<boolean> => {
@@ -223,25 +239,48 @@ export function useNewsPostMutations({
   const runLifecycle = useCallback(
     async (
       action: () => Promise<NewsPostAdminDto>,
-      successKey: 'toast.published' | 'toast.unpublished' | 'toast.archived',
-    ) => {
-      setLifecycleBusy(true);
+      successKey: 'toast.published' | 'toast.unpublished' | 'toast.archived' | 'toast.updated',
+      options?: { manageBusy?: boolean },
+    ): Promise<boolean> => {
+      const manageBusy = options?.manageBusy !== false;
+      if (manageBusy) setLifecycleBusy(true);
       try {
         const updated = await action();
         onPostChange(updated);
         form.reset(postToFormValues(updated));
+        if (successKey === 'toast.updated' || successKey === 'toast.published') {
+          setLiveMediaPending(false);
+        }
         showToast({ tone: 'success', title: t(successKey), message: '' });
         refresh();
+        return true;
       } catch (error) {
         showError(error);
+        return false;
       } finally {
-        setLifecycleBusy(false);
+        if (manageBusy) setLifecycleBusy(false);
       }
     },
     [form, onPostChange, refresh, showError, showToast, t],
   );
 
   const requestPublish = useCallback(() => {
+    const validationError = validateNewsPostForm(form.values, {
+      mode: 'publish',
+      hasCover: Boolean(post.coverMediaId),
+    });
+    if (validationError) {
+      showToast({
+        tone: 'warning',
+        title: t('toast.validationTitle'),
+        message: t(`validation.${validationError}`),
+      });
+      return;
+    }
+    setPublishOpen(true);
+  }, [form.values, post.coverMediaId, showToast, t]);
+
+  const requestUpdate = useCallback(() => {
     const validationError = validateNewsPostForm(form.values, {
       mode: 'publish',
       hasCover: Boolean(post.coverMediaId),
@@ -268,30 +307,55 @@ export function useNewsPostMutations({
     await runLifecycle(() => publishNewsPost(post.id), 'toast.published');
   }, [flushBeforeAction, post.id, runLifecycle, showError]);
 
-  const saveAndPublish = useCallback(async () => {
+  const confirmUpdate = useCallback(async () => {
     setPublishOpen(false);
-    setLifecycleBusy(true);
     try {
-      try {
-        await flushBeforeAction?.();
-      } catch (error) {
-        showError(error);
-        return;
-      }
-      const saved = await save({ silent: true });
-      if (!saved) {
-        showToast({
-          tone: 'warning',
-          title: t('toast.validationTitle'),
-          message: t('toast.saveBeforePublish'),
-        });
-        return;
-      }
-      await runLifecycle(() => publishNewsPost(post.id), 'toast.published');
-    } finally {
-      setLifecycleBusy(false);
+      await flushBeforeAction?.();
+    } catch (error) {
+      showError(error);
+      return;
     }
-  }, [flushBeforeAction, post.id, runLifecycle, save, showError, showToast, t]);
+    await runLifecycle(() => publishNewsPost(post.id), 'toast.updated');
+  }, [flushBeforeAction, post.id, runLifecycle, showError]);
+
+  const saveThenLifecycle = useCallback(
+    async (successKey: 'toast.published' | 'toast.updated') => {
+      setPublishOpen(false);
+      setLifecycleBusy(true);
+      try {
+        try {
+          await flushBeforeAction?.();
+        } catch (error) {
+          showError(error);
+          return;
+        }
+        const needsSave = isDirty();
+        if (needsSave) {
+          const saved = await save({ silent: true });
+          if (!saved) {
+            showToast({
+              tone: 'warning',
+              title: t('toast.validationTitle'),
+              message: t('toast.saveBeforePublish'),
+            });
+            return;
+          }
+        }
+        await runLifecycle(() => publishNewsPost(post.id), successKey, { manageBusy: false });
+      } finally {
+        setLifecycleBusy(false);
+      }
+    },
+    [flushBeforeAction, isDirty, post.id, runLifecycle, save, showError, showToast, t],
+  );
+
+  const saveAndPublish = useCallback(async () => {
+    await saveThenLifecycle('toast.published');
+  }, [saveThenLifecycle]);
+
+  const saveAndUpdate = useCallback(async () => {
+    await saveThenLifecycle('toast.updated');
+  }, [saveThenLifecycle]);
 
   const requestUnpublish = useCallback(() => {
     if (blockIfDirty()) return;
@@ -370,6 +434,7 @@ export function useNewsPostMutations({
           onPostChange(updated);
           refresh();
         }
+        if (post.status === 'published') setLiveMediaPending(true);
         showToast({ tone: 'success', title: t('toast.mediaUploaded'), message: '' });
       } catch (error) {
         showError(error);
@@ -430,6 +495,7 @@ export function useNewsPostMutations({
         const updated = await fetchNewsPost(post.id);
         onPostChange(updated);
         refresh();
+        if (post.status === 'published') setLiveMediaPending(true);
         showToast({ tone: 'success', title: t('toast.mediaUploaded'), message: '' });
       } catch (error) {
         showError(error);
@@ -479,6 +545,7 @@ export function useNewsPostMutations({
         const updated = await fetchNewsPost(post.id);
         onPostChange(updated);
         refresh();
+        if (post.status === 'published') setLiveMediaPending(true);
         showToast({ tone: 'success', title: t('toast.mediaUploaded'), message: '' });
       } catch (error) {
         showError(error);
@@ -487,7 +554,7 @@ export function useNewsPostMutations({
         setUploadingGallerySlot(null);
       }
     },
-    [form, locale, onPostChange, post.id, refresh, showError, showToast, t],
+    [form, locale, onPostChange, post.id, post.status, refresh, showError, showToast, t],
   );
 
   const uploadInlineAt = useCallback(
@@ -530,6 +597,7 @@ export function useNewsPostMutations({
         const updated = await fetchNewsPost(post.id);
         onPostChange(updated);
         refresh();
+        if (post.status === 'published') setLiveMediaPending(true);
         showToast({ tone: 'success', title: t('toast.mediaUploaded'), message: '' });
       } catch (error) {
         showError(error);
@@ -562,6 +630,7 @@ export function useNewsPostMutations({
       try {
         await deleteNewsMedia(mediaId);
         await mergePostMedia(isDirty());
+        if (post.status === 'published') setLiveMediaPending(true);
         showToast({ tone: 'success', title: t('toast.mediaDeleted'), message: '' });
       } catch (error) {
         showError(error);
@@ -569,7 +638,7 @@ export function useNewsPostMutations({
         setLifecycleBusy(false);
       }
     },
-    [isDirty, mergePostMedia, showError, showToast, t],
+    [isDirty, mergePostMedia, post.status, showError, showToast, t],
   );
 
   const busy = saving || lifecycleBusy || uploadingKind !== null;
@@ -594,6 +663,11 @@ export function useNewsPostMutations({
     requestPublish,
     confirmPublish,
     saveAndPublish,
+    requestUpdate,
+    confirmUpdate,
+    saveAndUpdate,
+    liveMediaPending,
+    markLiveMediaPending: () => setLiveMediaPending(true),
     requestUnpublish,
     confirmUnpublish,
     requestArchive,

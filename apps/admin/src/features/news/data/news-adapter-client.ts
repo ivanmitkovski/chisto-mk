@@ -81,6 +81,7 @@ export async function updateNewsPost(
     translations?: NewsTranslations;
     scheduledAt?: string | null;
     featured?: boolean;
+    expectedUpdatedAt?: string;
   },
 ): Promise<NewsPostAdminDto> {
   return apiFetch(`/admin/news/posts/${encodeURIComponent(id)}`, {

@@ -89,6 +89,94 @@ describe('NewsPostsLifecycleService', () => {
     );
   });
 
+  it('republishes published posts with validation, audit, and revalidate', async () => {
+    const publishedAt = new Date('2026-01-01T00:00:00.000Z');
+    const update = jest.fn().mockResolvedValue({
+      id: 'p1',
+      slug: 'live-post',
+      status: 'PUBLISHED',
+      scheduledAt: null,
+      publishedAt,
+      category: 'RELEASE',
+      featured: false,
+      coverMediaId: 'cover-1',
+      translations: {
+        en: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+        mk: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+        sq: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+      },
+      media: [{ id: 'cover-1', kind: 'COVER', objectKey: 'cover.jpg' }],
+      coverMedia: { objectKey: 'cover.jpg' },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    const prisma = {
+      newsPost: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'p1',
+          status: 'PUBLISHED',
+          scheduledAt: null,
+          publishedAt,
+          coverMediaId: 'cover-1',
+          translations: {
+            en: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+            mk: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+            sq: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+          },
+          media: [
+            {
+              id: 'cover-1',
+              kind: 'COVER',
+              objectKey: 'cover.jpg',
+              altText: { en: 'Cover', mk: 'Cover', sq: 'Cover' },
+            },
+          ],
+        }),
+        update,
+      },
+    };
+
+    await buildService(prisma).publish('p1', { userId: 'admin-1' } as never);
+
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          updatedById: 'admin-1',
+        }),
+      }),
+    );
+    expect(update.mock.calls[0][0].data).not.toHaveProperty('publishedAt');
+    expect(update.mock.calls[0][0].data).not.toHaveProperty('status');
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'news.post.update_publish' }),
+    );
+    expect(revalidate.triggerLandingRevalidate).toHaveBeenCalled();
+  });
+
+  it('rejects update-publish when published post is incomplete', async () => {
+    const prisma = {
+      newsPost: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'p1',
+          status: 'PUBLISHED',
+          scheduledAt: null,
+          coverMediaId: null,
+          translations: {
+            en: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+            mk: { title: '', excerpt: '', body: [] },
+            sq: { title: '', excerpt: '', body: [] },
+          },
+          media: [],
+        }),
+      },
+    };
+
+    await expect(buildService(prisma).publish('p1')).rejects.toMatchObject({
+      response: { code: 'NEWS_TITLE_REQUIRED' },
+    });
+    expect(revalidate.triggerLandingRevalidate).not.toHaveBeenCalled();
+  });
+
   it('keeps scheduled posts hidden until go-live', async () => {
     const scheduledAt = new Date(Date.now() + 3600_000);
     const update = jest.fn().mockResolvedValue({

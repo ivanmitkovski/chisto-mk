@@ -1,25 +1,28 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useId, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, UserRound } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
-import { motion } from "framer-motion";
+import * as Collapsible from "@radix-ui/react-collapsible";
+import { ChevronDown, UserRound } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
-import { fadeInUp, viewOnce } from "@/lib/animations/variants";
+import { SocialIcon } from "@/components/molecules/SocialIcon";
+import { fadeInUp } from "@/lib/animations/variants";
+import { cn } from "@/lib/utils/cn";
 import type { AboutCreator } from "./about-page.types";
 
 type AboutTeamProps = {
   sectionTitle: string;
+  sectionLead?: string;
   photoPlaceholder: string;
-  carouselPrevLabel: string;
-  carouselNextLabel: string;
+  readMore: string;
+  readLess: string;
+  linkedinAria: (name: string) => string;
   creators: AboutCreator[];
 };
 
-const carouselBtnClass =
-  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200/90 bg-white text-gray-700 shadow-sm transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:h-12 md:w-12";
+const cardViewport = { once: true as const, amount: 0.12 as const, margin: "0px 0px -8% 0px" };
 
 /** Names that are clearly “to be announced” copy — show icon instead of initials. */
 function isPlaceholderDisplayName(name: string): boolean {
@@ -113,75 +116,137 @@ function TeamPortraitPlaceholder({ name, caption }: { name: string; caption: str
   );
 }
 
-function TeamMemberSlide({
+function TeamMemberCard({
   creator,
   photoPlaceholder,
-  index,
-  total,
+  linkedinAria,
+  readMore,
+  readLess,
+  priority,
+  reduceMotion,
 }: {
   creator: AboutCreator;
   photoPlaceholder: string;
-  index: number;
-  total: number;
+  linkedinAria: string;
+  readMore: string;
+  readLess: string;
+  priority: boolean;
+  reduceMotion: boolean;
 }) {
+  const [bioOpen, setBioOpen] = useState(false);
+  const nameId = useId();
+  const bioId = useId();
   const src = creator.imageSrc?.trim();
+  const linkedinUrl = creator.linkedinUrl?.trim();
+  const role = creator.role?.trim();
+  const affiliation = creator.affiliation?.trim();
+  const bioParagraphs = (creator.bioParagraphs ?? []).map((p) => p.trim()).filter(Boolean);
+  const hasBio = bioParagraphs.length > 0;
+
   return (
-    <div
-      className="min-w-0 shrink-0 grow-0 basis-full pl-5 md:basis-1/2 md:pl-6 lg:basis-1/3 lg:pl-8"
-      role="group"
-      aria-roledescription="slide"
-      aria-label={`${index + 1} / ${total}`}
+    <article
+      aria-labelledby={nameId}
+      className="mx-auto flex h-full w-full max-w-sm flex-col rounded-3xl bg-white/70 p-5 text-center shadow-sm ring-1 ring-gray-200/80 transition-[box-shadow,ring-color] duration-300 ease-out hover:shadow-[var(--shadow-lift)] hover:ring-gray-300/80 sm:p-6 md:mx-0 md:max-w-none"
     >
-      <div className="flex h-full min-h-0 flex-col px-1">
-        <div className="relative mx-auto aspect-[3/4] w-full max-w-[220px] shrink-0 overflow-hidden rounded-2xl bg-gray-100/90 shadow-sm ring-1 ring-gray-200/85 sm:mx-0 sm:max-w-none">
-          {src ? (
-            <Image
-              src={src}
-              alt={creator.imageAlt}
-              fill
-              className="object-cover"
-              sizes="(max-width:768px) 90vw, (max-width:1024px) 45vw, 33vw"
-            />
-          ) : (
-            <TeamPortraitPlaceholder name={creator.name} caption={photoPlaceholder} />
-          )}
-        </div>
-        <div className="mt-4 flex min-h-0 flex-1 flex-col text-center sm:text-left">
-          <p className="text-about-team-name text-balance">{creator.name}</p>
-          <p className="mt-1.5 flex-1 text-pretty text-about-prose">{creator.role}</p>
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100 ring-1 ring-gray-200/70">
+        {src ? (
+          <Image
+            src={src}
+            alt={creator.imageAlt}
+            fill
+            quality={90}
+            priority={priority}
+            className="object-cover object-top"
+            sizes="(max-width: 768px) 280px, (max-width: 1024px) 360px, 320px"
+          />
+        ) : (
+          <TeamPortraitPlaceholder name={creator.name} caption={photoPlaceholder} />
+        )}
+      </div>
+
+      <div className="mt-5 flex min-h-0 flex-1 flex-col items-center">
+        <h3 id={nameId} className="text-about-team-name text-balance">
+          {creator.name}
+        </h3>
+        <p className="mt-1.5 text-[1.0625rem] font-semibold tracking-[-0.018em] text-primary-text md:text-[1.125rem]">
+          {creator.title}
+        </p>
+        {role ? <p className="mt-1 text-pretty text-about-prose">{role}</p> : null}
+        {affiliation ? (
+          <p className="mt-1 text-pretty text-sm leading-snug text-gray-500 md:text-[0.9375rem] md:leading-snug">
+            {affiliation}
+          </p>
+        ) : null}
+
+        <div className="mt-auto flex w-full flex-col items-center pt-4">
+          {hasBio ? (
+            <Collapsible.Root open={bioOpen} onOpenChange={setBioOpen} className="w-full">
+              <Collapsible.Trigger
+                type="button"
+                aria-controls={bioId}
+                aria-expanded={bioOpen}
+                className="inline-flex items-center justify-center gap-1 rounded-md text-sm font-semibold text-primary outline-none transition-colors hover:text-primary-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              >
+                <span>{bioOpen ? readLess : readMore}</span>
+                <ChevronDown
+                  className={cn(
+                    "size-4 shrink-0",
+                    !reduceMotion && "transition-transform duration-300 ease-out",
+                    bioOpen && "rotate-180",
+                  )}
+                  aria-hidden
+                />
+              </Collapsible.Trigger>
+
+              <Collapsible.Content
+                id={bioId}
+                aria-labelledby={nameId}
+                className={cn(
+                  "overflow-hidden",
+                  reduceMotion ? "data-[state=closed]:hidden" : "about-team-bio",
+                )}
+              >
+                <div className="space-y-3 pt-3 text-left text-pretty text-about-prose">
+                  {bioParagraphs.map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
+                </div>
+              </Collapsible.Content>
+            </Collapsible.Root>
+          ) : null}
+
+          {linkedinUrl ? (
+            <div className={cn(hasBio ? "mt-4" : "mt-0")}>
+              <SocialIcon
+                platform="linkedin"
+                href={linkedinUrl}
+                ariaLabel={linkedinAria}
+                className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              />
+            </div>
+          ) : null}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
 export function AboutTeam({
   sectionTitle,
+  sectionLead,
   photoPlaceholder,
-  carouselPrevLabel,
-  carouselNextLabel,
+  readMore,
+  readLess,
+  linkedinAria,
   creators,
 }: AboutTeamProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "start",
-    slidesToScroll: 1,
-    dragFree: false,
-  });
-
-  useEffect(() => {
-    emblaApi?.reInit();
-  }, [emblaApi, creators]);
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-
-  const total = creators.length;
+  const reduceMotion = useReducedMotion() ?? false;
+  const lead = sectionLead?.trim();
 
   return (
     <Section
       id="about-team"
-      className="scroll-mt-24 relative overflow-hidden border-t border-gray-200/50 md:scroll-mt-28 mesh-section-about-closure"
+      className="scroll-mt-24 relative overflow-x-clip border-t border-gray-200/50 md:scroll-mt-28 mesh-section-about-closure"
       aria-labelledby="about-team-heading"
     >
       <div
@@ -189,47 +254,57 @@ export function AboutTeam({
         aria-hidden
       />
       <Container className="relative z-10 py-[var(--section-y-tight)] md:py-[var(--section-y-lg)]">
-        <motion.h2
-          id="about-team-heading"
-          className="mx-auto max-w-3xl text-center text-about-section-title text-balance"
-          variants={fadeInUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewOnce}
-        >
-          {sectionTitle}
-        </motion.h2>
-
-        <div
-          className="mt-10 sm:mt-12"
-          role="region"
-          aria-roledescription="carousel"
-          aria-label={sectionTitle}
-        >
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-            <button type="button" className={carouselBtnClass} aria-label={carouselPrevLabel} onClick={scrollPrev}>
-              <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" aria-hidden />
-            </button>
-
-            <div className="min-w-0 flex-1 overflow-hidden py-1" ref={emblaRef}>
-              <div className="-ml-5 flex touch-pan-y md:-ml-6 lg:-ml-8">
-                {creators.map((creator, index) => (
-                  <TeamMemberSlide
-                    key={`${creator.name}-${index}`}
-                    creator={creator}
-                    photoPlaceholder={photoPlaceholder}
-                    index={index}
-                    total={total}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <button type="button" className={carouselBtnClass} aria-label={carouselNextLabel} onClick={scrollNext}>
-              <ChevronRight className="h-5 w-5 md:h-6 md:w-6" aria-hidden />
-            </button>
-          </div>
+        <div className="mx-auto max-w-3xl text-center">
+          <motion.h2
+            id="about-team-heading"
+            className="text-about-section-title text-balance"
+            variants={fadeInUp}
+            initial={reduceMotion ? false : "hidden"}
+            whileInView="visible"
+            viewport={cardViewport}
+          >
+            {sectionTitle}
+          </motion.h2>
+          {lead ? (
+            <motion.p
+              className="mx-auto mt-3 max-w-xl text-pretty text-about-prose"
+              variants={fadeInUp}
+              initial={reduceMotion ? false : "hidden"}
+              whileInView="visible"
+              viewport={cardViewport}
+            >
+              {lead}
+            </motion.p>
+          ) : null}
         </div>
+
+        {creators.length > 0 ? (
+          <ul
+            className="mx-auto mt-10 grid max-w-5xl list-none grid-cols-1 items-stretch gap-8 sm:mt-12 md:grid-cols-2 md:gap-10 lg:gap-12"
+            role="list"
+          >
+            {creators.map((creator, index) => (
+              <motion.li
+                key={creator.name}
+                className="min-w-0"
+                variants={fadeInUp}
+                initial={reduceMotion ? false : "hidden"}
+                whileInView="visible"
+                viewport={cardViewport}
+              >
+                <TeamMemberCard
+                  creator={creator}
+                  photoPlaceholder={photoPlaceholder}
+                  linkedinAria={linkedinAria(creator.name)}
+                  readMore={readMore}
+                  readLess={readLess}
+                  priority={index < 2}
+                  reduceMotion={reduceMotion}
+                />
+              </motion.li>
+            ))}
+          </ul>
+        ) : null}
       </Container>
     </Section>
   );
