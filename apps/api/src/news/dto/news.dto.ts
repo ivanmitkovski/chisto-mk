@@ -181,6 +181,13 @@ export class UpdateNewsPostDto {
   @IsOptional()
   @IsBoolean()
   featured?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'ISO timestamp of the post updatedAt the client last loaded; rejects with 409 on mismatch',
+  })
+  @IsOptional()
+  @IsString()
+  expectedUpdatedAt?: string;
 }
 
 export class ListNewsPostsQueryDto {

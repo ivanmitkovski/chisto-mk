@@ -47,7 +47,6 @@ describe('NewsMediaUploadService', () => {
       getSignedGetUrl: jest.fn().mockResolvedValue('https://signed.example/a.jpg'),
       invalidateKey: jest.fn(),
     };
-    const revalidate = { triggerLandingRevalidate: jest.fn() };
     const audit = { log: jest.fn() };
 
     const svc = new NewsMediaUploadService(
@@ -55,12 +54,36 @@ describe('NewsMediaUploadService', () => {
       s3 as never,
       imageProcessor,
       signedUrls as never,
-      revalidate as never,
       audit as never,
     );
 
     return { svc, prisma, s3 };
   }
+
+  it('uploads media on a published post without requiring revalidate wiring', async () => {
+    const { svc, prisma } = buildService({
+      post: {
+        id: 'post-1',
+        status: 'PUBLISHED',
+        coverMediaId: null,
+        coverMedia: null,
+      },
+    });
+
+    const result = await svc.upload({
+      postId: 'post-1',
+      kind: 'inline_image',
+      file: {
+        buffer: jpeg128,
+        mimetype: 'image/jpeg',
+        size: jpeg128.length,
+        originalname: 'inline.jpg',
+      },
+    });
+
+    expect(prisma.newsMedia.create).toHaveBeenCalled();
+    expect(result.url).toBe('https://signed.example/a.jpg');
+  });
 
   it('uploads JPEG with dimensions', async () => {
     const { svc, prisma, s3 } = buildService();
@@ -222,7 +245,6 @@ describe('NewsMediaUploadService', () => {
       s3 as never,
       imageProcessor,
       signedUrls as never,
-      { triggerLandingRevalidate: jest.fn() } as never,
       { log: jest.fn() } as never,
     );
 

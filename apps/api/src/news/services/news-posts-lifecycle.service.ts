@@ -36,15 +36,6 @@ export class NewsPostsLifecycleService {
       });
     }
 
-    if (existing.status === 'PUBLISHED') {
-      const now = new Date();
-      const isFutureSchedule = Boolean(existing.scheduledAt && existing.scheduledAt > now);
-      if (!isFutureSchedule) {
-        const signed = await signNewsPostMedia(this.signedUrls, existing);
-        return toAdminDto(existing, signed);
-      }
-    }
-
     const translations = parseTranslations(existing.translations);
     assertValidTranslations(translations, true);
 
@@ -54,6 +45,30 @@ export class NewsPostsLifecycleService {
 
     const now = new Date();
     const isFutureSchedule = Boolean(existing.scheduledAt && existing.scheduledAt > now);
+
+    // Already live: re-validate, audit update_publish, revalidate cache; preserve publishedAt.
+    if (existing.status === 'PUBLISHED' && !isFutureSchedule) {
+      const row = await this.prisma.newsPost.update({
+        where: { id },
+        data: {
+          updatedById: actor?.userId ?? null,
+        },
+        include: NEWS_POST_ADMIN_INCLUDE,
+      });
+
+      await this.audit?.log({
+        actorId: actor?.userId ?? null,
+        action: 'news.post.update_publish',
+        resourceType: 'NewsPost',
+        resourceId: row.id,
+        metadata: { slug: row.slug, status: row.status },
+      });
+
+      void this.revalidate.triggerLandingRevalidate();
+
+      const signed = await signNewsPostMedia(this.signedUrls, row);
+      return toAdminDto(row, signed);
+    }
 
     const row = await this.prisma.newsPost.update({
       where: { id },

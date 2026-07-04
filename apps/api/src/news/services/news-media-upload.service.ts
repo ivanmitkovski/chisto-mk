@@ -4,12 +4,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { S3StorageClient } from '../../storage/util/s3-storage.client';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
-import { NewsRevalidateService } from './news-revalidate.service';
 import { randomUUID } from 'crypto';
 import { Prisma } from '../../prisma-client';
 import type { NewsLocale, NewsTranslations } from '../types/news.types';
 import { parseTranslations, toMediaDto } from './news-posts.mapper';
-import { stripMediaIdFromTranslations } from './news-posts-validation';
+import { assertMediaIntegrity, stripMediaIdFromTranslations } from './news-posts-validation';
 import { NewsImageProcessor } from './news-image-processor';
 import {
   toNewsMediaPrismaKind,
@@ -33,7 +32,6 @@ export class NewsMediaUploadService {
     private readonly s3: S3StorageClient,
     private readonly imageProcessor: NewsImageProcessor,
     private readonly signedUrls: NewsMediaSignedUrlService,
-    private readonly revalidate: NewsRevalidateService,
     private readonly audit?: AuditService,
   ) {}
 
@@ -129,9 +127,8 @@ export class NewsMediaUploadService {
       metadata: { postId: input.postId, kind: input.kind },
     });
 
-    if (post.status === 'PUBLISHED' || post.status === 'SCHEDULED') {
-      void this.revalidate.triggerLandingRevalidate();
-    }
+    // Published posts: defer public cache refresh until explicit update-publish.
+    // Scheduled posts are not public yet; no ISR refresh needed for media alone.
 
     const url = await this.signedUrls.getSignedGetUrl(key);
     return { ...media, url };
@@ -203,9 +200,7 @@ export class NewsMediaUploadService {
       metadata: { postId: media.postId },
     });
 
-    if (media.post.status === 'PUBLISHED' || media.post.status === 'SCHEDULED') {
-      void this.revalidate.triggerLandingRevalidate();
-    }
+    // Published: defer revalidate until update-publish (see upload).
   }
 
   async updateAltText(
@@ -243,6 +238,27 @@ export class NewsMediaUploadService {
       }
     }
 
+    const isLive = media.post.status === 'PUBLISHED' || media.post.status === 'SCHEDULED';
+    if (isLive) {
+      const postWithMedia = await this.prisma.newsPost.findUnique({
+        where: { id: media.postId },
+        include: { media: true },
+      });
+      if (postWithMedia) {
+        const mediaForCheck = postWithMedia.media.map((m) =>
+          m.id === mediaId
+            ? { ...m, altText: Object.keys(merged).length > 0 ? merged : null }
+            : m,
+        );
+        assertMediaIntegrity(
+          parseTranslations(postWithMedia.translations) as NewsTranslations,
+          mediaForCheck,
+          postWithMedia.coverMediaId,
+          { requireCover: true, requireAltText: true },
+        );
+      }
+    }
+
     const updated = await this.prisma.newsMedia.update({
       where: { id: mediaId },
       data: {
@@ -261,9 +277,7 @@ export class NewsMediaUploadService {
       metadata: { postId: media.postId },
     });
 
-    if (media.post.status === 'PUBLISHED' || media.post.status === 'SCHEDULED') {
-      void this.revalidate.triggerLandingRevalidate();
-    }
+    // Published: defer revalidate until update-publish (see upload).
 
     const url = await this.signedUrls.getSignedGetUrl(updated.objectKey);
     const signed = new Map<string, string | null>([[updated.objectKey, url]]);

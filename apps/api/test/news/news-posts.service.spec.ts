@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 import { NewsPostsUpdateService } from '../../src/news/services/news-posts-update.service';
 
-describe('NewsPostsUpdateService featured exclusivity', () => {
+describe('NewsPostsUpdateService', () => {
   it('clears featured on other posts when setting featured true', async () => {
     const updateMany = jest.fn().mockResolvedValue({ count: 1 });
     const update = jest.fn().mockResolvedValue({
@@ -58,5 +58,71 @@ describe('NewsPostsUpdateService featured exclusivity', () => {
       where: { id: { not: 'post-1' }, featured: true },
       data: { featured: false },
     });
+  });
+
+  it('rejects stale expectedUpdatedAt with conflict', async () => {
+    const updatedAt = new Date('2026-06-01T12:00:00.000Z');
+    const findUnique = jest.fn().mockResolvedValue({
+      id: 'post-1',
+      slug: 'a',
+      status: 'DRAFT',
+      featured: false,
+      updatedAt,
+    });
+    const prisma = {
+      newsPost: { findUnique },
+      $transaction: jest.fn(),
+    };
+    const svc = new NewsPostsUpdateService(
+      prisma as never,
+      { signMany: jest.fn().mockResolvedValue(new Map()) } as never,
+      { triggerLandingRevalidate: jest.fn() } as never,
+      { createRevision: jest.fn() } as never,
+    );
+
+    await expect(
+      svc.update('post-1', {
+        featured: true,
+        expectedUpdatedAt: '2026-06-01T11:00:00.000Z',
+      }),
+    ).rejects.toMatchObject({ response: { code: 'NEWS_POST_CONFLICT' } });
+  });
+
+  it('requires cover and alt text when updating published translations', async () => {
+    const findUnique = jest
+      .fn()
+      .mockResolvedValueOnce({
+        id: 'post-1',
+        slug: 'live',
+        status: 'PUBLISHED',
+        featured: false,
+        updatedAt: new Date(),
+        translations: {},
+      })
+      .mockResolvedValueOnce({
+        id: 'post-1',
+        coverMediaId: null,
+        media: [],
+      });
+    const prisma = {
+      newsPost: { findUnique },
+      $transaction: jest.fn(),
+    };
+    const svc = new NewsPostsUpdateService(
+      prisma as never,
+      { signMany: jest.fn().mockResolvedValue(new Map()) } as never,
+      { triggerLandingRevalidate: jest.fn() } as never,
+      { createRevision: jest.fn() } as never,
+    );
+
+    await expect(
+      svc.update('post-1', {
+        translations: {
+          en: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+          mk: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+          sq: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: 'p' }] },
+        },
+      }),
+    ).rejects.toMatchObject({ response: { code: 'NEWS_COVER_REQUIRED' } });
   });
 });

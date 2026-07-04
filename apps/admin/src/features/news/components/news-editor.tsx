@@ -47,7 +47,7 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
   const [locale, setLocale] = useState<NewsFormLocale>('en');
   const [editorView, setEditorView] = useState<NewsEditorView>('write');
   const form = useNewsPostForm(postToFormValues(post));
-  const readOnly = !canWriteNews;
+  const permissionReadOnly = !canWriteNews;
   const savedFingerprintRef = useRef(newsFormEditorFingerprint(postToFormValues(initialPost)));
 
   useEffect(() => {
@@ -81,7 +81,15 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     onError: handleAltSaveError,
   });
 
-  useUnsavedChangesGuard(contentDirty || altPending, t('editor.unsavedLeaveConfirm'));
+  const isPublished = post.status === 'published';
+  const isArchived = post.status === 'archived';
+  const isScheduled = post.status === 'scheduled';
+  const readOnly = permissionReadOnly || isArchived;
+
+  useUnsavedChangesGuard(
+    !readOnly && (contentDirty || altPending),
+    t('editor.unsavedLeaveConfirm'),
+  );
 
   const mutations = useNewsPostMutations({
     post,
@@ -93,9 +101,13 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     flushBeforeAction: flushAltSaves,
   });
 
+  const livePending =
+    isPublished && (contentDirty || altPending || mutations.liveMediaPending);
+
   const autosave = useNewsAutosave({
     dirty: contentDirty,
     readOnly,
+    enabled: !isPublished && !isArchived,
     values: form.values,
     save: mutations.save,
     hasCover: Boolean(post.coverMediaId),
@@ -107,12 +119,13 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     () =>
       [
         t('editor.status', { status: t(`status.${post.status}`) }),
+        livePending ? t('editor.livePending') : '',
         autosave.statusLabel,
         mutations.busy && !autosave.statusLabel ? t('editor.saving') : '',
       ]
         .filter(Boolean)
         .join(' · '),
-    [autosave.statusLabel, mutations.busy, post.status, t],
+    [autosave.statusLabel, livePending, mutations.busy, post.status, t],
   );
 
   const handleDeleteMedia = useCallback(
@@ -146,8 +159,9 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
         media: prev.media.map((m) => (m.id === mediaId ? { ...m, altText: nextAlt } : m)),
       }));
       scheduleAltSave(mediaId, altLocale, nextAlt);
+      if (post.status === 'published') mutations.markLiveMediaPending();
     },
-    [post.media, scheduleAltSave],
+    [mutations, post.media, post.status, scheduleAltSave],
   );
 
   const handleRestored = useCallback(
@@ -160,15 +174,23 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (readOnly || mutations.busy) return;
+      if (readOnly || mutations.busy || isArchived) return;
       const mod = e.metaKey || e.ctrlKey;
       if (mod && e.key === 's') {
         e.preventDefault();
-        void mutations.save();
+        if (isPublished) {
+          mutations.requestUpdate();
+        } else {
+          void mutations.save();
+        }
       }
       if (mod && e.shiftKey && e.key === 'p') {
         e.preventDefault();
-        mutations.requestPublish();
+        if (isPublished) {
+          mutations.requestUpdate();
+        } else {
+          mutations.requestPublish();
+        }
       }
       if (mod && e.shiftKey && e.key === 'v') {
         e.preventDefault();
@@ -177,7 +199,7 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [mutations, readOnly]);
+  }, [isArchived, isPublished, mutations, readOnly]);
 
   const localeContent = form.values.translations[locale];
 
@@ -232,58 +254,139 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     status: post.status,
   });
 
+  const writeActions = (() => {
+    if (permissionReadOnly) {
+      return (
+        <Button variant="outline" onClick={() => router.push('/dashboard/news')}>
+          {t('actions.back')}
+        </Button>
+      );
+    }
+
+    const backAndPreview = (
+      <>
+        <Button variant="outline" onClick={() => router.push('/dashboard/news')} disabled={mutations.busy}>
+          {t('actions.back')}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => setEditorView((v) => (v === 'preview' ? 'write' : 'preview'))}
+          disabled={mutations.busy}
+        >
+          {editorView === 'preview' ? t('editor.writeTab') : t('editor.previewTab')}
+        </Button>
+      </>
+    );
+
+    if (isArchived) {
+      return (
+        <div className={styles.actions}>
+          {backAndPreview}
+          <Button
+            variant="ghost"
+            onClick={() => mutations.setDeleteOpen(true)}
+            disabled={mutations.busy}
+          >
+            {t('actions.delete')}
+          </Button>
+        </div>
+      );
+    }
+
+    if (isPublished) {
+      return (
+        <div className={styles.actions}>
+          {backAndPreview}
+          <Button
+            onClick={mutations.requestUpdate}
+            disabled={mutations.busy || !livePending}
+            isLoading={mutations.lifecycleBusy}
+          >
+            {t('actions.update')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={mutations.requestUnpublish}
+            disabled={mutations.busy}
+          >
+            {t('actions.unpublish')}
+          </Button>
+          <Button variant="ghost" onClick={mutations.requestArchive} disabled={mutations.busy}>
+            {t('actions.archive')}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => mutations.setDeleteOpen(true)}
+            disabled={mutations.busy}
+          >
+            {t('actions.delete')}
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.actions}>
+        {backAndPreview}
+        <Button
+          variant="outline"
+          onClick={() => void mutations.save()}
+          disabled={mutations.busy || !contentDirty}
+          isLoading={mutations.saving}
+        >
+          {t('actions.save')}
+        </Button>
+        {autosave.canRetry ? (
+          <Button variant="outline" onClick={() => void autosave.retrySave()} disabled={mutations.busy}>
+            {t('autosave.retry')}
+          </Button>
+        ) : null}
+        <Button
+          onClick={mutations.requestPublish}
+          disabled={mutations.busy}
+          isLoading={mutations.lifecycleBusy}
+        >
+          {t('actions.publish')}
+        </Button>
+        {isScheduled ? (
+          <Button
+            variant="outline"
+            onClick={mutations.requestUnpublish}
+            disabled={mutations.busy}
+          >
+            {t('actions.unpublish')}
+          </Button>
+        ) : null}
+        <Button variant="ghost" onClick={mutations.requestArchive} disabled={mutations.busy}>
+          {t('actions.archive')}
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() => mutations.setDeleteOpen(true)}
+          disabled={mutations.busy}
+        >
+          {t('actions.delete')}
+        </Button>
+      </div>
+    );
+  })();
+
   return (
     <div className={styles.root}>
       <PageHeader
         title={post.translations.en.title || post.slug}
         description={statusDescription}
-        actions={
-          readOnly ? (
-            <Button variant="outline" onClick={() => router.push('/dashboard/news')}>
-              {t('actions.back')}
-            </Button>
-          ) : (
-            <div className={styles.actions}>
-              <Button variant="outline" onClick={() => router.push('/dashboard/news')} disabled={mutations.busy}>
-                {t('actions.back')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setEditorView((v) => (v === 'preview' ? 'write' : 'preview'))}
-              >
-                {editorView === 'preview' ? t('editor.writeTab') : t('editor.previewTab')}
-              </Button>
-              <Button onClick={() => void mutations.save()} disabled={mutations.busy || !contentDirty}>
-                {t('actions.save')}
-              </Button>
-              {autosave.canRetry ? (
-                <Button variant="outline" onClick={() => void autosave.retrySave()} disabled={mutations.busy}>
-                  {t('autosave.retry')}
-                </Button>
-              ) : null}
-              {post.status !== 'published' ? (
-                <Button onClick={mutations.requestPublish} disabled={mutations.busy}>
-                  {t('actions.publish')}
-                </Button>
-              ) : (
-                <Button variant="outline" onClick={mutations.requestUnpublish} disabled={mutations.busy}>
-                  {t('actions.unpublish')}
-                </Button>
-              )}
-              <Button variant="ghost" onClick={mutations.requestArchive} disabled={mutations.busy}>
-                {t('actions.archive')}
-              </Button>
-              <Button variant="ghost" onClick={() => mutations.setDeleteOpen(true)} disabled={mutations.busy}>
-                {t('actions.delete')}
-              </Button>
-            </div>
-          )
-        }
+        descriptionAttention={livePending}
+        actions={writeActions}
       />
 
-      {readOnly ? (
+      {permissionReadOnly ? (
         <p className={styles.readOnlyBanner} role="note">
           {t('editor.readOnlyBanner')}
+        </p>
+      ) : isArchived ? (
+        <p className={styles.readOnlyBanner} role="note">
+          {t('editor.archivedBanner')}
         </p>
       ) : null}
 
@@ -402,13 +505,19 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
 
       <NewsPublishChecklistDialog
         open={mutations.publishOpen}
+        mode={isPublished ? 'update' : 'publish'}
         values={form.values}
         hasCover={Boolean(post.coverMediaId)}
         dirty={contentDirty || altPending}
+        isLoading={mutations.lifecycleBusy}
         media={post.media}
         onClose={() => mutations.setPublishOpen(false)}
-        onConfirm={() => void mutations.confirmPublish()}
-        onSaveAndPublish={() => void mutations.saveAndPublish()}
+        onConfirm={() =>
+          void (isPublished ? mutations.confirmUpdate() : mutations.confirmPublish())
+        }
+        onSaveAndConfirm={() =>
+          void (isPublished ? mutations.saveAndUpdate() : mutations.saveAndPublish())
+        }
         onGoToLocale={setLocale}
       />
       <ConfirmDialog
@@ -416,6 +525,7 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
         title={t('confirm.unpublishTitle')}
         description={t('confirm.unpublishBody')}
         confirmLabel={t('actions.unpublish')}
+        isLoading={mutations.lifecycleBusy}
         onConfirm={() => void mutations.confirmUnpublish()}
         onClose={() => mutations.setUnpublishOpen(false)}
       />
@@ -424,6 +534,7 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
         title={t('confirm.archiveTitle')}
         description={t('confirm.archiveBody')}
         confirmLabel={t('actions.archive')}
+        isLoading={mutations.lifecycleBusy}
         onConfirm={() => void mutations.confirmArchive()}
         onClose={() => mutations.setArchiveOpen(false)}
       />
@@ -433,6 +544,7 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
         description={t('delete.body')}
         confirmLabel={t('delete.confirm')}
         tone="danger"
+        isLoading={mutations.lifecycleBusy}
         onConfirm={() => void mutations.confirmDelete()}
         onClose={() => mutations.setDeleteOpen(false)}
       />

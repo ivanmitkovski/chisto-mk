@@ -112,6 +112,9 @@ export class AdminNewsController {
           : {}),
         ...(body.scheduledAt !== undefined ? { scheduledAt: body.scheduledAt } : {}),
         ...(body.featured !== undefined ? { featured: body.featured } : {}),
+        ...(body.expectedUpdatedAt !== undefined
+          ? { expectedUpdatedAt: body.expectedUpdatedAt }
+          : {}),
       },
       actor,
     );

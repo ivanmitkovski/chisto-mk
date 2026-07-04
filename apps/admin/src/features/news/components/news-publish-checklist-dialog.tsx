@@ -14,49 +14,54 @@ import styles from './news-publish-checklist-dialog.module.css';
 
 type NewsPublishChecklistDialogProps = {
   open: boolean;
+  mode?: 'publish' | 'update';
   values: NewsPostFormValues;
   hasCover: boolean;
   dirty?: boolean;
+  isLoading?: boolean;
   media?: NewsMediaDto[];
   onClose: () => void;
   onConfirm: () => void;
-  onSaveAndPublish?: () => void;
+  onSaveAndConfirm?: () => void;
   onGoToLocale: (locale: NewsFormLocale) => void;
 };
 
 export function NewsPublishChecklistDialog({
   open,
+  mode = 'publish',
   values,
   hasCover,
   dirty = false,
+  isLoading = false,
   media = [],
   onClose,
   onConfirm,
-  onSaveAndPublish,
+  onSaveAndConfirm,
   onGoToLocale,
 }: NewsPublishChecklistDialogProps) {
   const t = useTranslations('news');
   const scores = localeCompleteness(values, hasCover, media);
   const allReady = allLocalesPublishReady(values, hasCover, media);
+  const isUpdate = mode === 'update';
 
   return (
     <Modal
       open={open}
-      title={t('checklist.title')}
-      description={t('checklist.description')}
-      onClose={onClose}
+      title={isUpdate ? t('checklist.titleUpdate') : t('checklist.title')}
+      description={isUpdate ? t('checklist.descriptionUpdate') : t('checklist.description')}
+      onClose={isLoading ? () => undefined : onClose}
       footer={
         <div className={styles.footer}>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
             {t('checklist.cancel')}
           </Button>
-          {dirty && onSaveAndPublish ? (
-            <Button onClick={onSaveAndPublish} disabled={!allReady}>
-              {t('checklist.saveAndPublish')}
+          {dirty && onSaveAndConfirm ? (
+            <Button onClick={onSaveAndConfirm} disabled={!allReady} isLoading={isLoading}>
+              {isUpdate ? t('checklist.saveAndUpdate') : t('checklist.saveAndPublish')}
             </Button>
           ) : (
-            <Button onClick={onConfirm} disabled={!allReady}>
-              {t('checklist.confirmPublish')}
+            <Button onClick={onConfirm} disabled={!allReady} isLoading={isLoading}>
+              {isUpdate ? t('checklist.confirmUpdate') : t('checklist.confirmPublish')}
             </Button>
           )}
         </div>
@@ -73,7 +78,13 @@ export function NewsPublishChecklistDialog({
                   {loc.toUpperCase()}
                 </span>
                 {!ready ? (
-                  <Button type="button" variant="ghost" size="sm" onClick={() => onGoToLocale(loc)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onGoToLocale(loc)}
+                    disabled={isLoading}
+                  >
                     {t('checklist.goToLocale', { locale: loc.toUpperCase() })}
                   </Button>
                 ) : null}
@@ -89,7 +100,11 @@ export function NewsPublishChecklistDialog({
           );
         })}
       </div>
-      {allReady ? <p className={styles.allReady}>{t('checklist.allReady')}</p> : null}
+      {allReady ? (
+        <p className={styles.allReady}>
+          {isUpdate ? t('checklist.allReadyUpdate') : t('checklist.allReady')}
+        </p>
+      ) : null}
     </Modal>
   );
 }
