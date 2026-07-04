@@ -17,8 +17,8 @@ test.describe('News admin smoke', () => {
     await page.getByRole('button', { name: /create draft/i }).click();
     await page.waitForURL(/\/dashboard\/news\/(?!new)/);
     await expect(page.getByRole('heading').first()).toBeVisible();
-    await expect(page.getByRole('button', { name: /publish/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /^update$/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Publish', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Update', exact: true })).toHaveCount(0);
   });
 });
 
