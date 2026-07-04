@@ -27669,6 +27669,10 @@
           },
           "featured": {
             "type": "boolean"
+          },
+          "expectedUpdatedAt": {
+            "type": "string",
+            "description": "ISO timestamp of the post updatedAt the client last loaded; rejects with 409 on mismatch"
           }
         }
       },
