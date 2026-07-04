@@ -216,8 +216,11 @@ jobs:
           cd apps/mobile
           flutter --version
 
-      - name: Flutter mobile tests
-        timeout-minutes: 12
+      # Full `flutter test test/` lives in mobile-pr.yml. Running it here intermittently
+      # hangs shared runners and blocks required web/API deploys (Actions UI also stops
+      # streaming logs for the step). Keep design_system tests + static dart guards here.
+      - name: Flutter mobile guards
+        timeout-minutes: 8
         run: |
           cd apps/mobile
           flutter test packages/design_system/test/ --reporter expanded
@@ -254,9 +257,6 @@ jobs:
           dart run tool/check_no_empty_catch.dart
           dart run tool/check_no_readasbytes_in_upload_paths.dart
           dart run tool/check_loading_empty_error_triple.dart
-          # Expanded reporter streams logs so the Actions UI can open the step while running.
-          # Concurrency 1 avoids intermittent VM hangs observed on shared CI runners.
-          flutter test test/ --reporter expanded --concurrency=1
 
       - name: API unit tests (Jest) with coverage thresholds
         timeout-minutes: 20
