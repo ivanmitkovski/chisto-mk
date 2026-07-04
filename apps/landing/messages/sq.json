@@ -263,14 +263,65 @@
     "subtitle": "Ndërtojmë mjete që çdokush të raportojë një vend ndotjeje me foto dhe vendndodhje, ta mbajë të dukshëm në një hartë publike dhe të lidhet me aksione pastrimi.",
     "creatorsPhotoPlaceholder": "Foto së shpejti",
     "creatorsSectionTitle": "Ekipi",
-    "teamCarouselPrev": "Anëtari i mëparshëm i ekipit",
-    "teamCarouselNext": "Anëtari tjetër i ekipit",
+    "creatorsSectionLead": "Njerëzit që ndërtojnë Chisto.mk.",
+    "linkedinAria": "{name} në LinkedIn (hapet në një skedë të re)",
+    "readMore": "Lexo më shumë",
+    "readLess": "Lexo më pak",
     "creators": [
       {
-        "name": "Ekipi Chisto.mk",
-        "role": "Ndërtojmë mjete qytetare mjedisore në Maqedoni.",
-        "imageAlt": "Ekipi Chisto.mk",
-        "imageSrc": ""
+        "name": "Ivan Mitkovski",
+        "title": "CTO",
+        "role": "Inxhinier Full Stack",
+        "affiliation": "President i EKOHAB Shkup",
+        "imageAlt": "Portret i Ivan Mitkovski, CTO i Chisto.mk",
+        "imageSrc": "/about/creators/ivan-mitkovski.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/ivanmitkovski/",
+        "bioParagraphs": [
+          "I lindur në Shkup në vitin 2004, Ivani është kitarist i trajnuar klasikisht nga Shkolla Shtetërore e Muzikës \"Ilija Nikolovski - Luj\".",
+          "Ai luan kitarë në një grup me Vasil Angelovin dhe gjithmonë ka dashur muzikën dhe teknologjinë. Dikur shpresonte të luante violinë, por me kaq shumë violinistë në gjeneratën e tij, fati zgjodhi kitarën për të.",
+          "Ka punuar në disa projekte të rëndësishme programimi dhe udhëheq inxhinierinë në Chisto.mk si CTO, me të njëjtin kujdes që sjell në muzikë."
+        ]
+      },
+      {
+        "name": "Vasil Angelov",
+        "title": "CMO",
+        "role": "Marketer kryesor",
+        "affiliation": "Anëtar i Bordit Ekzekutiv të EKOHAB Shkup",
+        "imageAlt": "Portret i Vasil Angelov, CMO i Chisto.mk",
+        "imageSrc": "/about/creators/vasil-angelov.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/vasil-angelov-b0a25930b/",
+        "bioParagraphs": [
+          "I lindur në Shkup në vitin 2003, Vasili u rrit në një familje muzikantësh dhe zgjodhi muzikën me qëllim.",
+          "Ai u trajnua në Shkollën Shtetërore të Muzikës \"Ilija Nikolovski - Luj\", duke filluar me perkusionin para këndimit klasik solo. Ajo bazë formësoi disiplinën e tij, ndërsa rruga e tij u drejtua drejt popit bashkëkohor.",
+          "Ai luan kitarë, piano, bateri dhe bas, dhe punon në prodhim audio dhe video. I pëlqeu ideja e Chisto.mk dhe u bashkua si CMO, gati për të ndihmuar si marketer kryesor."
+        ]
+      },
+      {
+        "name": "Leon Mitev",
+        "title": "Marketer senior",
+        "affiliation": "President i Bordit Mbikëqyrës të EKOHAB Shkup",
+        "imageAlt": "Portret i Leon Mitev, marketer senior në Chisto.mk",
+        "imageSrc": "/about/creators/leon-mitev.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/leon-mitev-68aa3816a/",
+        "bioParagraphs": [
+          "Leon Mitev është marketer senior në Chisto.mk, një nivel nën marketerin kryesor në ekipin e marketingut.",
+          "Ai është president i Bordit Mbikëqyrës të EKOHAB Shkup dhe e mban me kujdes zërin e platformës, që më shumë njerëz ta gjejnë Chisto.mk.",
+          "Së bashku me Vasil Angelovin, e trajton marketingun si zanat: i qartë, njerëzor dhe i ndërtuar për të rritur një produkt qytetar me besim."
+        ]
+      },
+      {
+        "name": "Antonio Hristovski",
+        "title": "CDO",
+        "role": "Dizajn i produktit dhe i markës",
+        "affiliation": "Anëtar i Bordit Ekzekutiv të EKOHAB Shkup",
+        "imageAlt": "Portret i Antonio Hristovski, CDO i Chisto.mk",
+        "imageSrc": "/about/creators/antonio-hristovski.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/antoniohristovski/",
+        "bioParagraphs": [
+          "Antonio Hristovski është shef i dizajnit në Chisto.mk, vendi më i lartë i dizajnit në ekip.",
+          "Ai projektoi përvojën e plotë të produktit: faqen e uljes, aplikacionin celular, mjetet e administrimit, markën dhe sistemin e dizajnit që i mban së bashku.",
+          "Si anëtar i Bordit Ekzekutiv të EKOHAB Shkup, i jep Chisto.mk një fytyrë të qetë dhe koherente në çdo sipërfaqe."
+        ]
       }
     ]
   },

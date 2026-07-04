@@ -263,14 +263,65 @@
     "subtitle": "We build tools so anyone can report a pollution site with a photo and location, keep it visible on a public map, and connect with cleanup events.",
     "creatorsPhotoPlaceholder": "Photo coming soon",
     "creatorsSectionTitle": "Team",
-    "teamCarouselPrev": "Previous team member",
-    "teamCarouselNext": "Next team member",
+    "creatorsSectionLead": "The people building Chisto.mk.",
+    "linkedinAria": "{name} on LinkedIn (opens in a new tab)",
+    "readMore": "Read more",
+    "readLess": "Read less",
     "creators": [
       {
-        "name": "Chisto.mk team",
-        "role": "Building civic environmental tools in Macedonia.",
-        "imageAlt": "Chisto.mk team",
-        "imageSrc": ""
+        "name": "Ivan Mitkovski",
+        "title": "CTO",
+        "role": "Full Stack Engineer",
+        "affiliation": "President of EKOHAB Skopje",
+        "imageAlt": "Portrait of Ivan Mitkovski, CTO of Chisto.mk",
+        "imageSrc": "/about/creators/ivan-mitkovski.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/ivanmitkovski/",
+        "bioParagraphs": [
+          "Born in Skopje in 2004, Ivan is a classically trained guitarist from the State Music School \"Ilija Nikolovski - Luj.\"",
+          "He plays guitar in a band with Vasil Angelov, and has always loved both music and technology. He once hoped to play violin, but with so many violinists in his generation, destiny chose the guitar for him.",
+          "He has worked on several significant programming projects, and leads engineering at Chisto.mk as CTO with the same care he brings to music."
+        ]
+      },
+      {
+        "name": "Vasil Angelov",
+        "title": "CMO",
+        "role": "Principal Marketer",
+        "affiliation": "Member of the Executive Board of EKOHAB Skopje",
+        "imageAlt": "Portrait of Vasil Angelov, CMO of Chisto.mk",
+        "imageSrc": "/about/creators/vasil-angelov.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/vasil-angelov-b0a25930b/",
+        "bioParagraphs": [
+          "Born in Skopje in 2003, Vasil grew up in a family of musicians and chose music with intention.",
+          "He trained at the State Music School \"Ilija Nikolovski - Luj,\" starting with percussion before classical solo singing. That foundation shaped his discipline, while his path moved toward contemporary pop.",
+          "He plays guitar, piano, drums, and bass, and works in audio and video production. He liked the idea behind Chisto.mk and joined as CMO, ready to help as a Principal Marketer."
+        ]
+      },
+      {
+        "name": "Leon Mitev",
+        "title": "Senior Marketer",
+        "affiliation": "President of the Supervisory Board of EKOHAB Skopje",
+        "imageAlt": "Portrait of Leon Mitev, Senior Marketer at Chisto.mk",
+        "imageSrc": "/about/creators/leon-mitev.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/leon-mitev-68aa3816a/",
+        "bioParagraphs": [
+          "Leon Mitev is a Senior Marketer at Chisto.mk, working one tier below Principal Marketer on the marketing team.",
+          "He is President of the Supervisory Board of EKOHAB Skopje, and helps carry the platform's voice with care so more people can find Chisto.mk.",
+          "Alongside Vasil Angelov, he treats marketing as craft: clear, human, and built to grow a civic product with trust."
+        ]
+      },
+      {
+        "name": "Antonio Hristovski",
+        "title": "CDO",
+        "role": "Product & Brand Design",
+        "affiliation": "Member of the Executive Board of EKOHAB Skopje",
+        "imageAlt": "Portrait of Antonio Hristovski, CDO of Chisto.mk",
+        "imageSrc": "/about/creators/antonio-hristovski.jpg",
+        "linkedinUrl": "https://www.linkedin.com/in/antoniohristovski/",
+        "bioParagraphs": [
+          "Antonio Hristovski is Chief Design Officer at Chisto.mk, the highest design seat on the team.",
+          "He designed the full product experience: the landing site, mobile app, admin tools, branding, and the design system that holds them together.",
+          "As a member of the Executive Board of EKOHAB Skopje, he gives Chisto.mk a calm, coherent face across every surface."
+        ]
       }
     ]
   },
