@@ -216,10 +216,14 @@ jobs:
           cd apps/mobile
           flutter --version
 
-      - name: Flutter mobile tests
+      # Full `flutter test test/` lives in mobile-pr.yml. Running it here intermittently
+      # hangs shared runners and blocks required web/API deploys (Actions UI also stops
+      # streaming logs for the step). Keep design_system tests + static dart guards here.
+      - name: Flutter mobile guards
+        timeout-minutes: 8
         run: |
           cd apps/mobile
-          flutter test packages/design_system/test/
+          flutter test packages/design_system/test/ --reporter expanded
           dart run tool/check_haptics_usage.dart
           dart run tool/check_app_bootstrap_reads.dart
           dart run tool/check_screen_size.dart
@@ -253,7 +257,6 @@ jobs:
           dart run tool/check_no_empty_catch.dart
           dart run tool/check_no_readasbytes_in_upload_paths.dart
           dart run tool/check_loading_empty_error_triple.dart
-          flutter test test/
 
       - name: API unit tests (Jest) with coverage thresholds
         timeout-minutes: 20

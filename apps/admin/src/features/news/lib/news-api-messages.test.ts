@@ -6,6 +6,15 @@ describe('news-api-messages', () => {
   it('maps known API codes', () => {
     const err = new ApiError(400, 'NEWS_SLUG_TAKEN', 'taken');
     expect(newsApiErrorKey(err)).toBe('apiErrors.slugTaken');
+    expect(newsApiErrorKey(new ApiError(400, 'NEWS_POST_ARCHIVED', ''))).toBe(
+      'apiErrors.postArchived',
+    );
+    expect(newsApiErrorKey(new ApiError(409, 'NEWS_POST_CONFLICT', ''))).toBe(
+      'apiErrors.postConflict',
+    );
+    expect(newsApiErrorKey(new ApiError(400, 'NEWS_SCHEDULE_NOT_ALLOWED', ''))).toBe(
+      'apiErrors.scheduleNotAllowed',
+    );
   });
 
   it('maps upload error codes', () => {

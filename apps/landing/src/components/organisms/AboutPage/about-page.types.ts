@@ -1,6 +1,10 @@
 export type AboutCreator = {
   name: string;
-  role: string;
+  title: string;
+  role?: string;
+  affiliation?: string;
   imageAlt: string;
   imageSrc?: string;
+  linkedinUrl?: string;
+  bioParagraphs?: string[];
 };

@@ -18,15 +18,14 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@chisto/news-content": "workspace:*",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-dialog": "^1.1.15",
     "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/postcss": "^4.2.2",
     "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
-    "@chisto/news-content": "workspace:*",
     "clsx": "^2.1.1",
-    "embla-carousel-react": "^8.5.2",
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.575.0",
     "next": "^15.5.18",

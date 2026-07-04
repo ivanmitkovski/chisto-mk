@@ -15,9 +15,11 @@ export function AboutPage() {
       <AboutHero badge={t("badge")} title={t("title")} subtitle={t("subtitle")} />
       <AboutTeam
         sectionTitle={t("creatorsSectionTitle")}
+        sectionLead={t("creatorsSectionLead")}
         photoPlaceholder={t("creatorsPhotoPlaceholder")}
-        carouselPrevLabel={t("teamCarouselPrev")}
-        carouselNextLabel={t("teamCarouselNext")}
+        readMore={t("readMore")}
+        readLess={t("readLess")}
+        linkedinAria={(name) => t("linkedinAria", { name })}
         creators={creators}
       />
     </>

@@ -41,10 +41,13 @@ export function NewsEditorMetaPanel({ post, values, locale, status }: NewsEditor
   const landingUrl = landingNewsArticleUrl(locale, slug);
   const canViewOnSite = status === 'published' || status === 'scheduled';
   const tz = scheduleTimezoneLabel();
-  const shortcuts = useMemo(
-    () => (isMacPlatform() ? t('meta.shortcuts') : t('meta.shortcutsWin')),
-    [t],
-  );
+  const shortcuts = useMemo(() => {
+    const isUpdate = status === 'published';
+    if (isMacPlatform()) {
+      return isUpdate ? t('meta.shortcutsUpdate') : t('meta.shortcuts');
+    }
+    return isUpdate ? t('meta.shortcutsWinUpdate') : t('meta.shortcutsWin');
+  }, [status, t]);
 
   const savedSchedule = post.scheduledAt;
   const draftSchedule = values.scheduledAt.trim();

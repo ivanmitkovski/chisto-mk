@@ -11,6 +11,8 @@ type AutosaveStatus = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 type UseNewsAutosaveOptions = {
   dirty: boolean;
   readOnly: boolean;
+  /** When false, autosave is fully disabled (e.g. published posts). */
+  enabled?: boolean;
   values: NewsPostFormValues;
   save: (options?: { silent?: boolean }) => Promise<boolean>;
   hasCover?: boolean;
@@ -29,6 +31,7 @@ function formatSavedAgo(date: Date, t: (key: string, values?: Record<string, str
 export function useNewsAutosave({
   dirty,
   readOnly,
+  enabled = true,
   values,
   save,
   hasCover = false,
@@ -57,7 +60,7 @@ export function useNewsAutosave({
   }, [dirty]);
 
   useEffect(() => {
-    if (!dirty || readOnly || autosavePaused) {
+    if (!enabled || !dirty || readOnly || autosavePaused) {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -122,10 +125,10 @@ export function useNewsAutosave({
         timerRef.current = null;
       }
     };
-  }, [autosavePaused, debounceMs, dirty, fingerprint, hasCover, readOnly]);
+  }, [autosavePaused, debounceMs, dirty, enabled, fingerprint, hasCover, readOnly]);
 
   const statusLabel = (() => {
-    if (readOnly) return '';
+    if (readOnly || !enabled) return '';
     if (status === 'saving' || status === 'pending') return t('autosave.saving');
     if (status === 'error') return t('autosave.failed');
     if (status === 'saved' && lastSavedAt) return formatSavedAgo(lastSavedAt, t);

@@ -1,6 +1,7 @@
 import { Prisma } from '../../prisma-client';
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -29,6 +30,8 @@ export type UpdateNewsPostInput = {
   translations?: NewsTranslations;
   scheduledAt?: string | null;
   featured?: boolean;
+  /** When set, reject with 409 if the post was modified since this timestamp. */
+  expectedUpdatedAt?: string;
 };
 
 @Injectable()
@@ -55,6 +58,16 @@ export class NewsPostsUpdateService {
         code: 'NEWS_POST_ARCHIVED',
         message: 'Archived posts cannot be modified',
       });
+    }
+
+    if (input.expectedUpdatedAt) {
+      const expectedMs = Date.parse(input.expectedUpdatedAt);
+      if (Number.isNaN(expectedMs) || existing.updatedAt.getTime() !== expectedMs) {
+        throw new ConflictException({
+          code: 'NEWS_POST_CONFLICT',
+          message: 'News post was modified by another editor',
+        });
+      }
     }
 
     if (existing.status === 'PUBLISHED' && input.slug && input.slug !== existing.slug) {
@@ -84,7 +97,7 @@ export class NewsPostsUpdateService {
           translations,
           withMedia?.media ?? [],
           withMedia?.coverMediaId ?? null,
-          { requireCover: false },
+          { requireCover: true, requireAltText: true },
         );
       }
     }
@@ -125,6 +138,7 @@ export class NewsPostsUpdateService {
           translations,
           withMedia?.media ?? [],
           withMedia?.coverMediaId ?? null,
+          { requireCover: true, requireAltText: true },
         );
         data.status = 'SCHEDULED';
       } else if (!input.scheduledAt && existing.status === 'SCHEDULED') {

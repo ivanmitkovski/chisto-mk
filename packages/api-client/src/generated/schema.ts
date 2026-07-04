@@ -7171,6 +7171,8 @@ export interface components {
             translations?: components["schemas"]["DraftNewsTranslationsDto"];
             scheduledAt?: Record<string, never> | null;
             featured?: boolean;
+            /** @description ISO timestamp of the post updatedAt the client last loaded; rejects with 409 on mismatch */
+            expectedUpdatedAt?: string;
         };
         UpdateNewsMediaAltDto: {
             altText?: Record<string, never>;
