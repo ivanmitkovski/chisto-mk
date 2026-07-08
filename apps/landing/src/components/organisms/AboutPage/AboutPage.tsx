@@ -17,8 +17,6 @@ export function AboutPage() {
         sectionTitle={t("creatorsSectionTitle")}
         sectionLead={t("creatorsSectionLead")}
         photoPlaceholder={t("creatorsPhotoPlaceholder")}
-        readMore={t("readMore")}
-        readLess={t("readLess")}
         linkedinAria={(name) => t("linkedinAria", { name })}
         creators={creators}
       />

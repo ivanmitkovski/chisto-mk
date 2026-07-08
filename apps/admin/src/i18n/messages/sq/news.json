@@ -134,6 +134,9 @@
     "applyLink": "Apliko",
     "addHeading": "Shto titull",
     "addList": "Shto listë",
+    "addQuote": "Citim",
+    "addDivider": "Ndarës",
+    "addEmbed": "Fut video të integruar",
     "addHtmlBlock": "Bllok HTML",
     "blockHtml": "HTML i personalizuar",
     "blockHeading2": "Titull",
@@ -177,6 +180,17 @@
     "templatePlaceholder": "Zgjidhni një shabllon…",
     "addGalleryBlock": "Galeri",
     "blockGallery": "Galeri",
+    "blockQuote": "Citim",
+    "blockDivider": "Ndarës",
+    "blockEmbed": "Video e integruar",
+    "quotePlaceholder": "Teksti i citimit",
+    "quoteText": "Citim",
+    "quoteAttributionPlaceholder": "Atribuim (opsional)",
+    "quoteAttribution": "Atribuim",
+    "embedUrl": "URL e videos",
+    "embedApply": "Fut",
+    "embedEmptyHint": "Ngjisni një lidhje YouTube ose Vimeo.",
+    "embedClear": "Hiq embed-in",
     "addGalleryImage": "Shto foto",
     "addFromLibrary": "Nga biblioteka",
     "pickFromLibrary": "Zgjidh foto…",
@@ -198,7 +212,9 @@
     "galleryMoveSlideRight": "Lëviz sliden djathtas",
     "gallerySlideCount": "{filled} nga {total} foto",
     "galleryMinSlidesHint": "Shtoni të paktën 2 foto për publikim.",
-    "galleryMaxSlides": "Maksimumi 12 slide për galeri"
+    "galleryMaxSlides": "Maksimumi 12 slide për galeri",
+    "duplicateBlock": "Dyfisho bllokun",
+    "transformBlock": "Kthe në…"
   },
   "category": {
     "release": "Version i ri",
@@ -236,7 +252,9 @@
     "inspectorWithIssues": "Detaje dhe media · {count} të paplota",
     "writeTab": "Shkrim",
     "previewTab": "Parapamje",
-    "viewTabs": "Pamja e redaktuesit"
+    "viewTabs": "Pamja e redaktuesit",
+    "livePendingBanner": "Ky postim është aktiv. Ndryshimet nuk shfaqen në chisto.mk derisa të shtypni \"Përditëso\".",
+    "scheduledFor": "Planifikuar për {date}"
   },
   "autosave": {
     "saved": "Ruajtur para {time}",
@@ -248,7 +266,13 @@
   "previewBlocks": {
     "imageUnavailable": "Imazhi nuk është i disponueshëm",
     "videoUnavailable": "Videoja nuk është e disponueshme",
-    "unknownBlock": "Lloj blloku i pambështetur (nuk shfaqet në faqe)"
+    "unknownBlock": "Lloj blloku i pambështetur (nuk shfaqet në faqe)",
+    "galleryUnavailable": "Galeria nuk është e disponueshme",
+    "galleryClose": "Mbyll",
+    "galleryPrevious": "Imazhi i mëparshëm",
+    "galleryNext": "Imazhi tjetër",
+    "galleryDialogLabel": "Galeria e imazheve",
+    "gallerySlideLabel": "Imazhi {index} nga {total}"
   },
   "preview": {
     "label": "Parapamje live",
@@ -300,7 +324,12 @@
     "cleared": "Historiku i rishikimeve u pastrua",
     "retentionHint": "Ruhen automatikisht deri në {max} rishikime.",
     "showAll": "Shfaq të gjitha ({count})",
-    "showLess": "Shfaq më pak"
+    "showLess": "Shfaq më pak",
+    "diffTitle": "Titulli ndryshoi",
+    "diffExcerpt": "Përmbledhja ndryshoi",
+    "diffBlocks": "Blloqe {delta}",
+    "diffMedia": "Multimedia {delta}",
+    "diffNone": "Nuk ka ndryshime për këtë gjuhë"
   },
   "checklist": {
     "title": "Gatishmëria për publikim",
@@ -320,7 +349,8 @@
     "saveAndUpdate": "Ruaj dhe përditëso",
     "altTextField": "Alt teksti i imazhit",
     "limitsField": "Kufijtë e gjatësisë",
-    "cancel": "Anulo"
+    "cancel": "Anulo",
+    "jumpToField": "Rregullo"
   },
   "meta": {
     "label": "Metadatat e postimit",
@@ -391,7 +421,8 @@
     "mediaIdRequired": "Bllokët e imazhit dhe videos kërkojnë media të ngarkuar.",
     "blockLimit": "U arrit numri maksimal i 50 bllokëve.",
     "titleTooLong": "Titulli tejkalon gjatësinë maksimale.",
-    "excerptTooLong": "Përmbledhja tejkalon gjatësinë maksimale."
+    "excerptTooLong": "Përmbledhja tejkalon gjatësinë maksimale.",
+    "altTextRequired": "Teksti alt për kopertinën dhe imazhet inline kërkohet para ruajtjes së një postimi të planifikuar."
   },
   "apiErrors": {
     "slugTaken": "Ekziston tashmë një postim me këtë slug.",
@@ -447,6 +478,9 @@
     "paragraph": "Tekst i pasur me formatim, lidhje dhe lista.",
     "heading": "Titull seksioni për të ndarë artikuj të gjatë.",
     "list": "Listë me pika ose numra për hapa dhe theksime.",
+    "quote": "Citim i theksuar me atribuim opsional.",
+    "divider": "Ndarje vizuale midis seksioneve.",
+    "embed": "YouTube ose Vimeo pa HTML të papërpunuar.",
     "gallery": "Karusel 4:3 me të paktën dy foto.",
     "imageBlock": "Foto me gjerësi të plotë në trupin e artikullit.",
     "videoBlock": "Video e integruar në artikull.",
@@ -456,7 +490,17 @@
     "video": "Ngarkoni një video në artikull.",
     "starterLabel": "Shto blloqe",
     "starterTitle": "Filloni historinë",
-    "starterDescription": "Zgjidhni një bllok ose përdorni Fut në shirit për më shumë opsione."
+    "starterDescription": "Zgjidhni një bllok ose përdorni Fut në shirit për më shumë opsione.",
+    "recents": "Të fundit",
+    "templates": "Shabllone",
+    "filterPlaceholder": "Filtro blloqet…",
+    "filterEmpty": "Asnjë bllok nuk përputhet.",
+    "template": {
+      "release": "Blloqe të paraplotësuara për njoftim.",
+      "partnership": "Strukturë për partneritet.",
+      "community": "Paraqitje për komunitet.",
+      "product": "Përmbledhje produkti."
+    }
   },
   "drag": {
     "emptyPreview": "Bllok bosh",
@@ -496,6 +540,94 @@
     "conflictReload": "Ringarko",
     "duplicated": "Drafti u duplikua",
     "duplicatedMediaHint": "Teksti u kopjua. Shtoni përsëri kopertinën dhe mediat e integruara.",
-    "saveBeforePublish": "Ruani ndryshimet para publikimit."
+    "saveBeforePublish": "Ruani ndryshimet para publikimit.",
+    "blockDeleted": "Blloku u fshi",
+    "undo": "Zhbëj"
+  },
+  "localeStatus": {
+    "complete": "i plotë",
+    "incomplete": "i paplotë"
+  },
+  "transform": {
+    "menuLabel": "Kthe në",
+    "paragraph": "Paragraf",
+    "paragraphDescription": "Tekst bazë me formatim",
+    "heading2": "Titull",
+    "heading2Description": "Titull i madh seksioni",
+    "heading3": "Nëntitull",
+    "heading3Description": "Titull më i vogël seksioni",
+    "list": "Listë",
+    "listDescription": "Pika ose artikuj të numëruar",
+    "quote": "Citim",
+    "quoteDescription": "Citim i theksuar me atribuim"
+  },
+  "shortcuts": {
+    "title": "Shkurtoret e tastierës",
+    "description": "Shkruani dhe strukturoni pa miun.",
+    "writing": "Shkrim",
+    "blocks": "Blloqe",
+    "enterNewBlock": "Paragraf i ri poshtë (në fund)",
+    "modEnterNewBlock": "Paragraf i ri poshtë",
+    "backspaceMerge": "Bashko me paragrafin e mëparshëm (në fillim)",
+    "modBold": "Të trashë",
+    "modItalic": "Kursiv",
+    "modUnderline": "Nënvizuar",
+    "modLink": "Lidhje",
+    "slashPalette": "Shto bllok (paragraf bosh)",
+    "modSlashPalette": "Shto bllok",
+    "modOrderedList": "Listë e numëruar",
+    "modBulletList": "Listë me pika",
+    "pasteBody": "Ngjit trup të formatuar nga clipboard-i",
+    "openHelp": "Shkurtoret e tastierës"
+  },
+  "lint": {
+    "label": "Gjendja e përmbajtjes",
+    "wordCount": "{count, plural, one {# fjalë} other {# fjalë}}",
+    "readingTime": "{minutes, plural, one {# min lexim} other {# min lexim}}",
+    "readingByLocale": "Koha e leximit sipas gjuhës",
+    "noIssues": "Nuk ka probleme për këtë gjuhë.",
+    "jump": "Shko te problemi",
+    "titleMissing": "Titulli kërkohet",
+    "titleTooLong": "Titulli tejkalon kufirin",
+    "excerptMissing": "Përmbledhja kërkohet",
+    "excerptTooLong": "Përmbledhja tejkalon kufirin",
+    "bodyEmpty": "Trupi duhet të ketë të paktën një bllok",
+    "bodyInvalid": "Trupi ka blloqe të paplota",
+    "bodyLimit": "Trupi tejkalon kufirin e blloqeve",
+    "coverMissing": "Kopertina kërkohet",
+    "altTextMissing": "Mungon alt teksti për imazhet inline",
+    "mediaMissing": "Një bllok media referon një skedar që mungon",
+    "embedEmpty": "Blloku embed nuk ka URL videoje",
+    "quoteEmpty": "Blloku citim është bosh"
+  },
+  "paste": {
+    "toolbarLabel": "Ngjit trupin",
+    "toolbarAction": "Ngjit trup të formatuar nga clipboard-i",
+    "confirmTitle": "Të ngjitet trupi i formatuar?",
+    "confirmDescription": "U zbuluan {count} blloqe në clipboard.",
+    "replaceBody": "Zëvendëso trupin",
+    "insertAtCursor": "Fut te kursori",
+    "cancel": "Anulo",
+    "truncatedWarning": "Ngjitja u shkurtua në kufirin prej 50 blloqesh.",
+    "unstructuredWarning": "Clipboard-i nuk përmban përmbajtje të strukturuar. Ngjiteni në një paragraf bosh.",
+    "clipboardUnavailable": "Clipboard-i nuk u lexua. Klikoni në redaktues dhe provoni përsëri, ose ngjisni me Cmd+V në një paragraf bosh.",
+    "appliedTitle": "Trupi u ngjit",
+    "summaryQuote": "{count, plural, one {# citim} other {# citime}}",
+    "summaryHeading": "{count, plural, one {# titull} other {# tituj}}",
+    "summaryParagraph": "{count, plural, one {# paragraf} other {# paragrafë}}",
+    "summaryList": "{count, plural, one {# listë} other {# lista}}",
+    "summaryDivider": "{count, plural, one {# ndarës} other {# ndarës}}",
+    "summaryOther": "{count, plural, one {# bllok tjetër} other {# blloqe të tjera}}"
+  },
+  "conflict": {
+    "title": "Konflikt redaktimi",
+    "description": "Dikush tjetër e ruajti postimin ndërsa redaktonit.",
+    "body": "Ringarkoni versionin më të fundit ose mbishkruani me draftin tuaj.",
+    "cancel": "Anulo",
+    "reload": "Ringarko",
+    "overwrite": "Mbishkruaj me të miat"
+  },
+  "offline": {
+    "banner": "Jeni offline. Ruajtja automatike është në pauzë."
   }
 }

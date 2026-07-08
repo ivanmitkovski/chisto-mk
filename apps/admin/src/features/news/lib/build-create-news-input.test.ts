@@ -38,7 +38,7 @@ describe('buildCreateNewsInput', () => {
     expect(payload).not.toHaveProperty('slug');
   });
 
-  it('strips client-only block ids from template bodies', () => {
+  it('keeps stable block ids on template bodies (ADR-1)', () => {
     const payload = buildCreateNewsInput({
       category: 'release',
       translations: {
@@ -51,7 +51,9 @@ describe('buildCreateNewsInput', () => {
       },
     });
 
-    expect(payload.translations.en.body).toEqual([{ type: 'paragraph', text: 'Hello' }]);
+    expect(payload.translations.en.body).toEqual([
+      { id: 'client-only', type: 'paragraph', text: 'Hello' },
+    ]);
   });
 
   it('keeps a trimmed slug when provided', () => {

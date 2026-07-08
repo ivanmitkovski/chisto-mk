@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useCallback, useId, useRef, useState, type DragEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Icon, Spinner } from '@/components/ui';
-import { MediaUploadZone } from '@/components/ui/media-upload-zone';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 import { useNewsMediaGuidanceText } from '../hooks/use-news-media-guidance';
 import { NEWS_MEDIA_ACCEPT } from '../lib/news-media-validation';
@@ -23,7 +22,6 @@ type NewsMediaBlockEditorProps = {
   uploadBusy: boolean;
   uploadError?: string | null | undefined;
   localPreviewSrc?: string | null | undefined;
-  variant?: 'classic' | 'document';
   onChange: (block: MediaBlock) => void;
   onUpload?: ((file: File) => void) | undefined;
 };
@@ -36,7 +34,6 @@ export function NewsMediaBlockEditor({
   uploadBusy,
   uploadError = null,
   localPreviewSrc = null,
-  variant = 'classic',
   onChange,
   onUpload,
 }: NewsMediaBlockEditorProps) {
@@ -45,7 +42,6 @@ export function NewsMediaBlockEditor({
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
-  const isDocument = variant === 'document';
   const isVideo = block.type === 'video';
   const hasMedia = Boolean(attached?.url) || Boolean(localPreviewSrc);
   const accept = isVideo ? NEWS_MEDIA_ACCEPT.inline_video : NEWS_MEDIA_ACCEPT.inline_image;
@@ -70,9 +66,7 @@ export function NewsMediaBlockEditor({
     [disabled, pickFile],
   );
 
-  const rootClass = [styles.root, isDocument ? styles.rootDocument : styles.rootClassic]
-    .filter(Boolean)
-    .join(' ');
+  const rootClass = `${styles.root} ${styles.rootDocument}`;
 
   return (
     <div className={rootClass}>
@@ -84,10 +78,10 @@ export function NewsMediaBlockEditor({
               mimeType={attached?.mimeType ?? null}
               localPreviewSrc={localPreviewSrc}
               playbackErrorLabel={t('form.videoPlaybackError')}
-              frameClassName={isDocument ? styles.videoFrameDocument : styles.videoFrame}
+              frameClassName={styles.videoFrameDocument}
             />
           ) : attached?.url ? (
-            <div className={isDocument ? styles.imageFrameDocument : styles.imageFrame}>
+            <div className={styles.imageFrameDocument}>
               <Image src={attached.url} alt="" fill className={styles.image} unoptimized />
             </div>
           ) : null}
@@ -106,7 +100,7 @@ export function NewsMediaBlockEditor({
             </div>
           ) : null}
         </div>
-      ) : isDocument ? (
+      ) : (
         <div
           className={[
             styles.dropZone,
@@ -133,7 +127,7 @@ export function NewsMediaBlockEditor({
               </p>
               <p className={styles.dropHint}>{guidanceText}</p>
               <p className={styles.dropAction}>
-                {isVideo ? t('form.mediaBlockVideoUploadHint') : t('form.mediaBlockImageUploadHint')}
+                {isVideo ? t('toolbar.mediaBlockVideoUploadHint') : t('toolbar.mediaBlockImageUploadHint')}
               </p>
             </>
           )}
@@ -147,20 +141,6 @@ export function NewsMediaBlockEditor({
             />
           ) : null}
         </div>
-      ) : !readOnly && onUpload ? (
-        <MediaUploadZone
-          accept={accept}
-          label={isVideo ? t('form.addVideo') : t('form.addImage')}
-          hint={guidanceText}
-          dropRegionAriaLabel={isVideo ? t('form.addVideo') : t('form.addImage')}
-          error={uploadBusy ? null : uploadError}
-          busy={uploadBusy}
-          disabled={busy && !uploadBusy}
-          compact
-          onFileSelected={onUpload}
-        />
-      ) : (
-        <p className={styles.emptyRef}>{block.mediaId || t('form.noMedia')}</p>
       )}
 
       {!readOnly && onUpload ? (
@@ -180,17 +160,17 @@ export function NewsMediaBlockEditor({
         />
       ) : null}
 
-      {uploadError && (isDocument || hasMedia) ? (
+      {uploadError ? (
         <p className={styles.uploadError} role="alert">
           {uploadError}
         </p>
       ) : null}
 
-      <label className={isDocument ? styles.captionDocument : styles.captionField}>
+      <label className={styles.captionDocument}>
         <span className={styles.captionLabel}>{t('form.caption')}</span>
         <input
           type="text"
-          className={isDocument ? styles.captionInputDocument : styles.captionInput}
+          className={styles.captionInputDocument}
           value={block.caption ?? ''}
           onChange={(event) => onChange({ ...block, caption: event.target.value })}
           disabled={readOnly || busy}

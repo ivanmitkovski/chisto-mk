@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { migrateLegacyBlocks } from '@chisto/news-content';
+import { ensureBlockIds } from '@chisto/news-content';
 import type { NewsCategory, NewsMedia, NewsMediaKind, NewsPost, NewsPostStatus } from '../../prisma-client';
 import type {
   NewsCategoryApi,
@@ -74,7 +74,7 @@ export function parseTranslations(raw: unknown): NewsTranslations {
     out[locale] = {
       title: String(e.title ?? ''),
       excerpt: String(e.excerpt ?? ''),
-      body: migrateLegacyBlocks(
+      body: ensureBlockIds(
         Array.isArray(e.body) ? (e.body as NewsTranslations[NewsLocale]['body']) : [],
       ),
     };

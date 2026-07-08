@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeHtmlBlock, sanitizeInlineHtml, stripHtmlToPlainText, htmlBlockHasContent } from './html-sanitize';
-import { embedUrlFromVideoLink, buildEmbedIframeHtml } from './embed-allowlist';
+import { sanitizeHtmlBlock, sanitizeInlineHtml, sanitizePastedInlineHtml, normalizeInlineLinksInHtml, stripHtmlToPlainText, htmlBlockHasContent } from './html-sanitize';
+import { embedProviderFromUrl, embedUrlFromVideoLink, buildEmbedIframeHtml } from './embed-allowlist';
 import { plainTextFromBlocks, wordCountFromBlocks } from '../plain-text';
 import { sanitizeBodyBlocks, stripEmptyBlocks } from '../migrate-blocks';
 
@@ -78,6 +78,14 @@ describe('embedUrlFromVideoLink', () => {
   });
 });
 
+describe('embedProviderFromUrl', () => {
+  it('detects youtube and vimeo providers', () => {
+    expect(embedProviderFromUrl('https://www.youtube-nocookie.com/embed/abc')).toBe('youtube');
+    expect(embedProviderFromUrl('https://player.vimeo.com/video/123')).toBe('vimeo');
+    expect(embedProviderFromUrl('https://evil.example/embed')).toBeNull();
+  });
+});
+
 describe('plainTextFromBlocks', () => {
   it('extracts text from rich paragraph html', () => {
     const text = plainTextFromBlocks([
@@ -137,5 +145,64 @@ describe('buildEmbedIframeHtml', () => {
 describe('stripHtmlToPlainText', () => {
   it('removes tags', () => {
     expect(stripHtmlToPlainText('<p>Hello</p>')).toBe('Hello');
+  });
+});
+
+describe('sanitizePastedInlineHtml', () => {
+  it('strips Word cruft while keeping emphasis and links', () => {
+    const word = `<!--[if gte mso 9]><xml><o:OfficeDocumentSettings/></xml><![endif]-->
+<p class="MsoNormal" style="margin:0cm"><b>Bold</b> and <i>italic</i> with
+<a href="https://example.com">a link</a><o:p></o:p></p>
+<p class="MsoNormal"><span style="mso-spacerun:yes">&nbsp;</span></p>`;
+    const out = sanitizePastedInlineHtml(word);
+    expect(out).toContain('<strong>Bold</strong>');
+    expect(out).toContain('<em>italic</em>');
+    expect(out).toContain('<a href="https://example.com">a link</a>');
+    expect(out).not.toContain('MsoNormal');
+    expect(out).not.toContain('mso-');
+    expect(out).not.toMatch(/<p>(?:\s|&nbsp;)*<\/p>/);
+  });
+
+  it('unwraps the Google Docs bold wrapper without bolding everything', () => {
+    const gdocs =
+      '<b style="font-weight:normal;" id="docs-internal-guid-x"><p><span style="font-weight:700">Strong</span> plain <span style="font-style:italic">slanted</span></p></b>';
+    const out = sanitizePastedInlineHtml(gdocs);
+    expect(out).toBe('<p><strong>Strong</strong> plain <em>slanted</em></p>');
+  });
+
+  it('preserves list structure and downgrades headings to paragraphs', () => {
+    const html = '<h2>Title</h2><ul><li>One</li><li>Two</li></ul>';
+    const out = sanitizePastedInlineHtml(html);
+    expect(out).toBe('<p>Title</p><ul><li>One</li><li>Two</li></ul>');
+  });
+
+  it('drops style payloads and scripts entirely', () => {
+    const html = '<style>p{color:red}</style><script>alert(1)</script><p>Safe</p>';
+    expect(sanitizePastedInlineHtml(html)).toBe('<p>Safe</p>');
+  });
+});
+
+describe('normalizeInlineLinksInHtml', () => {
+  it('strips broken bare chisto.mk anchor links', () => {
+    const out = normalizeInlineLinksInHtml('<p><a href="http://Chisto.mk">Chisto.mk</a> exists.</p>');
+    expect(out).not.toContain('<a ');
+    expect(out).toContain('Chisto.mk exists.');
+  });
+
+  it('adds target blank to external https links', () => {
+    const out = normalizeInlineLinksInHtml('<p><a href="https://www.chisto.mk/en">site</a></p>');
+    expect(out).toContain('target="_blank"');
+    expect(out).toContain('https://www.chisto.mk/en');
+  });
+});
+
+describe('sanitizeBodyBlocks id stability (ADR-1)', () => {
+  it('preserves ids provided by the editor and assigns them where missing', () => {
+    const out = sanitizeBodyBlocks([
+      { id: 'keep-me', type: 'paragraph', text: 'Hello' },
+      { type: 'heading', level: 2, text: 'Section' },
+    ]);
+    expect(out[0]!.id).toBe('keep-me');
+    expect(out[1]!.id).toBeTruthy();
   });
 });

@@ -10,6 +10,7 @@ import {
   restoreNewsRevision,
   type NewsRevisionDto,
 } from '../data/news-adapter-client';
+import { summarizeLocaleContentDiff } from '../lib/news-revision-diff';
 import { newsApiErrorMessage } from '../lib/news-api-messages';
 import type { NewsMediaDto, NewsPostAdminDto } from '../news-api-types';
 import { NewsPreviewBlocks, resolvePreviewBlocks } from './news-preview-blocks';
@@ -42,6 +43,7 @@ type NewsRevisionPanelProps = {
   readOnly: boolean;
   hasUnsavedChanges?: boolean;
   activeLocale?: 'en' | 'mk' | 'sq';
+  currentValues?: import('../types').NewsPostFormValues | undefined;
   embedded?: boolean;
   onBeforeRestore?: () => Promise<void>;
   onRestored: (post: NewsPostAdminDto) => void;
@@ -53,6 +55,7 @@ export function NewsRevisionPanel({
   readOnly,
   hasUnsavedChanges = false,
   activeLocale = 'en',
+  currentValues,
   embedded = false,
   onBeforeRestore,
   onRestored,
@@ -233,6 +236,34 @@ export function NewsRevisionPanel({
 
       {preview ? (
         <div className={styles.previewBox} role="region" aria-label={t('revisions.preview')}>
+          {currentValues ? (
+            <div className={styles.diffChips} role="status">
+              {(() => {
+                const before = preview.snapshot.translations[activeLocale];
+                const after = currentValues.translations[activeLocale];
+                const diff = summarizeLocaleContentDiff(before, after);
+                return (
+                  <>
+                    {diff.titleChanged ? <span className={styles.diffChip}>{t('revisions.diffTitle')}</span> : null}
+                    {diff.excerptChanged ? <span className={styles.diffChip}>{t('revisions.diffExcerpt')}</span> : null}
+                    {diff.blockDelta !== 0 ? (
+                      <span className={styles.diffChip}>
+                        {t('revisions.diffBlocks', { delta: diff.blockDelta > 0 ? `+${diff.blockDelta}` : String(diff.blockDelta) })}
+                      </span>
+                    ) : null}
+                    {diff.mediaDelta !== 0 ? (
+                      <span className={styles.diffChip}>
+                        {t('revisions.diffMedia', { delta: diff.mediaDelta > 0 ? `+${diff.mediaDelta}` : String(diff.mediaDelta) })}
+                      </span>
+                    ) : null}
+                    {!diff.titleChanged && !diff.excerptChanged && diff.blockDelta === 0 && diff.mediaDelta === 0 ? (
+                      <span className={styles.diffChipMuted}>{t('revisions.diffNone')}</span>
+                    ) : null}
+                  </>
+                );
+              })()}
+            </div>
+          ) : null}
           <p className={styles.previewTitle}>
             {preview.snapshot.translations[activeLocale]?.title ??
               preview.snapshot.translations.en.title}

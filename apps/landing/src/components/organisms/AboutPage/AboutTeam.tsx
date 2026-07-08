@@ -1,23 +1,19 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId } from "react";
 import Image from "next/image";
-import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronDown, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { SocialIcon } from "@/components/molecules/SocialIcon";
 import { fadeInUp } from "@/lib/animations/variants";
-import { cn } from "@/lib/utils/cn";
 import type { AboutCreator } from "./about-page.types";
 
 type AboutTeamProps = {
   sectionTitle: string;
   sectionLead?: string;
   photoPlaceholder: string;
-  readMore: string;
-  readLess: string;
   linkedinAria: (name: string) => string;
   creators: AboutCreator[];
 };
@@ -120,28 +116,18 @@ function TeamMemberCard({
   creator,
   photoPlaceholder,
   linkedinAria,
-  readMore,
-  readLess,
   priority,
-  reduceMotion,
 }: {
   creator: AboutCreator;
   photoPlaceholder: string;
   linkedinAria: string;
-  readMore: string;
-  readLess: string;
   priority: boolean;
-  reduceMotion: boolean;
 }) {
-  const [bioOpen, setBioOpen] = useState(false);
   const nameId = useId();
-  const bioId = useId();
   const src = creator.imageSrc?.trim();
   const linkedinUrl = creator.linkedinUrl?.trim();
   const role = creator.role?.trim();
   const affiliation = creator.affiliation?.trim();
-  const bioParagraphs = (creator.bioParagraphs ?? []).map((p) => p.trim()).filter(Boolean);
-  const hasBio = bioParagraphs.length > 0;
 
   return (
     <article
@@ -178,54 +164,16 @@ function TeamMemberCard({
           </p>
         ) : null}
 
-        <div className="mt-auto flex w-full flex-col items-center pt-4">
-          {hasBio ? (
-            <Collapsible.Root open={bioOpen} onOpenChange={setBioOpen} className="w-full">
-              <Collapsible.Trigger
-                type="button"
-                aria-controls={bioId}
-                aria-expanded={bioOpen}
-                className="inline-flex items-center justify-center gap-1 rounded-md text-sm font-semibold text-primary outline-none transition-colors hover:text-primary-600 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              >
-                <span>{bioOpen ? readLess : readMore}</span>
-                <ChevronDown
-                  className={cn(
-                    "size-4 shrink-0",
-                    !reduceMotion && "transition-transform duration-300 ease-out",
-                    bioOpen && "rotate-180",
-                  )}
-                  aria-hidden
-                />
-              </Collapsible.Trigger>
-
-              <Collapsible.Content
-                id={bioId}
-                aria-labelledby={nameId}
-                className={cn(
-                  "overflow-hidden",
-                  reduceMotion ? "data-[state=closed]:hidden" : "about-team-bio",
-                )}
-              >
-                <div className="space-y-3 pt-3 text-left text-pretty text-about-prose">
-                  {bioParagraphs.map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                  ))}
-                </div>
-              </Collapsible.Content>
-            </Collapsible.Root>
-          ) : null}
-
-          {linkedinUrl ? (
-            <div className={cn(hasBio ? "mt-4" : "mt-0")}>
-              <SocialIcon
-                platform="linkedin"
-                href={linkedinUrl}
-                ariaLabel={linkedinAria}
-                className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              />
-            </div>
-          ) : null}
-        </div>
+        {linkedinUrl ? (
+          <div className="mt-auto flex w-full flex-col items-center pt-4">
+            <SocialIcon
+              platform="linkedin"
+              href={linkedinUrl}
+              ariaLabel={linkedinAria}
+              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            />
+          </div>
+        ) : null}
       </div>
     </article>
   );
@@ -235,8 +183,6 @@ export function AboutTeam({
   sectionTitle,
   sectionLead,
   photoPlaceholder,
-  readMore,
-  readLess,
   linkedinAria,
   creators,
 }: AboutTeamProps) {
@@ -296,10 +242,7 @@ export function AboutTeam({
                   creator={creator}
                   photoPlaceholder={photoPlaceholder}
                   linkedinAria={linkedinAria(creator.name)}
-                  readMore={readMore}
-                  readLess={readLess}
                   priority={index < 2}
-                  reduceMotion={reduceMotion}
                 />
               </motion.li>
             ))}

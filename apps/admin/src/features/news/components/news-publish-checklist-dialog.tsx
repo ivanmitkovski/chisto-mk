@@ -6,6 +6,7 @@ import {
   allLocalesPublishReady,
   localeCompleteness,
   localePublishChecklist,
+  type LocalePublishChecklistItem,
 } from '../lib/news-locale-utils';
 import type { NewsFormLocale, NewsPostFormValues } from '../types';
 import { NEWS_LOCALES } from '../types';
@@ -24,6 +25,7 @@ type NewsPublishChecklistDialogProps = {
   onConfirm: () => void;
   onSaveAndConfirm?: () => void;
   onGoToLocale: (locale: NewsFormLocale) => void;
+  onJumpToField?: ((target: import('./news-content-lint-panel').NewsLintJumpTarget, locale: NewsFormLocale) => void) | undefined;
 };
 
 export function NewsPublishChecklistDialog({
@@ -38,11 +40,32 @@ export function NewsPublishChecklistDialog({
   onConfirm,
   onSaveAndConfirm,
   onGoToLocale,
+  onJumpToField,
 }: NewsPublishChecklistDialogProps) {
   const t = useTranslations('news');
   const scores = localeCompleteness(values, hasCover, media);
   const allReady = allLocalesPublishReady(values, hasCover, media);
   const isUpdate = mode === 'update';
+
+  function jumpForItem(
+    item: LocalePublishChecklistItem,
+  ): import('./news-content-lint-panel').NewsLintJumpTarget | null {
+    switch (item) {
+      case 'title':
+        return 'title';
+      case 'excerpt':
+        return 'excerpt';
+      case 'body':
+      case 'limits':
+        return 'body';
+      case 'cover':
+        return 'cover';
+      case 'altText':
+        return 'media';
+      default:
+        return null;
+    }
+  }
 
   return (
     <Modal
@@ -90,11 +113,27 @@ export function NewsPublishChecklistDialog({
                 ) : null}
               </header>
               <ul className={styles.items}>
-                {items.map(({ item, ok }) => (
+                {items.map(({ item, ok }) => {
+                  const jump = jumpForItem(item);
+                  return (
                   <li key={item} className={ok ? styles.itemOk : styles.itemMissing}>
-                    {t(`checklist.${item}Field`)}
+                    <span>{t(`checklist.${item}Field`)}</span>
+                    {!ok && jump && onJumpToField ? (
+                      <button
+                        type="button"
+                        className={styles.jumpBtn}
+                        disabled={isLoading}
+                        onClick={() => {
+                          onGoToLocale(loc);
+                          onJumpToField(jump, loc);
+                        }}
+                      >
+                        {t('checklist.jumpToField')}
+                      </button>
+                    ) : null}
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </section>
           );

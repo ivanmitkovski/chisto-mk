@@ -8,7 +8,6 @@ import styles from './news-block-list.module.css';
 type NewsBlockDragOverlayRowProps = {
   block: NewsBodyBlock;
   media: NewsMediaDto[];
-  documentMode?: boolean;
   width?: number | undefined;
   height?: number | undefined;
 };
@@ -16,14 +15,11 @@ type NewsBlockDragOverlayRowProps = {
 export function NewsBlockDragOverlayRow({
   block,
   media,
-  documentMode = false,
   width,
   height,
 }: NewsBlockDragOverlayRowProps) {
-  const wrapClass = [styles.rowWrap, documentMode ? styles.rowWrapDocument : ''].filter(Boolean).join(' ');
-  const rowClass = [styles.row, documentMode ? styles.rowDocument : '', styles.rowDragging]
-    .filter(Boolean)
-    .join(' ');
+  const wrapClass = `${styles.rowWrap} ${styles.rowWrapDocument}`;
+  const rowClass = `${styles.row} ${styles.rowDocument} ${styles.rowDragging}`;
 
   const frozenSize =
     width || height
@@ -37,16 +33,16 @@ export function NewsBlockDragOverlayRow({
     <div className={wrapClass} style={frozenSize}>
       <div className={rowClass}>
         <span
-          className={documentMode ? styles.dragHandleDocument : styles.dragHandle}
+          className={styles.dragHandleDocument}
           aria-hidden
         >
           <Icon name="arrow-up-down" size={14} strokeWidth={2} />
         </span>
         <div className={styles.rowContent}>
-          <NewsBlockDragSnapshot block={block} media={media} documentMode={documentMode} />
+          <NewsBlockDragSnapshot block={block} media={media} />
         </div>
         <span
-          className={documentMode ? styles.removeBtnDocument : styles.removeBtn}
+          className={styles.removeBtnDocument}
           aria-hidden
         />
       </div>

@@ -1,0 +1,39 @@
+/**
+ * External-link affordance for news prose (editor + public render).
+ * Icon matches Lucide `external-link` used across the admin UI.
+ */
+:root {
+  --news-external-link-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='M10 14 21 3'/%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E");
+}
+
+.news-prose a[target='_blank']:where(:not([href^='mailto:']))::after {
+  content: '';
+  display: inline-block;
+  width: 0.75em;
+  height: 0.75em;
+  margin-inline-start: 0.25em;
+  vertical-align: 0.05em;
+  background-color: currentColor;
+  opacity: 0.75;
+  pointer-events: none;
+  -webkit-mask-image: var(--news-external-link-icon);
+  mask-image: var(--news-external-link-icon);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  transition: opacity 0.12s ease;
+}
+
+.news-prose a[target='_blank']:where(:not([href^='mailto:'])):hover::after,
+.news-prose a[target='_blank']:where(:not([href^='mailto:'])):focus-visible::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-prose a[target='_blank']::after {
+    transition: none;
+  }
+}

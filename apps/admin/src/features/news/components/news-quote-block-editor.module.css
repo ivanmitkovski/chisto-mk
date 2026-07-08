@@ -1,0 +1,52 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quote {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--border-subtle);
+}
+
+.quoteText {
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0;
+  border: 0;
+  resize: vertical;
+  background: transparent;
+  font-size: var(--news-prose-font-size);
+  line-height: var(--news-prose-line-height);
+  font-style: italic;
+  color: var(--news-prose-color);
+}
+
+.quoteText:focus-visible {
+  outline: none;
+}
+
+.quoteText::placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.attribution {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.attribution:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.attribution::placeholder {
+  color: var(--color-text-muted);
+}

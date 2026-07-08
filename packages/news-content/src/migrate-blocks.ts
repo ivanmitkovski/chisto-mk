@@ -1,5 +1,5 @@
 import type { NewsBodyBlock } from './types';
-import { createBlockId, galleryHasContent, isParagraphBlock } from './types';
+import { createBlockId, galleryHasContent, isParagraphBlock, isQuoteBlock } from './types';
 import {
   hasVisibleText,
   htmlBlockHasContent,
@@ -47,6 +47,12 @@ export function sanitizeBodyBlocks(blocks: NewsBodyBlock[]): NewsBodyBlock[] {
           ...block,
           items: block.items.map((item) => item.trim()).filter(Boolean),
         };
+      case 'quote':
+        return {
+          ...block,
+          text: block.text.trim(),
+          ...(block.attribution?.trim() ? { attribution: block.attribution.trim() } : {}),
+        };
       default:
         return block;
     }
@@ -75,10 +81,15 @@ export function stripEmptyBlocks(blocks: NewsBodyBlock[]): NewsBodyBlock[] {
     if (block.type === 'gallery') {
       return galleryHasContent(block);
     }
+    if (isQuoteBlock(block)) {
+      return Boolean(block.text.trim());
+    }
+    if (block.type === 'divider') {
+      return true;
+    }
+    if (block.type === 'embed') {
+      return Boolean(block.url?.trim());
+    }
     return true;
   });
-}
-
-export function migrateLegacyBlocks(blocks: NewsBodyBlock[]): NewsBodyBlock[] {
-  return ensureBlockIds(blocks);
 }

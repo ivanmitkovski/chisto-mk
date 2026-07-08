@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { newsFormSaveFingerprint } from '../lib/news-save-payload';
-import { validateNewsPostForm } from '../lib/news-post-policy';
+import { validateNewsPostForAutosave } from '../lib/news-post-policy';
 import type { NewsPostFormValues } from '../types';
+import type { NewsMediaDto, NewsPostStatusApi } from '../news-api-types';
 
 type AutosaveStatus = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 
@@ -15,8 +16,9 @@ type UseNewsAutosaveOptions = {
   enabled?: boolean;
   values: NewsPostFormValues;
   save: (options?: { silent?: boolean }) => Promise<boolean>;
-  hasCover?: boolean;
+  post: { status: NewsPostStatusApi; coverMediaId: string | null; media: NewsMediaDto[] };
   debounceMs?: number;
+  online?: boolean;
 };
 
 function formatSavedAgo(date: Date, t: (key: string, values?: Record<string, string>) => string): string {
@@ -34,8 +36,9 @@ export function useNewsAutosave({
   enabled = true,
   values,
   save,
-  hasCover = false,
+  post,
   debounceMs = 2000,
+  online = true,
 }: UseNewsAutosaveOptions) {
   const t = useTranslations('news');
   const [status, setStatus] = useState<AutosaveStatus>('idle');
@@ -60,7 +63,17 @@ export function useNewsAutosave({
   }, [dirty]);
 
   useEffect(() => {
-    if (!enabled || !dirty || readOnly || autosavePaused) {
+    if (!online) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      setStatus((current) => (current === 'pending' || current === 'saving' ? 'idle' : current));
+    }
+  }, [online]);
+
+  useEffect(() => {
+    if (!enabled || !dirty || readOnly || autosavePaused || !online) {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -68,10 +81,7 @@ export function useNewsAutosave({
       return;
     }
 
-    const validationError = validateNewsPostForm(valuesRef.current, {
-      mode: 'save',
-      hasCover,
-    });
+    const validationError = validateNewsPostForAutosave(valuesRef.current, post);
     if (validationError) {
       setStatus('idle');
       return;
@@ -125,7 +135,7 @@ export function useNewsAutosave({
         timerRef.current = null;
       }
     };
-  }, [autosavePaused, debounceMs, dirty, enabled, fingerprint, hasCover, readOnly]);
+  }, [autosavePaused, debounceMs, dirty, enabled, fingerprint, online, post, readOnly]);
 
   const statusLabel = (() => {
     if (readOnly || !enabled) return '';
@@ -140,7 +150,21 @@ export function useNewsAutosave({
   const retrySave = () => {
     pausedFingerprintRef.current = null;
     setAutosavePaused(false);
-    void save({ silent: true });
+    setStatus('saving');
+    void (async () => {
+      const ok = await save({ silent: true });
+      if (ok) {
+        pausedFingerprintRef.current = null;
+        setAutosavePaused(false);
+        setLastSavedAt(new Date());
+        setStatus('saved');
+      } else {
+        const attemptFingerprint = newsFormSaveFingerprint(valuesRef.current);
+        pausedFingerprintRef.current = attemptFingerprint;
+        setAutosavePaused(true);
+        setStatus('error');
+      }
+    })();
   };
 
   return { status, lastSavedAt, statusLabel, retrySave, canRetry: status === 'error' };

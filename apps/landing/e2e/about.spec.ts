@@ -77,25 +77,6 @@ test.describe("about page", () => {
     await expect(ivanLinkedIn).toBeFocused();
   });
 
-  test("expands and collapses team member bios", async ({ page }) => {
-    await page.goto("/en/about");
-
-    const readMoreButtons = page.getByRole("button", { name: "Read more" });
-    await expect(readMoreButtons).toHaveCount(4);
-
-    const ivanCard = page.getByRole("article", { name: "Ivan Mitkovski" });
-    await ivanCard.scrollIntoViewIfNeeded();
-
-    await ivanCard.getByRole("button", { name: "Read more" }).click();
-    await expect(ivanCard.getByText("classically trained guitarist")).toBeVisible();
-    await expect(ivanCard.getByRole("button", { name: "Read less" })).toBeVisible();
-
-    await ivanCard.getByRole("button", { name: "Read less" }).click();
-    await expect(ivanCard.getByText("classically trained guitarist")).toHaveCount(0);
-    await expect(ivanCard.getByRole("button", { name: "Read more" })).toBeVisible();
-    await expect(ivanCard.getByRole("button", { name: "Read more" })).toHaveAttribute("aria-expanded", "false");
-  });
-
   test("has no critical or serious axe violations", async ({ page }) => {
     await page.goto("/en/about");
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).exclude(".brand-logotype").analyze();
