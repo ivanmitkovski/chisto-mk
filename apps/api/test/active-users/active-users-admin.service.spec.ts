@@ -3,6 +3,13 @@ import { ActiveUsersPresenceService } from '../../src/active-users/services/acti
 import { ActiveUsersRealtimeService } from '../../src/active-users/services/active-users-realtime.service';
 import { UserActivityService } from '../../src/active-users/services/user-activity.service';
 
+function utcDateKey(daysAgo: number): string {
+  const day = new Date();
+  day.setUTCHours(0, 0, 0, 0);
+  day.setUTCDate(day.getUTCDate() - daysAgo);
+  return day.toISOString().slice(0, 10);
+}
+
 describe('ActiveUsersAdminService', () => {
   const presence = {
     countByStatus: jest.fn(),
@@ -25,14 +32,17 @@ describe('ActiveUsersAdminService', () => {
   }
 
   it('computes engagement analytics from Postgres activity events', async () => {
+    const rollupDate = utcDateKey(5);
+    const recentDate = utcDateKey(4);
+
     const queryRaw = jest
       .fn()
       .mockResolvedValueOnce([{ count: 4n }])
       .mockResolvedValueOnce([{ count: 9n }])
       .mockResolvedValueOnce([{ count: 20n }])
       .mockResolvedValueOnce([
-        { date: '2026-06-07', dau: 3n },
-        { date: '2026-06-08', dau: 4n },
+        { date: rollupDate, dau: 3n },
+        { date: recentDate, dau: 4n },
       ])
       .mockResolvedValueOnce([{ avg_minutes: 12.5 }]);
 
@@ -47,7 +57,7 @@ describe('ActiveUsersAdminService', () => {
       dailyActiveStat: {
         findMany: jest.fn().mockResolvedValue([
           {
-            date: new Date('2026-06-07T00:00:00.000Z'),
+            date: new Date(`${rollupDate}T00:00:00.000Z`),
             dau: 3,
             wau: 10,
             mau: 25,
@@ -68,7 +78,7 @@ describe('ActiveUsersAdminService', () => {
     expect(result.reportsSubmittedToday).toBe(2);
     expect(result.avgSessionDurationMinutes).toBe(12.5);
     expect(result.history).toHaveLength(30);
-    expect(result.history.find((row) => row.date === '2026-06-07')).toEqual(
+    expect(result.history.find((row) => row.date === rollupDate)).toEqual(
       expect.objectContaining({
         dau: 3,
         wau: 10,
