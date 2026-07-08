@@ -9,7 +9,13 @@ export {
   type ClipboardImportSummary,
 } from './clipboard-to-blocks';
 export { htmlToNewsBlocks, looksLikeStructuredHtml } from './html-to-blocks';
-export { inlineMarkdownToHtml, listItemHasInlineMarkup, normalizeMarkdownLinkUrl, stripInlineMarkdown } from './inline-markdown';
+export {
+  hasMarkdownLink,
+  inlineMarkdownToHtml,
+  listItemHasInlineMarkup,
+  normalizeMarkdownLinkUrl,
+  stripInlineMarkdown,
+} from './inline-markdown';
 export { looksLikeMarkdown, markdownToNewsBlocks } from './markdown-to-blocks';
 export {
   paragraphBlocksFromPlainText,

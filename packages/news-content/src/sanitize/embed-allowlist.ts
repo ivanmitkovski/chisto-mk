@@ -88,6 +88,21 @@ export function embedProviderFromUrl(url: string): 'youtube' | 'vimeo' | null {
   return null;
 }
 
+function escapeHtmlAttr(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 export function buildEmbedIframeHtml(embedUrl: string): string {
-  return `<div class="news-embed"><iframe src="${embedUrl}" title="Embedded video" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+  if (!isAllowedEmbedUrl(embedUrl)) return '';
+  let safeSrc: string;
+  try {
+    safeSrc = escapeHtmlAttr(new URL(embedUrl).href);
+  } catch {
+    return '';
+  }
+  return `<div class="news-embed"><iframe src="${safeSrc}" title="Embedded video" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
 }

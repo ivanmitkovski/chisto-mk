@@ -94,8 +94,7 @@ export function sanitizeHtmlBlock(html: string): string {
  * - unwraps headings/divs into paragraphs so text is never lost
  */
 export function sanitizePastedInlineHtml(html: string): string {
-  const withoutComments = html.replace(/<!--[\s\S]*?-->/g, '');
-  const sanitized = sanitizeHtml(withoutComments, {
+  const sanitized = sanitizeHtml(html, {
     allowedTags: INLINE_ALLOWED_TAGS,
     allowedAttributes: {
       a: ['href', 'target', 'rel'],
@@ -142,8 +141,7 @@ export function sanitizePastedInlineHtml(html: string): string {
  * semantics (headings, quotes, dividers) before mapping to NewsBodyBlock types.
  */
 export function sanitizeImportHtml(html: string): string {
-  const withoutComments = html.replace(/<!--[\s\S]*?-->/g, '');
-  return sanitizeHtml(withoutComments, {
+  return sanitizeHtml(html, {
     allowedTags: IMPORT_ALLOWED_TAGS,
     allowedAttributes: {
       a: ['href', 'target', 'rel'],

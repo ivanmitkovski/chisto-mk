@@ -1,6 +1,7 @@
 import { sanitizeInlineHtml } from '../sanitize/html-sanitize';
 import { createBlockId, type NewsBodyBlock } from '../types';
 import {
+  hasMarkdownLink,
   inlineMarkdownToHtml,
   listItemHasInlineMarkup,
   stripInlineMarkdown,
@@ -183,6 +184,6 @@ export function looksLikeMarkdown(text: string): boolean {
     /^---+$/m.test(text) ||
     /^\d+\.\s+/m.test(text) ||
     /^[-*]\s+/m.test(text) ||
-    /\[([^\]]+)\]\([^)]+\)/.test(text)
+    hasMarkdownLink(text)
   );
 }
