@@ -308,7 +308,6 @@ export function NewsDocumentToolbar({
           type="button"
           className={styles.button}
           disabled={busy || readOnly}
-          aria-label={t('paste.toolbarAction')}
           title={`${t('paste.toolbarAction')} · ${mod}⇧B`}
           onClick={onPasteBody}
         >
