@@ -17,7 +17,6 @@ type NewsHtmlBlockEditorProps = {
   html?: string;
   readOnly: boolean;
   busy: boolean;
-  variant?: 'classic' | 'document';
   onChange: (html: string) => void;
 };
 
@@ -30,7 +29,6 @@ export function NewsHtmlBlockEditor({
   html = '',
   readOnly,
   busy,
-  variant = 'classic',
   onChange,
 }: NewsHtmlBlockEditorProps) {
   const t = useTranslations('news');
@@ -38,7 +36,6 @@ export function NewsHtmlBlockEditor({
   const [embedUrl, setEmbedUrl] = useState('');
   const [embedError, setEmbedError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('split');
-  const isDocument = variant === 'document';
 
   const previewHtml = useMemo(() => sanitizeHtmlBlock(html), [html]);
   const hasSanitizeDiff = html.trim().length > 0 && html.trim() !== previewHtml;
@@ -71,9 +68,7 @@ export function NewsHtmlBlockEditor({
     onChange(previewHtml);
   }
 
-  const rootClass = [styles.root, isDocument ? styles.rootDocument : styles.rootClassic]
-    .filter(Boolean)
-    .join(' ');
+  const rootClass = `${styles.root} ${styles.rootDocument}`;
 
   return (
     <div className={rootClass}>
@@ -186,7 +181,7 @@ export function NewsHtmlBlockEditor({
               </span>
             </div>
             <textarea
-              className={isDocument ? styles.textareaDocument : styles.textarea}
+              className={styles.textareaDocument}
               value={html}
               onChange={(event) => onChange(event.target.value)}
               disabled={busy || readOnly}

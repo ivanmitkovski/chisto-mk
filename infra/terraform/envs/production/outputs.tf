@@ -105,3 +105,8 @@ output "cloudwatch_dashboard_name" {
 output "sns_alarm_topic_arn" {
   value = module.observability.sns_topic_arn
 }
+
+output "rds_password_sync_lambda_name" {
+  description = "Lambda that syncs DATABASE_URL after RDS password rotation."
+  value       = module.rds_password_sync.lambda_function_name
+}

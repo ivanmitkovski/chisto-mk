@@ -7,6 +7,7 @@ import { Button, ConfirmDialog, PageHeader, useToast } from '@/components/ui';
 import { useUnsavedChangesGuard } from '@/features/admin-shell/hooks/use-unsaved-changes-guard';
 import { useNewsAltTextSave } from '../hooks/use-news-alt-text-save';
 import { useNewsAutosave } from '../hooks/use-news-autosave';
+import { useNewsOnlineStatus } from '../hooks/use-news-online-status';
 import { useNewsPostForm } from '../hooks/use-news-post-form';
 import { useNewsPostMutations } from '../hooks/use-news-post-mutations';
 import { updateNewsMediaAlt } from '../data/news-adapter-client';
@@ -15,8 +16,9 @@ import { newsFormEditorFingerprint } from '../lib/news-save-payload';
 import { newsApiErrorMessage } from '../lib/news-api-messages';
 import { mediaReferencedInBody } from '../lib/news-locale-utils';
 import type { NewsPostAdminDto } from '../news-api-types';
+import { postToFormValues } from '../lib/post-to-form-values';
 import type { NewsFormLocale } from '../types';
-import { postToFormValues } from '../types';
+import { readClipboardForImport, type ClipboardImportPayload } from '../lib/news-structured-paste';
 import { NewsBlockList } from './news-block-list';
 import { NewsCoverHero } from './news-cover-hero';
 import { NewsDocumentShell } from './news-document-shell';
@@ -30,7 +32,11 @@ import { insertMediaBlockAt } from './news-media-library';
 import { NewsDocumentHeader } from './news-document-header';
 import { NewsDocumentEditorProvider } from '../context/news-document-editor-context';
 import { mergeBlocksAtIndex, NewsDocumentToolbar } from './news-document-toolbar';
+import { NewsConflictDialog } from './news-conflict-dialog';
+import type { NewsLintJumpTarget } from './news-content-lint-panel';
+import { NewsOfflineBanner } from './news-offline-banner';
 import { NewsPublishChecklistDialog } from './news-publish-checklist-dialog';
+import { NewsShortcutsDialog } from './news-shortcuts-dialog';
 import { countIncompleteLocales } from '../lib/news-locale-utils';
 import styles from './news-editor.module.css';
 
@@ -46,6 +52,8 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
   const [post, setPost] = useState(initialPost);
   const [locale, setLocale] = useState<NewsFormLocale>('en');
   const [editorView, setEditorView] = useState<NewsEditorView>('write');
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const pasteBodyRef = useRef<((raw: ClipboardImportPayload | null) => Promise<void>) | null>(null);
   const form = useNewsPostForm(postToFormValues(post));
   const permissionReadOnly = !canWriteNews;
   const savedFingerprintRef = useRef(newsFormEditorFingerprint(postToFormValues(initialPost)));
@@ -85,6 +93,46 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
   const isArchived = post.status === 'archived';
   const isScheduled = post.status === 'scheduled';
   const readOnly = permissionReadOnly || isArchived;
+  const online = useNewsOnlineStatus();
+
+  const handleLintJump = useCallback((target: NewsLintJumpTarget, jumpLocale: NewsFormLocale) => {
+    setLocale(jumpLocale);
+    setEditorView('write');
+    window.requestAnimationFrame(() => {
+      if (target === 'title') {
+        document.getElementById('news-document-title')?.focus();
+        return;
+      }
+      if (target === 'excerpt') {
+        document.getElementById('news-document-excerpt')?.focus();
+        return;
+      }
+      if (target === 'body') {
+        document.getElementById('news-document-body')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (target === 'cover') {
+        document.getElementById('news-inspector-cover')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (target === 'media') {
+        document.getElementById('news-inspector-media')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (readOnly || editorView !== 'write') return undefined;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== '?' || event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('[contenteditable="true"], input, textarea, select')) return;
+      event.preventDefault();
+      setShortcutsOpen(true);
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [editorView, readOnly]);
 
   useUnsavedChangesGuard(
     !readOnly && (contentDirty || altPending),
@@ -104,13 +152,23 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
   const livePending =
     isPublished && (contentDirty || altPending || mutations.liveMediaPending);
 
+  const autosavePost = useMemo(
+    () => ({
+      status: post.status,
+      coverMediaId: post.coverMediaId,
+      media: post.media,
+    }),
+    [post.coverMediaId, post.media, post.status],
+  );
+
   const autosave = useNewsAutosave({
     dirty: contentDirty,
     readOnly,
     enabled: !isPublished && !isArchived,
     values: form.values,
     save: mutations.save,
-    hasCover: Boolean(post.coverMediaId),
+    post: autosavePost,
+    online,
   });
 
   const categoryLabel = t(`category.${form.values.category}`);
@@ -119,13 +177,21 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     () =>
       [
         t('editor.status', { status: t(`status.${post.status}`) }),
+        isScheduled && post.scheduledAt
+          ? t('editor.scheduledFor', {
+              date: new Date(post.scheduledAt).toLocaleString(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              }),
+            })
+          : '',
         livePending ? t('editor.livePending') : '',
         autosave.statusLabel,
         mutations.busy && !autosave.statusLabel ? t('editor.saving') : '',
       ]
         .filter(Boolean)
         .join(' · '),
-    [autosave.statusLabel, livePending, mutations.busy, post.status, t],
+    [autosave.statusLabel, isScheduled, livePending, mutations.busy, post.scheduledAt, post.status, t],
   );
 
   const handleDeleteMedia = useCallback(
@@ -192,9 +258,12 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
           mutations.requestPublish();
         }
       }
-      if (mod && e.shiftKey && e.key === 'v') {
+      if (mod && e.shiftKey && e.key.toLowerCase() === 'b') {
         e.preventDefault();
-        setEditorView((v) => (v === 'preview' ? 'write' : 'preview'));
+        void (async () => {
+          const raw = await readClipboardForImport();
+          await pasteBodyRef.current?.(raw);
+        })();
       }
     }
     window.addEventListener('keydown', onKeyDown);
@@ -241,6 +310,7 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
       onAltTextChange={handleAltTextChange}
       onBeforeRestore={flushAltSaves}
       onRestored={handleRestored}
+      onLintJump={handleLintJump}
     />
   );
 
@@ -388,7 +458,13 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
         <p className={styles.readOnlyBanner} role="note">
           {t('editor.archivedBanner')}
         </p>
+      ) : isPublished && livePending ? (
+        <p className={styles.livePendingBanner} role="status">
+          {t('editor.livePendingBanner')}
+        </p>
       ) : null}
+
+      <NewsOfflineBanner visible={!online && !readOnly && !isPublished && !isArchived} />
 
       <NewsDocumentEditorProvider>
       <NewsDocumentShell
@@ -425,9 +501,16 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
                         message: t('validation.blockLimit'),
                       })
                     }
+                    onOpenShortcuts={() => setShortcutsOpen(true)}
+                    onPasteBody={() => {
+                      void (async () => {
+                        const raw = await readClipboardForImport();
+                        await pasteBodyRef.current?.(raw);
+                      })();
+                    }}
                   />
                 ) : null}
-                <div className={documentStyles.proseDocument}>
+                <div id="news-document-body" className={documentStyles.proseDocument}>
                 <NewsCoverHero
                   coverImageUrl={post.coverImageUrl}
                   coverAttached={Boolean(post.coverMediaId)}
@@ -452,7 +535,6 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
                   media={post.media}
                   readOnly={readOnly}
                   actionsDisabled={mutations.lifecycleBusy}
-                  documentMode
                   uploadingBlockKind={
                     mutations.uploadingKind === 'inline_image' || mutations.uploadingKind === 'inline_video'
                       ? mutations.uploadingKind
@@ -477,6 +559,10 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
                   onUploadForGallerySlot={(blockIndex, itemIndex, file) =>
                     void mutations.uploadForGallerySlot(blockIndex, itemIndex, file)
                   }
+                  onPasteImageAt={(insertIndex, file) =>
+                    void mutations.uploadInlineAt(file, 'inline_image', insertIndex)
+                  }
+                  pasteBodyRef={pasteBodyRef}
                 />
                 </div>
               </>
@@ -519,6 +605,15 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
           void (isPublished ? mutations.saveAndUpdate() : mutations.saveAndPublish())
         }
         onGoToLocale={setLocale}
+        onJumpToField={handleLintJump}
+      />
+      <NewsShortcutsDialog open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
+      <NewsConflictDialog
+        open={mutations.conflictOpen}
+        isLoading={mutations.saving}
+        onReload={() => void mutations.resolveConflictReload()}
+        onOverwrite={() => void mutations.resolveConflictOverwrite()}
+        onClose={() => mutations.setConflictOpen(false)}
       />
       <ConfirmDialog
         open={mutations.unpublishOpen}

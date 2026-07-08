@@ -134,6 +134,9 @@
     "applyLink": "Примени",
     "addHeading": "Додај наслов",
     "addList": "Додај листа",
+    "addQuote": "Цитат",
+    "addDivider": "Разделник",
+    "addEmbed": "Видео embed",
     "addHtmlBlock": "HTML блок",
     "blockHtml": "Прилагоден HTML",
     "blockHeading2": "Наслов",
@@ -177,6 +180,17 @@
     "templatePlaceholder": "Изберете шаблон…",
     "addGalleryBlock": "Галерија",
     "blockGallery": "Галерија",
+    "blockQuote": "Цитат",
+    "blockDivider": "Разделник",
+    "blockEmbed": "Вградување",
+    "quotePlaceholder": "Текст на цитат",
+    "quoteText": "Цитат",
+    "quoteAttributionPlaceholder": "Атрибуција (опционално)",
+    "quoteAttribution": "Атрибуција",
+    "embedUrl": "URL на видео",
+    "embedApply": "Вметни",
+    "embedEmptyHint": "Залепете YouTube или Vimeo линк.",
+    "embedClear": "Отстрани embed",
     "addGalleryImage": "Додај слика",
     "addFromLibrary": "Од библиотека",
     "pickFromLibrary": "Избери слика…",
@@ -198,7 +212,9 @@
     "galleryMoveSlideRight": "Помести слајд надесно",
     "gallerySlideCount": "{filled} од {total} слики",
     "galleryMinSlidesHint": "Додајте најмалку 2 слики за објава.",
-    "galleryMaxSlides": "Најмногу 12 слајда по галерија"
+    "galleryMaxSlides": "Најмногу 12 слајда по галерија",
+    "duplicateBlock": "Дуплицирај блок",
+    "transformBlock": "Претвори во…"
   },
   "category": {
     "release": "Издание",
@@ -236,7 +252,9 @@
     "inspectorWithIssues": "Детали и медија · {count} нецелосни",
     "writeTab": "Пишување",
     "previewTab": "Преглед",
-    "viewTabs": "Приказ на уредникот"
+    "viewTabs": "Приказ на уредникот",
+    "livePendingBanner": "Оваа објава е активна. Измените нема да бидат видливи на chisto.mk додека не притиснете „Ажурирај“.",
+    "scheduledFor": "Закажано за {date}"
   },
   "autosave": {
     "saved": "Зачувано пред {time}",
@@ -248,7 +266,13 @@
   "previewBlocks": {
     "imageUnavailable": "Сликата не е достапна",
     "videoUnavailable": "Видеото не е достапно",
-    "unknownBlock": "Неподдржан тип блок (нема да се прикаже на сајтот)"
+    "unknownBlock": "Неподдржан тип блок (нема да се прикаже на сајтот)",
+    "galleryUnavailable": "Галеријата не е достапна",
+    "galleryClose": "Затвори",
+    "galleryPrevious": "Претходна слика",
+    "galleryNext": "Следна слика",
+    "galleryDialogLabel": "Галерија на слики",
+    "gallerySlideLabel": "Слика {index} од {total}"
   },
   "preview": {
     "label": "Преглед во живо",
@@ -300,7 +324,12 @@
     "cleared": "Историјата на ревизии е исчистена",
     "retentionHint": "Автоматски се чуваат најмногу {max} ревизии.",
     "showAll": "Прикажи ги сите ({count})",
-    "showLess": "Прикажи помалку"
+    "showLess": "Прикажи помалку",
+    "diffTitle": "Насловот е променет",
+    "diffExcerpt": "Изводот е променет",
+    "diffBlocks": "Блокови {delta}",
+    "diffMedia": "Медија {delta}",
+    "diffNone": "Нема промени за овој јазик"
   },
   "checklist": {
     "title": "Подготвеност за објавување",
@@ -320,7 +349,8 @@
     "saveAndUpdate": "Зачувај и ажурирај",
     "altTextField": "Alt текст на слика",
     "limitsField": "Ограничувања на должина",
-    "cancel": "Откажи"
+    "cancel": "Откажи",
+    "jumpToField": "Поправи"
   },
   "meta": {
     "label": "Метаподатоци за објавата",
@@ -391,7 +421,8 @@
     "mediaIdRequired": "Блоковите со слика и видео бараат прикачено медиа.",
     "blockLimit": "Достигнат е максимумот од 50 блокови.",
     "titleTooLong": "Насловот ја надминува максималната должина.",
-    "excerptTooLong": "Краткиот опис ја надминува максималната должина."
+    "excerptTooLong": "Краткиот опис ја надминува максималната должина.",
+    "altTextRequired": "Alt текст за насловна и вметнати слики е задолжителен пред зачувување на закажан пост."
   },
   "apiErrors": {
     "slugTaken": "Вест со овој slug веќе постои.",
@@ -447,6 +478,9 @@
     "paragraph": "Текст со форматирање, врски и листи.",
     "heading": "Наслов на дел за поделба на долги статии.",
     "list": "Листа со точки или броеви за чекори и нагласувања.",
+    "quote": "Истакнат цитат со опционална атрибуција.",
+    "divider": "Визуелна граница помеѓу делови.",
+    "embed": "YouTube или Vimeo без raw HTML.",
     "gallery": "4:3 карусел со најмалку две фотографии.",
     "imageBlock": "Широка фотографија во телото на статијата.",
     "videoBlock": "Вметнато видео во статијата.",
@@ -456,7 +490,17 @@
     "video": "Прикачете видео во статијата.",
     "starterLabel": "Додај блокови",
     "starterTitle": "Започнете ја приказната",
-    "starterDescription": "Изберете блок или користете Вметни на лентата за повеќе опции."
+    "starterDescription": "Изберете блок или користете Вметни на лентата за повеќе опции.",
+    "recents": "Неодамнешни",
+    "templates": "Шаблони",
+    "filterPlaceholder": "Филтрирај блокови…",
+    "filterEmpty": "Нема блокови што одговараат.",
+    "template": {
+      "release": "Претходно пополнети блокови за објава.",
+      "partnership": "Структура за партнерство.",
+      "community": "Распоред за заедница.",
+      "product": "Преглед на производ."
+    }
   },
   "drag": {
     "emptyPreview": "Празен блок",
@@ -496,6 +540,94 @@
     "conflictReload": "Вчитај најново",
     "duplicated": "Нацртот е дуплиран",
     "duplicatedMediaHint": "Текстот е копиран. Повторно додадете насловна и вградено медиа.",
-    "saveBeforePublish": "Зачувајте ги промените пред објавување."
+    "saveBeforePublish": "Зачувајте ги промените пред објавување.",
+    "blockDeleted": "Блокот е избришан",
+    "undo": "Врати"
+  },
+  "localeStatus": {
+    "complete": "комплетно",
+    "incomplete": "некомплетно"
+  },
+  "transform": {
+    "menuLabel": "Претвори во",
+    "paragraph": "Параграф",
+    "paragraphDescription": "Основен текст со форматирање",
+    "heading2": "Наслов",
+    "heading2Description": "Голем наслов на секција",
+    "heading3": "Поднаслов",
+    "heading3Description": "Помал наслов на секција",
+    "list": "Листа",
+    "listDescription": "Точки или нумерирани ставки",
+    "quote": "Цитат",
+    "quoteDescription": "Истакнат цитат со атрибуција"
+  },
+  "shortcuts": {
+    "title": "Тастатурни кратенки",
+    "description": "Пишувајте и структурирајте без глувче.",
+    "writing": "Пишување",
+    "blocks": "Блокови",
+    "enterNewBlock": "Нов пасус подолу (на крајот)",
+    "modEnterNewBlock": "Нов пасус подолу",
+    "backspaceMerge": "Спој со претходен пасус (на почеток)",
+    "modBold": "Здебелено",
+    "modItalic": "Косо",
+    "modUnderline": "Подвлечено",
+    "modLink": "Врска",
+    "slashPalette": "Вметни блок (празен пасус)",
+    "modSlashPalette": "Вметни блок",
+    "modOrderedList": "Нумерирана листа",
+    "modBulletList": "Листа со точки",
+    "pasteBody": "Залепи форматирано тело од клипборд",
+    "openHelp": "Тастатурни кратенки"
+  },
+  "lint": {
+    "label": "Состојба на содржината",
+    "wordCount": "{count, plural, one {# збор} other {# зборови}}",
+    "readingTime": "{minutes, plural, one {# мин читање} other {# мин читање}}",
+    "readingByLocale": "Време за читање по јазик",
+    "noIssues": "Нема проблеми за овој јазик.",
+    "jump": "Оди до проблемот",
+    "titleMissing": "Насловот е задолжителен",
+    "titleTooLong": "Насловот ја надминува границата",
+    "excerptMissing": "Изводот е задолжителен",
+    "excerptTooLong": "Изводот ја надминува границата",
+    "bodyEmpty": "Содржината мора да има барем еден блок",
+    "bodyInvalid": "Содржината има нецелосни блокови",
+    "bodyLimit": "Содржината ја надминува границата за блокови",
+    "coverMissing": "Насловната слика е задолжителна",
+    "altTextMissing": "Недостасува alt текст за вметнати слики",
+    "mediaMissing": "Блок со медија повикува недостасувачка датотека",
+    "embedEmpty": "Embed блокот нема URL за видео",
+    "quoteEmpty": "Цитат блокот е празен"
+  },
+  "paste": {
+    "toolbarLabel": "Залепи содржина",
+    "toolbarAction": "Залепи форматирано тело од клипборд",
+    "confirmTitle": "Да се залепи форматирано тело?",
+    "confirmDescription": "Откриени се {count} блокови во клипбордот.",
+    "replaceBody": "Замени го телото",
+    "insertAtCursor": "Вметни на курсорот",
+    "cancel": "Откажи",
+    "truncatedWarning": "Залепувањето е скратено на лимитот од 50 блока.",
+    "unstructuredWarning": "Клипбордот нема структурирана содржина. Залепете во празен пасус.",
+    "clipboardUnavailable": "Клипбордот не може да се прочита. Кликнете во уредувачот и обидете се повторно, или залепете со Cmd+V во празен пасус.",
+    "appliedTitle": "Телото е залепено",
+    "summaryQuote": "{count, plural, one {# цитат} other {# цитати}}",
+    "summaryHeading": "{count, plural, one {# наслов} other {# наслови}}",
+    "summaryParagraph": "{count, plural, one {# пасус} other {# пасуси}}",
+    "summaryList": "{count, plural, one {# листа} other {# листи}}",
+    "summaryDivider": "{count, plural, one {# разделник} other {# разделници}}",
+    "summaryOther": "{count, plural, one {# друг блок} other {# други блокови}}"
+  },
+  "conflict": {
+    "title": "Конфликт при уредување",
+    "description": "Некој друг го зачува постот додека уредувавте.",
+    "body": "Вчитајте ја најновата верзија или презапишете со вашиот нацрт.",
+    "cancel": "Откажи",
+    "reload": "Вчитај најново",
+    "overwrite": "Презапиши со мојот"
+  },
+  "offline": {
+    "banner": "Офлајн сте. Автоматското зачувување е паузирано."
   }
 }

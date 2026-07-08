@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import type { EnrichedGalleryBlock, EnrichedGalleryItem, ResolvedNewsBodyBlock } from '../types';
+import { buildEmbedIframeHtml } from '../sanitize/embed-allowlist';
 import { sanitizeHtmlBlock, sanitizeInlineHtml } from '../sanitize/html-sanitize';
+import './external-link-indicator.css';
 import styles from './render-news-blocks.module.css';
 
 export type RenderNewsBlocksLabels = {
@@ -101,7 +103,7 @@ export function RenderNewsBlocks({
   renderGallery,
 }: RenderNewsBlocksOptions) {
   return (
-    <div className={[styles.proseNews, className].filter(Boolean).join(' ')}>
+    <div className={[styles.proseNews, 'news-prose', className].filter(Boolean).join(' ')}>
       {blocks.map((block, i) => {
         const key = block.id ?? `${block.type}-${i}`;
 
@@ -243,6 +245,36 @@ export function RenderNewsBlocks({
             <div key={key}>
               {defaultRenderGallery({ items: galleryItems, labels, className: styles.gallery, renderImage })}
             </div>
+          );
+        }
+
+        if (block.type === 'quote') {
+          const text = block.text.trim();
+          if (!text) return null;
+          return (
+            <blockquote key={key} className={styles.quote}>
+              <p>{text}</p>
+              {block.attribution?.trim() ? (
+                <cite className={styles.quoteAttribution}>{block.attribution.trim()}</cite>
+              ) : null}
+            </blockquote>
+          );
+        }
+
+        if (block.type === 'divider') {
+          return <hr key={key} className={styles.divider} aria-hidden />;
+        }
+
+        if (block.type === 'embed') {
+          const embedUrl = block.url?.trim();
+          if (!embedUrl) return null;
+          const html = buildEmbedIframeHtml(embedUrl);
+          return (
+            <div
+              key={key}
+              className={styles.embedBlock}
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
           );
         }
 

@@ -1,31 +1,49 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
-import { blockTypeLabel } from '../lib/news-block-display';
-import { NewsGalleryBlockEditor } from './news-gallery-block-editor';
-import { NewsHtmlBlockEditor } from './news-html-block-editor';
 import { NewsListBlockEditor } from './news-list-block-editor';
 import { NewsMediaBlockEditor } from './news-media-block-editor';
+import { NewsQuoteBlockEditor } from './news-quote-block-editor';
 import styles from './news-body-block-editor.module.css';
+
+const NewsGalleryBlockEditor = dynamic(
+  () => import('./news-gallery-block-editor').then((m) => ({ default: m.NewsGalleryBlockEditor })),
+  { ssr: false },
+);
+const NewsHtmlBlockEditor = dynamic(
+  () => import('./news-html-block-editor').then((m) => ({ default: m.NewsHtmlBlockEditor })),
+  { ssr: false },
+);
+const NewsEmbedBlockEditor = dynamic(
+  () => import('./news-embed-block-editor').then((m) => ({ default: m.NewsEmbedBlockEditor })),
+  { ssr: false },
+);
 
 type NewsBodyBlockEditorProps = {
   block: NewsBodyBlock;
   index: number;
-  total: number;
   media: NewsMediaDto[];
   readOnly: boolean;
   busy: boolean;
   uploadBusy?: boolean;
   uploadError?: string | null;
   localPreviewSrc?: string | null;
-  variant?: 'classic' | 'document';
+  autoFocus?: boolean | undefined;
+  onAutoFocused?: (() => void) | undefined;
   onChange: (block: NewsBodyBlock) => void;
-  onRemove: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
+  /** Typing "/" in an empty paragraph opens the insert palette. */
+  onSlashMenu?: (() => void) | undefined;
+  onCreateBlockAfter?: (() => void) | undefined;
+  onMergeWithPrevious?: (() => void) | undefined;
+  onMultiParagraphPaste?: ((raw: { html: string; plain: string }) => boolean) | undefined;
+  onPasteImageFile?: ((file: File) => boolean) | undefined;
+  /** Enter in a heading starts a fresh paragraph below (news writing flow). */
+  onInsertParagraphAfter?: (() => void) | undefined;
+  /** Backspace on an empty heading removes it, like merging up in a document. */
+  onRemoveSelf?: (() => void) | undefined;
   onUploadForBlock?: (file: File) => void;
   onReplaceForBlock?: (file: File) => void;
   onUploadForGallerySlot?: (itemIndex: number, file: File) => void;
@@ -42,18 +60,22 @@ function mediaForBlock(block: NewsBodyBlock, media: NewsMediaDto[]): NewsMediaDt
 export function NewsBodyBlockEditor({
   block,
   index,
-  total,
   media,
   readOnly,
   busy,
   uploadBusy = false,
   uploadError = null,
   localPreviewSrc = null,
-  variant = 'classic',
+  autoFocus = false,
+  onAutoFocused,
   onChange,
-  onRemove,
-  onMoveUp,
-  onMoveDown,
+  onSlashMenu,
+  onCreateBlockAfter,
+  onMergeWithPrevious,
+  onMultiParagraphPaste,
+  onPasteImageFile,
+  onInsertParagraphAfter,
+  onRemoveSelf,
   onUploadForBlock,
   onReplaceForBlock,
   onUploadForGallerySlot,
@@ -63,46 +85,20 @@ export function NewsBodyBlockEditor({
   const attached = mediaForBlock(block, media);
 
   return (
-    <div className={variant === 'document' ? styles.blockDocument : styles.block}>
-      {variant === 'classic' ? (
-      <div className={styles.blockHeader}>
-        <span className={styles.blockType}>{blockTypeLabel(block, t)}</span>
-        {!readOnly ? (
-          <div className={styles.blockActions}>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={busy || index === 0}
-              onClick={onMoveUp}
-              aria-label={t('form.moveBlockUp')}
-            >
-              ↑
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={busy || index >= total - 1}
-              onClick={onMoveDown}
-              aria-label={t('form.moveBlockDown')}
-            >
-              ↓
-            </Button>
-            <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={onRemove}>
-              {t('form.removeBlock')}
-            </Button>
-          </div>
-        ) : null}
-      </div>
-      ) : null}
-
+    <div className={styles.blockDocument}>
       {block.type === 'paragraph' ? (
         <RichTextEditor
           key={block.id}
-          variant={variant === 'document' ? 'document' : 'default'}
+          variant="document"
           documentBlockId={block.id ?? `block-${index}`}
           documentBlockIndex={index}
+          autoFocus={autoFocus}
+          onAutoFocused={onAutoFocused}
+          onSlashMenu={onSlashMenu}
+          onCreateBlockAfter={onCreateBlockAfter}
+          onMergeWithPrevious={onMergeWithPrevious}
+          onMultiParagraphPaste={onMultiParagraphPaste}
+          onPasteImageFile={onPasteImageFile}
           value={{ text: block.text, html: block.html }}
           onChange={(next) => {
             const nextBlock = { ...block, text: next.text };
@@ -120,55 +116,46 @@ export function NewsBodyBlockEditor({
           html={block.html}
           readOnly={readOnly}
           busy={busy}
-          variant={variant}
           onChange={(html) => onChange({ ...block, html })}
         />
       ) : block.type === 'heading' ? (
-        <div className={variant === 'document' ? styles.headingBlockDocument : styles.headingBlock}>
-          {variant === 'document' ? (
-            <div className={styles.headingMeta}>
-              <select
-                className={styles.headingLevelSelect}
-                value={block.level}
-                onChange={(e) =>
-                  onChange({ ...block, level: Number(e.target.value) as 2 | 3 })
-                }
-                disabled={readOnly}
-                aria-label={t('form.headingLevel')}
-              >
-                <option value={2}>H2</option>
-                <option value={3}>H3</option>
-              </select>
-            </div>
-          ) : (
-            <label className={styles.captionField}>
-              <span>{t('form.headingLevel')}</span>
-              <select
-                value={block.level}
-                onChange={(e) =>
-                  onChange({ ...block, level: Number(e.target.value) as 2 | 3 })
-                }
-                disabled={readOnly}
-              >
-                <option value={2}>H2</option>
-                <option value={3}>H3</option>
-              </select>
-            </label>
-          )}
+        <div className={styles.headingBlockDocument}>
+          <div className={styles.headingMeta}>
+            <select
+              className={styles.headingLevelSelect}
+              value={block.level}
+              onChange={(e) =>
+                onChange({ ...block, level: Number(e.target.value) as 2 | 3 })
+              }
+              disabled={readOnly}
+              aria-label={t('form.headingLevel')}
+            >
+              <option value={2}>H2</option>
+              <option value={3}>H3</option>
+            </select>
+          </div>
           <input
             type="text"
             className={
-              variant === 'document'
-                ? block.level === 3
-                  ? styles.headingInputDocument3
-                  : styles.headingInputDocument2
-                : styles.headingInput
+              block.level === 3 ? styles.headingInputDocument3 : styles.headingInputDocument2
             }
             value={block.text}
             onChange={(e) => onChange({ ...block, text: e.target.value })}
+            onKeyDown={(e) => {
+              if (readOnly) return;
+              if (e.key === 'Enter' && !e.shiftKey && onInsertParagraphAfter) {
+                e.preventDefault();
+                onInsertParagraphAfter();
+              }
+              if (e.key === 'Backspace' && block.text === '' && onRemoveSelf) {
+                e.preventDefault();
+                onRemoveSelf();
+              }
+            }}
             disabled={readOnly}
             maxLength={200}
             placeholder={t('form.headingPlaceholder')}
+            {...(autoFocus ? { autoFocus: true } : {})}
           />
         </div>
       ) : block.type === 'list' ? (
@@ -176,7 +163,6 @@ export function NewsBodyBlockEditor({
           block={block}
           readOnly={readOnly}
           busy={busy}
-          variant={variant}
           onChange={onChange}
         />
       ) : block.type === 'gallery' ? (
@@ -185,7 +171,6 @@ export function NewsBodyBlockEditor({
           media={media}
           readOnly={readOnly}
           busy={busy}
-          variant={variant}
           uploadBusySlotIndex={uploadGallerySlotIndex}
           uploadError={uploadError}
           onChange={onChange}
@@ -193,6 +178,22 @@ export function NewsBodyBlockEditor({
             onChange({ ...block, items: [...block.items, { mediaId }] })
           }
           onUploadForSlot={onUploadForGallerySlot}
+        />
+      ) : block.type === 'quote' ? (
+        <NewsQuoteBlockEditor
+          block={block}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          onChange={onChange}
+        />
+      ) : block.type === 'divider' ? (
+        <hr className={styles.dividerDocument} aria-label={t('form.blockDivider')} />
+      ) : block.type === 'embed' ? (
+        <NewsEmbedBlockEditor
+          block={block}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          onChange={onChange}
         />
       ) : block.type === 'image' || block.type === 'video' ? (
         <NewsMediaBlockEditor
@@ -203,7 +204,6 @@ export function NewsBodyBlockEditor({
           uploadBusy={uploadBusy}
           uploadError={uploadError}
           localPreviewSrc={localPreviewSrc}
-          variant={variant}
           onChange={onChange}
           onUpload={onReplaceForBlock ?? onUploadForBlock}
         />

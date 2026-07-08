@@ -45,6 +45,24 @@ export type NewsGalleryBlock = NewsBodyBlockBase & {
   items: NewsGalleryItem[];
 };
 
+export type NewsQuoteBlock = NewsBodyBlockBase & {
+  type: 'quote';
+  text: string;
+  attribution?: string;
+};
+
+export type NewsDividerBlock = NewsBodyBlockBase & {
+  type: 'divider';
+};
+
+export type NewsEmbedProvider = 'youtube' | 'vimeo';
+
+export type NewsEmbedBlock = NewsBodyBlockBase & {
+  type: 'embed';
+  provider: NewsEmbedProvider;
+  url: string;
+};
+
 export type NewsBodyBlock =
   | NewsParagraphBlock
   | NewsHtmlBlock
@@ -52,7 +70,10 @@ export type NewsBodyBlock =
   | NewsListBlock
   | NewsImageBlock
   | NewsVideoBlock
-  | NewsGalleryBlock;
+  | NewsGalleryBlock
+  | NewsQuoteBlock
+  | NewsDividerBlock
+  | NewsEmbedBlock;
 
 export type EnrichedMediaBlock = (NewsImageBlock | NewsVideoBlock) & {
   url?: string | null;
@@ -74,7 +95,10 @@ export type ResolvedNewsBodyBlock =
   | NewsHeadingBlock
   | NewsListBlock
   | EnrichedMediaBlock
-  | EnrichedGalleryBlock;
+  | EnrichedGalleryBlock
+  | NewsQuoteBlock
+  | NewsDividerBlock
+  | NewsEmbedBlock;
 
 export function createBlockId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -105,6 +129,18 @@ export function isMediaBlock(block: NewsBodyBlock): block is NewsImageBlock | Ne
 
 export function isGalleryBlock(block: NewsBodyBlock): block is NewsGalleryBlock {
   return block.type === 'gallery';
+}
+
+export function isQuoteBlock(block: NewsBodyBlock): block is NewsQuoteBlock {
+  return block.type === 'quote';
+}
+
+export function isDividerBlock(block: NewsBodyBlock): block is NewsDividerBlock {
+  return block.type === 'divider';
+}
+
+export function isEmbedBlock(block: NewsBodyBlock): block is NewsEmbedBlock {
+  return block.type === 'embed';
 }
 
 export function galleryHasContent(block: NewsGalleryBlock): boolean {

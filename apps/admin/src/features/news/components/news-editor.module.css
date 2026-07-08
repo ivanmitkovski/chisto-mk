@@ -23,6 +23,16 @@
   font-size: var(--font-size-sm);
 }
 
+.livePendingBanner {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  color: var(--color-status-warning-fg);
+  font-size: var(--font-size-sm);
+}
+
 .editorGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) min(16rem, 100%);

@@ -134,6 +134,9 @@
     "applyLink": "Apply",
     "addHeading": "Add heading",
     "addList": "Add list",
+    "addQuote": "Quote",
+    "addDivider": "Divider",
+    "addEmbed": "Video embed",
     "addHtmlBlock": "HTML block",
     "blockHtml": "Custom HTML",
     "blockHeading2": "Heading",
@@ -177,6 +180,17 @@
     "templatePlaceholder": "Choose a template…",
     "addGalleryBlock": "Gallery",
     "blockGallery": "Gallery",
+    "blockQuote": "Quote",
+    "blockDivider": "Divider",
+    "blockEmbed": "Embed",
+    "quotePlaceholder": "Quote text",
+    "quoteText": "Quote",
+    "quoteAttributionPlaceholder": "Attribution (optional)",
+    "quoteAttribution": "Attribution",
+    "embedUrl": "Video URL",
+    "embedApply": "Embed",
+    "embedEmptyHint": "Paste a YouTube or Vimeo link to embed a video.",
+    "embedClear": "Remove embed",
     "addGalleryImage": "Add image",
     "addFromLibrary": "Add from library",
     "pickFromLibrary": "Choose image…",
@@ -198,7 +212,9 @@
     "galleryMoveSlideRight": "Move slide right",
     "gallerySlideCount": "{filled} of {total} photos",
     "galleryMinSlidesHint": "Add at least 2 photos to publish.",
-    "galleryMaxSlides": "Maximum 12 slides per gallery"
+    "galleryMaxSlides": "Maximum 12 slides per gallery",
+    "duplicateBlock": "Duplicate block",
+    "transformBlock": "Turn into…"
   },
   "category": {
     "release": "Release",
@@ -236,7 +252,9 @@
     "inspectorWithIssues": "Details & media · {count} incomplete",
     "writeTab": "Write",
     "previewTab": "Preview",
-    "viewTabs": "Editor view"
+    "viewTabs": "Editor view",
+    "livePendingBanner": "This post is live. Your edits are not visible on chisto.mk until you press Update.",
+    "scheduledFor": "Scheduled for {date}"
   },
   "autosave": {
     "saved": "Saved {time} ago",
@@ -248,7 +266,13 @@
   "previewBlocks": {
     "imageUnavailable": "Image unavailable",
     "videoUnavailable": "Video unavailable",
-    "unknownBlock": "Unsupported block type (not shown on site)"
+    "unknownBlock": "Unsupported block type (not shown on site)",
+    "galleryUnavailable": "Gallery unavailable",
+    "galleryClose": "Close",
+    "galleryPrevious": "Previous image",
+    "galleryNext": "Next image",
+    "galleryDialogLabel": "Image gallery",
+    "gallerySlideLabel": "Image {index} of {total}"
   },
   "preview": {
     "label": "Live preview",
@@ -300,7 +324,12 @@
     "cleared": "Revision history cleared",
     "retentionHint": "Up to {max} revisions are kept automatically.",
     "showAll": "Show all ({count})",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "diffTitle": "Title changed",
+    "diffExcerpt": "Excerpt changed",
+    "diffBlocks": "Blocks {delta}",
+    "diffMedia": "Media {delta}",
+    "diffNone": "No changes in this locale"
   },
   "checklist": {
     "title": "Publish readiness",
@@ -320,7 +349,8 @@
     "saveAndUpdate": "Save and update",
     "altTextField": "Image alt text",
     "limitsField": "Length limits",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "jumpToField": "Fix"
   },
   "meta": {
     "label": "Post metadata",
@@ -391,7 +421,8 @@
     "mediaIdRequired": "Image and video blocks need uploaded media.",
     "blockLimit": "Maximum number of body blocks reached (50).",
     "titleTooLong": "Title exceeds the maximum length.",
-    "excerptTooLong": "Excerpt exceeds the maximum length."
+    "excerptTooLong": "Excerpt exceeds the maximum length.",
+    "altTextRequired": "Cover and inline image alt text are required before saving a scheduled post."
   },
   "apiErrors": {
     "slugTaken": "A post with this slug already exists.",
@@ -447,6 +478,9 @@
     "paragraph": "Rich body text with bold, links, and lists.",
     "heading": "Section title to break up long articles.",
     "list": "Bullet or numbered list for steps and highlights.",
+    "quote": "Pull quote with optional attribution.",
+    "divider": "Visual break between sections.",
+    "embed": "YouTube or Vimeo video without raw HTML.",
     "gallery": "Swipeable 4:3 carousel with two or more photos.",
     "imageBlock": "Full-width photo in the article body.",
     "videoBlock": "Embedded video clip in the article body.",
@@ -456,7 +490,17 @@
     "video": "Upload a video clip into the article body.",
     "starterLabel": "Add content blocks",
     "starterTitle": "Start your story",
-    "starterDescription": "Pick a block to begin, or use Insert in the toolbar for more options."
+    "starterDescription": "Pick a block to begin, or use Insert in the toolbar for more options.",
+    "recents": "Recent",
+    "templates": "Templates",
+    "filterPlaceholder": "Filter blocks…",
+    "filterEmpty": "No blocks match your search.",
+    "template": {
+      "release": "Pre-filled release announcement blocks.",
+      "partnership": "Partnership story structure.",
+      "community": "Community highlights layout.",
+      "product": "Product update outline."
+    }
   },
   "drag": {
     "emptyPreview": "Empty block",
@@ -496,6 +540,94 @@
     "conflictReload": "Reload latest",
     "duplicated": "Draft duplicated",
     "duplicatedMediaHint": "Text copied. Re-add cover and inline media.",
-    "saveBeforePublish": "Save your changes before publishing."
+    "saveBeforePublish": "Save your changes before publishing.",
+    "blockDeleted": "Block deleted",
+    "undo": "Undo"
+  },
+  "localeStatus": {
+    "complete": "complete",
+    "incomplete": "incomplete"
+  },
+  "transform": {
+    "menuLabel": "Turn into",
+    "paragraph": "Paragraph",
+    "paragraphDescription": "Body text with formatting",
+    "heading2": "Heading",
+    "heading2Description": "Large section heading",
+    "heading3": "Subheading",
+    "heading3Description": "Smaller section heading",
+    "list": "List",
+    "listDescription": "Bulleted or numbered items",
+    "quote": "Quote",
+    "quoteDescription": "Pull quote with attribution"
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "description": "Write and structure articles without reaching for the mouse.",
+    "writing": "Writing",
+    "blocks": "Blocks",
+    "enterNewBlock": "New paragraph below (at end of block)",
+    "modEnterNewBlock": "New paragraph below",
+    "backspaceMerge": "Merge with previous paragraph (at start)",
+    "modBold": "Bold",
+    "modItalic": "Italic",
+    "modUnderline": "Underline",
+    "modLink": "Insert link",
+    "slashPalette": "Insert block (empty paragraph)",
+    "modSlashPalette": "Insert block",
+    "modOrderedList": "Numbered list",
+    "modBulletList": "Bullet list",
+    "pasteBody": "Paste formatted body from clipboard",
+    "openHelp": "Keyboard shortcuts"
+  },
+  "lint": {
+    "label": "Content health",
+    "wordCount": "{count, plural, one {# word} other {# words}}",
+    "readingTime": "{minutes, plural, one {# min read} other {# min read}}",
+    "readingByLocale": "Reading time by locale",
+    "noIssues": "No issues for this locale.",
+    "jump": "Go to issue",
+    "titleMissing": "Title is required",
+    "titleTooLong": "Title exceeds the limit",
+    "excerptMissing": "Excerpt is required",
+    "excerptTooLong": "Excerpt exceeds the limit",
+    "bodyEmpty": "Body needs at least one block",
+    "bodyInvalid": "Body has incomplete blocks",
+    "bodyLimit": "Body exceeds the block limit",
+    "coverMissing": "Cover image is required",
+    "altTextMissing": "Alt text missing for inline images",
+    "mediaMissing": "A media block references a missing file",
+    "embedEmpty": "Embed block is missing a video URL",
+    "quoteEmpty": "Quote block is empty"
+  },
+  "paste": {
+    "toolbarLabel": "Paste body",
+    "toolbarAction": "Paste formatted body from clipboard",
+    "confirmTitle": "Paste formatted body?",
+    "confirmDescription": "{count} blocks detected in the clipboard.",
+    "replaceBody": "Replace body",
+    "insertAtCursor": "Insert at cursor",
+    "cancel": "Cancel",
+    "truncatedWarning": "Paste was trimmed to the 50-block limit.",
+    "unstructuredWarning": "Clipboard does not contain structured article content. Paste into an empty paragraph instead.",
+    "clipboardUnavailable": "Could not read the clipboard. Click in the editor and try again, or paste with Cmd+V into an empty paragraph.",
+    "appliedTitle": "Body pasted",
+    "summaryQuote": "{count, plural, one {# quote} other {# quotes}}",
+    "summaryHeading": "{count, plural, one {# heading} other {# headings}}",
+    "summaryParagraph": "{count, plural, one {# paragraph} other {# paragraphs}}",
+    "summaryList": "{count, plural, one {# list} other {# lists}}",
+    "summaryDivider": "{count, plural, one {# divider} other {# dividers}}",
+    "summaryOther": "{count, plural, one {# other block} other {# other blocks}}"
+  },
+  "conflict": {
+    "title": "Edit conflict",
+    "description": "Someone else saved this post while you were editing.",
+    "body": "Reload to discard your changes and load the latest version, or overwrite with your current draft.",
+    "cancel": "Cancel",
+    "reload": "Reload latest",
+    "overwrite": "Overwrite with mine"
+  },
+  "offline": {
+    "banner": "You are offline. Autosave is paused until the connection returns."
   }
 }

@@ -1,0 +1,12 @@
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.body {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}

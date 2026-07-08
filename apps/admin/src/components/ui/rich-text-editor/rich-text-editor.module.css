@@ -194,8 +194,8 @@
   border: none;
   border-radius: 0;
   background: transparent;
-  font-size: 1.0625rem;
-  line-height: 1.65;
+  font-size: var(--news-prose-font-size, 1.0625rem);
+  line-height: var(--news-prose-line-height, 1.65);
   box-shadow: none;
 }
 
@@ -219,14 +219,91 @@
 }
 
 .editorSurfaceDocument :global(.ProseMirror p + p) {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
+}
+
+.editorSurfaceDocument :global(.ProseMirror ul),
+.editorSurfaceDocument :global(.ProseMirror ol) {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.editorSurfaceDocument :global(.ProseMirror li + li) {
+  margin-top: 0.375rem;
 }
 
 .editorSurfaceDocument :global(.ProseMirror a) {
-  color: var(--color-primary);
+  color: var(--news-prose-link, var(--color-primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editorSurfaceDocument :global(.ProseMirror a:hover) {
+  color: var(--news-prose-link-hover, var(--color-primary));
 }
 
 .editorSurfaceDocument :global(.ProseMirror p.is-editor-empty:first-child::before) {
   color: color-mix(in srgb, var(--text-secondary) 65%, transparent);
   font-style: italic;
+}
+
+/* Selection bubble menu — floats above the current text selection */
+.bubbleMenu {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-lg, 0.5rem);
+  border: 1px solid var(--border-default);
+  background: var(--surface-elevated);
+  box-shadow:
+    0 8px 24px color-mix(in srgb, var(--text-primary) 10%, transparent),
+    0 2px 6px color-mix(in srgb, var(--text-primary) 6%, transparent);
+}
+
+.bubbleButton {
+  min-width: 1.875rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: var(--radius-md, 0.375rem);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.bubbleButton:hover {
+  background: var(--color-button-ghost-hover-bg);
+  color: var(--text-primary);
+}
+
+.bubbleButtonActive {
+  background: var(--color-button-icon-bg);
+  color: var(--color-green-700);
+}
+
+.bubbleItalic {
+  font-style: italic;
+}
+
+.bubbleUnderline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.bubbleDivider {
+  width: 1px;
+  height: 1rem;
+  margin: 0 0.125rem;
+  background: var(--border-default);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubbleButton {
+    transition: none;
+  }
 }

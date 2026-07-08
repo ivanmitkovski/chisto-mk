@@ -24,6 +24,9 @@ export function bodyBlocksValidForPublish(body: NewsBodyBlock[]): boolean {
       if (b.type === 'list') return b.items.some((item) => item.trim());
       if (b.type === 'image' || b.type === 'video') return Boolean(b.mediaId.trim());
       if (b.type === 'gallery') return galleryHasContent(b) && b.items.filter((i) => i.mediaId?.trim()).length >= 2;
+      if (b.type === 'quote') return Boolean(b.text.trim());
+      if (b.type === 'divider') return true;
+      if (b.type === 'embed') return Boolean(b.url?.trim());
       return false;
     })
   );

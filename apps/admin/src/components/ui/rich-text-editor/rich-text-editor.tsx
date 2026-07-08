@@ -1,17 +1,24 @@
 'use client';
 
+import { Extension } from '@tiptap/core';
 import Link from '@tiptap/extension-link';
+import '@chisto/news-content/render/external-link-indicator.css';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
-import { EditorContent, useEditor } from '@tiptap/react';
+import { BubbleMenu, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { sanitizeInlineHtml, stripHtmlToPlainText } from '@chisto/news-content';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  sanitizeInlineHtml,
+  sanitizePastedInlineHtml,
+  stripHtmlToPlainText,
+} from '@chisto/news-content';
 import { RichTextLinkDialog } from '@/components/ui/rich-text-editor/rich-text-link-dialog';
 import { useOptionalNewsDocumentEditor } from '@/features/news/context/news-document-editor-context';
 import {
   captureLinkDialogState,
+  normalizeLinkUrl,
   type LinkSelectionSnapshot,
 } from '@/lib/rich-text/apply-editor-link';
 import styles from './rich-text-editor.module.css';
@@ -31,6 +38,19 @@ type RichTextEditorProps = {
   variant?: 'default' | 'document' | undefined;
   documentBlockId?: string | undefined;
   documentBlockIndex?: number | undefined;
+  /** Focus the editor after mount (used when a block is created via keyboard). */
+  autoFocus?: boolean | undefined;
+  onAutoFocused?: (() => void) | undefined;
+  /** Typing "/" in an empty paragraph opens the block insert palette. */
+  onSlashMenu?: (() => void) | undefined;
+  /** Enter at end or Mod+Enter — insert a fresh paragraph block below. */
+  onCreateBlockAfter?: (() => void) | undefined;
+  /** Backspace at block start — merge into the previous paragraph. */
+  onMergeWithPrevious?: (() => void) | undefined;
+  /** Multi-paragraph paste into an empty block (returns true when handled). */
+  onMultiParagraphPaste?: ((raw: { html: string; plain: string }) => boolean) | undefined;
+  /** Image paste — insert an image block (returns true when handled). */
+  onPasteImageFile?: ((file: File) => boolean) | undefined;
 };
 
 function initialContent(value: RichTextEditorValue): string {
@@ -54,6 +74,14 @@ function richTextValuesEqual(a: RichTextEditorValue, b: RichTextEditorValue): bo
   return left.text === right.text && (left.html ?? '') === (right.html ?? '');
 }
 
+/** Platform-aware modifier label for shortcut hints in tooltips. */
+export function modKeyLabel(): string {
+  if (typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)) {
+    return '⌘';
+  }
+  return 'Ctrl+';
+}
+
 export function RichTextEditor({
   value,
   onChange,
@@ -62,6 +90,13 @@ export function RichTextEditor({
   variant = 'default',
   documentBlockId,
   documentBlockIndex,
+  autoFocus = false,
+  onAutoFocused,
+  onSlashMenu,
+  onCreateBlockAfter,
+  onMergeWithPrevious,
+  onMultiParagraphPaste,
+  onPasteImageFile,
 }: RichTextEditorProps) {
   const t = useTranslations('news');
   const documentContext = useOptionalNewsDocumentEditor();
@@ -70,6 +105,19 @@ export function RichTextEditor({
   const valueRef = useRef(value);
   valueRef.current = value;
   const suppressUpdateRef = useRef(true);
+  const openLinkDialogRef = useRef<() => void>(() => {});
+  const slashMenuRef = useRef(onSlashMenu);
+  slashMenuRef.current = onSlashMenu;
+  const createBlockAfterRef = useRef(onCreateBlockAfter);
+  createBlockAfterRef.current = onCreateBlockAfter;
+  const mergeWithPreviousRef = useRef(onMergeWithPrevious);
+  mergeWithPreviousRef.current = onMergeWithPrevious;
+  const multiParagraphPasteRef = useRef(onMultiParagraphPaste);
+  multiParagraphPasteRef.current = onMultiParagraphPaste;
+  const pasteImageFileRef = useRef(onPasteImageFile);
+  pasteImageFileRef.current = onPasteImageFile;
+  const autoFocusedRef = useRef(false);
+  const mod = useMemo(() => modKeyLabel(), []);
 
   const emitChange = useCallback(
     (html: string) => {
@@ -83,6 +131,26 @@ export function RichTextEditor({
       onChange(next);
     },
     [onChange],
+  );
+
+  const shortcuts = useMemo(
+    () =>
+      Extension.create({
+        name: 'newsRichTextShortcuts',
+        addKeyboardShortcuts() {
+          return {
+            'Mod-k': () => {
+              openLinkDialogRef.current();
+              return true;
+            },
+            'Mod-/': () => {
+              slashMenuRef.current?.();
+              return Boolean(slashMenuRef.current);
+            },
+          };
+        },
+      }),
+    [],
   );
 
   const editor = useEditor({
@@ -100,6 +168,11 @@ export function RichTextEditor({
         openOnClick: false,
         autolink: true,
         linkOnPaste: true,
+        shouldAutoLink: (url) => /^https?:\/\//i.test(url) || /^mailto:/i.test(url),
+        isAllowedUri: (url) => {
+          if (/^https?:\/\/chisto\.mk\/?$/i.test(url)) return false;
+          return normalizeLinkUrl(url) !== null;
+        },
         HTMLAttributes: {
           rel: 'noopener noreferrer',
         },
@@ -107,7 +180,79 @@ export function RichTextEditor({
       Placeholder.configure({
         placeholder: placeholder ?? t('form.paragraphPlaceholder'),
       }),
+      shortcuts,
     ],
+    editorProps: {
+      // Strip Word/Google Docs markup down to the shared inline allowlist.
+      transformPastedHTML: (html) => sanitizePastedInlineHtml(html),
+      handleKeyDown: (_view, event) => {
+        const ed = editorRef.current;
+        if (!ed || disabled) return false;
+
+        if (
+          event.key === '/' &&
+          !event.metaKey &&
+          !event.ctrlKey &&
+          slashMenuRef.current &&
+          ed.isEmpty
+        ) {
+          event.preventDefault();
+          slashMenuRef.current();
+          return true;
+        }
+
+        const { $from, empty } = ed.state.selection;
+        const atStart = empty && $from.parentOffset === 0;
+        const atEnd = empty && $from.parentOffset === $from.parent.content.size;
+
+        if (event.key === 'Enter' && !event.shiftKey) {
+          const modEnter = event.metaKey || event.ctrlKey;
+          if ((atEnd || modEnter) && createBlockAfterRef.current) {
+            event.preventDefault();
+            createBlockAfterRef.current();
+            return true;
+          }
+        }
+
+        if (event.key === 'Backspace' && atStart && mergeWithPreviousRef.current) {
+          event.preventDefault();
+          mergeWithPreviousRef.current();
+          return true;
+        }
+
+        return false;
+      },
+      handlePaste: (_view, event) => {
+        const ed = editorRef.current;
+        if (!ed) return false;
+
+        const clipboard = event.clipboardData;
+        if (!clipboard) return false;
+
+        const items = clipboard.items;
+        if (items && pasteImageFileRef.current) {
+          for (const item of Array.from(items)) {
+            if (!item.type.startsWith('image/')) continue;
+            const file = item.getAsFile();
+            if (file && pasteImageFileRef.current(file)) {
+              event.preventDefault();
+              return true;
+            }
+          }
+        }
+
+        if (ed.isEmpty && multiParagraphPasteRef.current) {
+          const html = clipboard.getData('text/html');
+          const plain = clipboard.getData('text/plain');
+          if (multiParagraphPasteRef.current({ html, plain })) {
+            event.preventDefault();
+            return true;
+          }
+        }
+
+        return false;
+      },
+    },
     content: initialContent(value),
     editable: !disabled,
     onUpdate: ({ editor: ed }) => {
@@ -115,6 +260,9 @@ export function RichTextEditor({
       emitChange(ed.getHTML());
     },
   });
+
+  const editorRef = useRef(editor);
+  editorRef.current = editor;
 
   useEffect(() => {
     if (!editor) return;
@@ -124,6 +272,17 @@ export function RichTextEditor({
     });
     return () => cancelAnimationFrame(frame);
   }, [editor]);
+
+  useEffect(() => {
+    if (!autoFocus) {
+      autoFocusedRef.current = false;
+      return;
+    }
+    if (!editor || autoFocusedRef.current) return;
+    autoFocusedRef.current = true;
+    editor.commands.focus('end');
+    onAutoFocused?.();
+  }, [autoFocus, editor, onAutoFocused]);
 
   useEffect(() => {
     if (!editor) return;
@@ -226,6 +385,8 @@ export function RichTextEditor({
     setLinkOpen(true);
   }, [editor]);
 
+  openLinkDialogRef.current = openLinkDialog;
+
   const closeLinkDialog = useCallback(() => {
     setLinkOpen(false);
     setLinkSnapshot(null);
@@ -238,6 +399,55 @@ export function RichTextEditor({
   const showCharCount = !isDocument || plainLength > 8_000;
   const showInlineToolbar = !disabled && !usesCentralToolbar;
 
+  const bubbleButtons = (
+    <>
+      <button
+        type="button"
+        className={`${styles.bubbleButton} ${editor.isActive('bold') ? styles.bubbleButtonActive : ''}`}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        aria-label={t('form.bold')}
+        aria-pressed={editor.isActive('bold')}
+        title={`${t('form.bold')} · ${mod}B`}
+      >
+        B
+      </button>
+      <button
+        type="button"
+        className={`${styles.bubbleButton} ${editor.isActive('italic') ? styles.bubbleButtonActive : ''}`}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        aria-label={t('form.italic')}
+        aria-pressed={editor.isActive('italic')}
+        title={`${t('form.italic')} · ${mod}I`}
+      >
+        <span className={styles.bubbleItalic}>I</span>
+      </button>
+      <button
+        type="button"
+        className={`${styles.bubbleButton} ${editor.isActive('underline') ? styles.bubbleButtonActive : ''}`}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        aria-label={t('form.underline')}
+        aria-pressed={editor.isActive('underline')}
+        title={`${t('form.underline')} · ${mod}U`}
+      >
+        <span className={styles.bubbleUnderline}>U</span>
+      </button>
+      <span className={styles.bubbleDivider} aria-hidden />
+      <button
+        type="button"
+        className={`${styles.bubbleButton} ${editor.isActive('link') ? styles.bubbleButtonActive : ''}`}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={openLinkDialog}
+        aria-label={t('form.insertLink')}
+        title={`${t('form.insertLink')} · ${mod}K`}
+      >
+        {t('form.link')}
+      </button>
+    </>
+  );
+
   return (
     <div className={isDocument ? `${styles.richTextEditor} ${styles.richTextEditorDocument}` : styles.richTextEditor}>
       {showInlineToolbar ? (
@@ -248,6 +458,7 @@ export function RichTextEditor({
             onClick={() => editor.chain().focus().toggleBold().run()}
             aria-label={t('form.bold')}
             aria-pressed={editor.isActive('bold')}
+            title={`${t('form.bold')} · ${mod}B`}
           >
             B
           </button>
@@ -257,6 +468,7 @@ export function RichTextEditor({
             onClick={() => editor.chain().focus().toggleItalic().run()}
             aria-label={t('form.italic')}
             aria-pressed={editor.isActive('italic')}
+            title={`${t('form.italic')} · ${mod}I`}
           >
             I
           </button>
@@ -266,6 +478,7 @@ export function RichTextEditor({
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             aria-label={t('form.underline')}
             aria-pressed={editor.isActive('underline')}
+            title={`${t('form.underline')} · ${mod}U`}
           >
             U
           </button>
@@ -275,6 +488,7 @@ export function RichTextEditor({
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             aria-label={t('form.bulletList')}
             aria-pressed={editor.isActive('bulletList')}
+            title={t('form.bulletList')}
           >
             •
           </button>
@@ -284,6 +498,7 @@ export function RichTextEditor({
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             aria-label={t('form.numberedList')}
             aria-pressed={editor.isActive('orderedList')}
+            title={t('form.numberedList')}
           >
             1.
           </button>
@@ -292,13 +507,30 @@ export function RichTextEditor({
             className={`${styles.toolbarButton} ${editor.isActive('link') ? styles.toolbarButtonActive : ''}`}
             onClick={openLinkDialog}
             aria-label={t('form.insertLink')}
+            title={`${t('form.insertLink')} · ${mod}K`}
           >
             {t('form.link')}
           </button>
         </div>
       ) : null}
 
-      <div className={isDocument ? `${styles.editorSurface} ${styles.editorSurfaceDocument}` : styles.editorSurface}>
+      {!disabled ? (
+        <BubbleMenu
+          editor={editor}
+          tippyOptions={{ duration: 120, placement: 'top' }}
+          className={styles.bubbleMenu}
+        >
+          {bubbleButtons}
+        </BubbleMenu>
+      ) : null}
+
+      <div
+        className={
+          isDocument
+            ? `${styles.editorSurface} ${styles.editorSurfaceDocument} news-prose`
+            : styles.editorSurface
+        }
+      >
         <EditorContent editor={editor} />
       </div>
 
@@ -310,14 +542,12 @@ export function RichTextEditor({
         </div>
       ) : null}
 
-      {showInlineToolbar ? (
-        <RichTextLinkDialog
-          editor={editor}
-          snapshot={linkSnapshot}
-          open={linkOpen}
-          onClose={closeLinkDialog}
-        />
-      ) : null}
+      <RichTextLinkDialog
+        editor={editor}
+        snapshot={linkSnapshot}
+        open={linkOpen}
+        onClose={closeLinkDialog}
+      />
     </div>
   );
 }

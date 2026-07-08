@@ -206,6 +206,19 @@
   --text-secondary: #4c6361;
   --text-on-dark: #ffffff;
 
+  /**
+   * News prose scale — mirrors packages/news-content render defaults so the
+   * editor canvas, admin preview, and landing article share one type system.
+   */
+  --news-prose-color: #374151;
+  --news-prose-heading: #111827;
+  --news-prose-link: #2563eb;
+  --news-prose-link-hover: #1d4ed8;
+  --news-prose-font-size: 1rem;
+  --news-prose-line-height: 1.625;
+  --news-prose-h2-size: clamp(1.375rem, 1.2rem + 0.9vw, 1.625rem);
+  --news-prose-h3-size: clamp(1.1875rem, 1.1rem + 0.5vw, 1.3125rem);
+
   --font-size-xs: 0.6875rem;
   --font-size-sm: 0.75rem;
   --font-size-base: 0.8125rem;

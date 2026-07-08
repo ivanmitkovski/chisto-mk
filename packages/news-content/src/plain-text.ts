@@ -33,6 +33,14 @@ export function plainTextFromBlocks(blocks: NewsBodyBlock[]): string {
           if (item.caption?.trim()) parts.push(item.caption.trim());
         }
         break;
+      case 'quote':
+        parts.push(block.text.trim());
+        if (block.attribution?.trim()) parts.push(block.attribution.trim());
+        break;
+      case 'embed':
+        break;
+      case 'divider':
+        break;
       default:
         break;
     }

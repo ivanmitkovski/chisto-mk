@@ -17,6 +17,10 @@
 }
 
 /* Document mode — soft Apple-like block chrome */
+.rowWrapDocument[data-block-type='heading'] + .rowWrapDocument[data-block-type='paragraph'] .rowDocument {
+  padding-top: 0;
+}
+
 .rowWrapDocument {
   margin: 0.125rem 0;
   padding: 0.125rem 0;
@@ -25,7 +29,7 @@
 .rowDocument {
   position: relative;
   z-index: 1;
-  grid-template-columns: 1.5rem minmax(0, 1fr) 1.75rem;
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto;
   gap: 0.25rem;
   align-items: start;
   margin: 0 -0.375rem;
@@ -197,6 +201,54 @@
   min-height: 0;
 }
 
+/* Right-side action rail: transform, duplicate, remove — revealed on hover/focus */
+.rowActions {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.125rem;
+}
+
+.rowActionBtn {
+  align-self: start;
+  margin-top: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full, 999px);
+  background: transparent;
+  color: color-mix(in srgb, var(--text-secondary) 75%, transparent);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.rowActionBtn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  color: var(--text-primary);
+}
+
+.rowActionBtn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.rowActionBtn:disabled {
+  cursor: default;
+  opacity: 0.25;
+}
+
+.rowWrapDocument:hover .rowActionBtn,
+.rowWrapDocument:focus-within .rowActionBtn {
+  opacity: 1;
+}
+
 .removeBtn {
   align-self: start;
   margin-top: 0.25rem;
@@ -315,6 +367,7 @@
   .rowWrap,
   .dragHandle,
   .dragHandleDocument,
+  .rowActionBtn,
   .removeBtnDocument,
   .rowDocument,
   .root[data-dragging-active='true'] .rowWrap:not([data-dragging]),
@@ -322,4 +375,9 @@
     transition: none;
     animation: none;
   }
+}
+
+/* Anchor for the slash-command palette under a paragraph block */
+.slashMenuAnchor {
+  position: relative;
 }

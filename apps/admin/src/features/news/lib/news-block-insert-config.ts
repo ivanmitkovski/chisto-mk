@@ -7,6 +7,9 @@ import {
   createImageBlock,
   createListBlock,
   createParagraphBlock,
+  createQuoteBlock,
+  createDividerBlock,
+  createEmbedBlock,
   createVideoBlock,
 } from './news-block-factory';
 
@@ -14,6 +17,9 @@ export type BlockInsertType =
   | 'paragraph'
   | 'heading'
   | 'list'
+  | 'quote'
+  | 'divider'
+  | 'embed'
   | 'image'
   | 'gallery'
   | 'video'
@@ -61,6 +67,27 @@ export const BLOCK_INSERT_OPTIONS: BlockInsertOption[] = [
     tone: 'text',
     labelKey: 'form.addList',
     descriptionKey: 'insert.list',
+  },
+  {
+    type: 'quote',
+    icon: 'document-text',
+    tone: 'text',
+    labelKey: 'form.addQuote',
+    descriptionKey: 'insert.quote',
+  },
+  {
+    type: 'divider',
+    icon: 'minus',
+    tone: 'text',
+    labelKey: 'form.addDivider',
+    descriptionKey: 'insert.divider',
+  },
+  {
+    type: 'embed',
+    icon: 'video',
+    tone: 'advanced',
+    labelKey: 'form.addEmbed',
+    descriptionKey: 'insert.embed',
   },
   {
     type: 'gallery',
@@ -123,6 +150,7 @@ export const MEDIA_INSERT_OPTIONS: MediaInsertOption[] = [
 export const EMPTY_BODY_QUICK_INSERT: BlockInsertType[] = [
   'paragraph',
   'heading',
+  'quote',
   'image',
   'gallery',
 ];
@@ -135,6 +163,12 @@ export function createBlockFromType(type: BlockInsertType): NewsBodyBlock {
       return createHeadingBlock();
     case 'list':
       return createListBlock();
+    case 'quote':
+      return createQuoteBlock();
+    case 'divider':
+      return createDividerBlock();
+    case 'embed':
+      return createEmbedBlock();
     case 'image':
       return createImageBlock();
     case 'gallery':
@@ -156,5 +190,5 @@ export function blockOptionByType(type: BlockInsertType): BlockInsertOption {
 
 /** Content blocks shown in the toolbar insert menu (media uploads are separate). */
 export const TOOLBAR_BLOCK_INSERT_OPTIONS = BLOCK_INSERT_OPTIONS.filter(
-  (option) => option.type !== 'image' && option.type !== 'video',
+  (option) => option.type !== 'image' && option.type !== 'video' && option.type !== 'html',
 );

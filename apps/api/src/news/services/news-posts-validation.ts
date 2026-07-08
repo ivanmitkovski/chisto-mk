@@ -1,7 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
 import type { NewsMediaKind } from '../../prisma-client';
 import {
+  embedProviderFromUrl,
   htmlBlockHasContent,
+  isAllowedEmbedUrl,
   MAX_GALLERY_CAPTION_LENGTH,
   MAX_GALLERY_ITEMS,
   MIN_GALLERY_ITEMS,
@@ -18,6 +20,8 @@ const MAX_PARAGRAPH_LENGTH = 10_000;
 const MAX_PARAGRAPH_HTML_LENGTH = 15_000;
 const MAX_HTML_BLOCK_LENGTH = 20_000;
 const MAX_HEADING_LENGTH = 200;
+const MAX_QUOTE_LENGTH = 2_000;
+const MAX_QUOTE_ATTRIBUTION_LENGTH = 200;
 const MAX_LIST_ITEMS = 20;
 const MAX_LIST_ITEM_LENGTH = 500;
 const MAX_CAPTION_LENGTH = 500;
@@ -173,6 +177,59 @@ function assertBodyBlock(block: NewsBodyBlock, index: number): void {
       }
     }
     return;
+  }
+
+  if (block.type === 'quote') {
+    const text = block.text?.trim() ?? '';
+    if (!text) {
+      throw new BadRequestException({
+        code: 'NEWS_EMPTY_QUOTE',
+        message: `Body block ${index + 1} quote text is required`,
+      });
+    }
+    if (text.length > MAX_QUOTE_LENGTH) {
+      throw new BadRequestException({
+        code: 'NEWS_QUOTE_TOO_LONG',
+        message: `Body block ${index + 1} quote exceeds maximum length`,
+      });
+    }
+    const attribution = block.attribution?.trim() ?? '';
+    if (attribution.length > MAX_QUOTE_ATTRIBUTION_LENGTH) {
+      throw new BadRequestException({
+        code: 'NEWS_QUOTE_ATTRIBUTION_TOO_LONG',
+        message: `Body block ${index + 1} quote attribution exceeds maximum length`,
+      });
+    }
+    return;
+  }
+
+  if (block.type === 'divider') {
+    return;
+  }
+
+  if (block.type === 'embed') {
+    const url = block.url?.trim() ?? '';
+    if (!url || !isAllowedEmbedUrl(url)) {
+      throw new BadRequestException({
+        code: 'NEWS_INVALID_EMBED_URL',
+        message: `Body block ${index + 1} embed URL is invalid`,
+      });
+    }
+    const provider = embedProviderFromUrl(url);
+    if (!provider || block.provider !== provider) {
+      throw new BadRequestException({
+        code: 'NEWS_INVALID_EMBED_PROVIDER',
+        message: `Body block ${index + 1} embed provider does not match URL`,
+      });
+    }
+    return;
+  }
+
+  if (block.type !== 'image' && block.type !== 'video') {
+    throw new BadRequestException({
+      code: 'NEWS_UNKNOWN_BLOCK_TYPE',
+      message: `Body block ${index + 1} has an unsupported type`,
+    });
   }
 
   if (!block.mediaId?.trim()) {
@@ -411,6 +468,10 @@ export function assertMediaIntegrity(
         continue;
       }
 
+      if (block.type === 'quote' || block.type === 'divider' || block.type === 'embed') {
+        continue;
+      }
+
       const kind = mediaById.get(block.mediaId);
       if (!kind) {
         throw new BadRequestException({
@@ -480,7 +541,15 @@ export function stripMediaIdFromTranslations(
           };
         })
         .filter((block) => {
-          if (block.type === 'paragraph' || block.type === 'html' || block.type === 'heading' || block.type === 'list') {
+          if (
+            block.type === 'paragraph' ||
+            block.type === 'html' ||
+            block.type === 'heading' ||
+            block.type === 'list' ||
+            block.type === 'quote' ||
+            block.type === 'divider' ||
+            block.type === 'embed'
+          ) {
             return true;
           }
           if (block.type === 'gallery') {

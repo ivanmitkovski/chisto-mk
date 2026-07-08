@@ -34,6 +34,10 @@ type NewsBlockInsertMenuPanelProps = {
   panelRef: React.RefObject<HTMLDivElement | null>;
   className?: string;
   align?: 'start' | 'center' | 'end';
+  filterQuery?: string | undefined;
+  filterPlaceholder?: string | undefined;
+  emptyLabel?: string | undefined;
+  onFilterChange?: ((query: string) => void) | undefined;
   onClose?: () => void;
 };
 
@@ -72,6 +76,10 @@ export function NewsBlockInsertMenuPanel({
   panelRef,
   className,
   align = 'start',
+  filterQuery,
+  filterPlaceholder,
+  emptyLabel,
+  onFilterChange,
   onClose,
 }: NewsBlockInsertMenuPanelProps) {
   const reducedMotion = useReducedMotion();
@@ -142,6 +150,21 @@ export function NewsBlockInsertMenuPanel({
             <div className={styles.scrollFadeTop} aria-hidden />
             <div className={styles.scrollFadeBottom} aria-hidden />
             <div ref={scrollRef} className={styles.panelScroll}>
+              {onFilterChange ? (
+                <div className={styles.filterRow}>
+                  <input
+                    type="search"
+                    className={styles.filterInput}
+                    value={filterQuery ?? ''}
+                    placeholder={filterPlaceholder}
+                    aria-label={filterPlaceholder}
+                    onChange={(event) => onFilterChange(event.target.value)}
+                  />
+                </div>
+              ) : null}
+              {sections.length === 0 && emptyLabel ? (
+                <p className={styles.empty}>{emptyLabel}</p>
+              ) : null}
               {sections.map((section, sectionIndex) => (
                 <div key={section.id} className={styles.section}>
                   <p className={styles.sectionLabel}>{section.label}</p>
