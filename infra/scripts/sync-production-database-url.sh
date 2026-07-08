@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Sync DATABASE_URL in chisto/production/api from the RDS-managed master password secret.
-# Use after RDS automatic password rotation or when ECS tasks fail with P1000 / 28P01.
+# Normally automated by the chisto-prod-rds-password-sync Lambda (EventBridge rotation
+# event + 15-minute reconciliation). Use this script for manual recovery when ECS tasks
+# fail with P1000 / 28P01.
 set -euo pipefail
 
 REGION="${AWS_REGION:-eu-central-1}"

@@ -5,3 +5,4 @@ export * from './types';
 export * from './plain-text';
 export * from './migrate-blocks';
 export * from './sanitize';
+export * from './import';

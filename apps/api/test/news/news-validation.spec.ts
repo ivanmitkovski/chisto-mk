@@ -240,6 +240,45 @@ describe('news-posts-validation', () => {
     };
     expect(() => assertValidTranslations(draft, false)).not.toThrow();
   });
+
+  it('accepts quote, divider, and embed blocks on publish', () => {
+    const translations: NewsTranslations = {
+      en: {
+        title: 'T',
+        excerpt: 'E',
+        body: [
+          { type: 'quote', text: 'A wise line', attribution: 'Author' },
+          { type: 'divider' },
+          {
+            type: 'embed',
+            provider: 'youtube',
+            url: 'https://www.youtube-nocookie.com/embed/abc123',
+          },
+        ],
+      },
+      mk: { title: 'T', excerpt: 'E', body: paragraphsToBody(['p']) },
+      sq: { title: 'T', excerpt: 'E', body: paragraphsToBody(['p']) },
+    };
+    expect(() => assertValidTranslations(translations, true)).not.toThrow();
+  });
+
+  it('rejects embed blocks with mismatched provider', () => {
+    const translations: NewsTranslations = {
+      ...completeTranslations(),
+      en: {
+        title: 'T',
+        excerpt: 'E',
+        body: [
+          {
+            type: 'embed',
+            provider: 'vimeo',
+            url: 'https://www.youtube-nocookie.com/embed/abc123',
+          },
+        ],
+      },
+    };
+    expect(() => assertValidTranslations(translations, true)).toThrow(BadRequestException);
+  });
 });
 
 describe('news translations shape', () => {

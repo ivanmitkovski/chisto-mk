@@ -17,7 +17,6 @@ type NewsGalleryBlockEditorProps = {
   media: NewsMediaDto[];
   readOnly: boolean;
   busy?: boolean | undefined;
-  variant?: 'classic' | 'document' | undefined;
   uploadBusySlotIndex?: number | null | undefined;
   uploadError?: string | null | undefined;
   onChange: (block: GalleryBlock) => void;
@@ -32,7 +31,6 @@ type GallerySlotProps = {
   attached: NewsMediaDto | undefined;
   readOnly: boolean;
   busy: boolean;
-  isDocument: boolean;
   uploadBusy: boolean;
   inlineImages: NewsMediaDto[];
   onUpdate: (patch: Partial<GalleryBlock['items'][number]>) => void;
@@ -51,7 +49,6 @@ function GallerySlot({
   attached,
   readOnly,
   busy,
-  isDocument,
   uploadBusy,
   inlineImages,
   onUpdate,
@@ -95,7 +92,7 @@ function GallerySlot({
 
   return (
     <li
-      className={[styles.slide, isDocument ? styles.slideDocument : ''].filter(Boolean).join(' ')}
+      className={`${styles.slide} ${styles.slideDocument}`}
       aria-label={t('form.gallerySlideAria', { index: index + 1, total })}
     >
       <div
@@ -213,11 +210,11 @@ function GallerySlot({
         />
       ) : null}
 
-      <label className={isDocument ? styles.captionDocument : styles.captionField}>
+      <label className={styles.captionDocument}>
         <span className={styles.captionLabel}>{t('form.caption')}</span>
         <input
           type="text"
-          className={isDocument ? styles.captionInputDocument : styles.captionInput}
+          className={styles.captionInputDocument}
           value={item.caption ?? ''}
           onChange={(event) => onUpdate({ caption: event.target.value })}
           disabled={readOnly || busy}
@@ -234,7 +231,6 @@ export function NewsGalleryBlockEditor({
   media,
   readOnly,
   busy = false,
-  variant = 'classic',
   uploadBusySlotIndex = null,
   uploadError = null,
   onChange,
@@ -243,7 +239,6 @@ export function NewsGalleryBlockEditor({
 }: NewsGalleryBlockEditorProps) {
   const t = useTranslations('news');
   const guidance = useNewsMediaGuidanceText();
-  const isDocument = variant === 'document';
   const inlineImages = media.filter((m) => m.kind === 'inline_image');
   const filledCount = block.items.filter((item) => item.mediaId.trim()).length;
   const atMax = block.items.length >= MAX_GALLERY_ITEMS;
@@ -272,9 +267,7 @@ export function NewsGalleryBlockEditor({
     onChange({ ...block, items: [...block.items, { mediaId: '' }] });
   }
 
-  const rootClass = [styles.root, isDocument ? styles.rootDocument : styles.rootClassic]
-    .filter(Boolean)
-    .join(' ');
+  const rootClass = `${styles.root} ${styles.rootDocument}`;
 
   return (
     <div className={rootClass}>
@@ -312,7 +305,6 @@ export function NewsGalleryBlockEditor({
               attached={attached}
               readOnly={readOnly}
               busy={busy}
-              isDocument={isDocument}
               uploadBusy={uploadBusySlotIndex === index}
               inlineImages={inlineImages}
               onUpdate={(patch) => updateItem(index, patch)}

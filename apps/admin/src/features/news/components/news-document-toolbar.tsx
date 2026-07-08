@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { modKeyLabel } from '@/components/ui/rich-text-editor';
 import { Icon } from '@/components/ui';
 import { RichTextLinkDialog } from '@/components/ui/rich-text-editor/rich-text-link-dialog';
 import type { LinkSelectionSnapshot } from '@/lib/rich-text/apply-editor-link';
@@ -32,6 +33,8 @@ type NewsDocumentToolbarProps = {
   onUploadCover: (file: File) => void;
   onUploadInlineAt: (file: File, kind: 'inline_image' | 'inline_video', insertIndex: number) => void;
   onBlockLimit: () => void;
+  onOpenShortcuts?: (() => void) | undefined;
+  onPasteBody?: (() => void) | undefined;
 };
 
 export function NewsDocumentToolbar({
@@ -42,9 +45,12 @@ export function NewsDocumentToolbar({
   onUploadCover,
   onUploadInlineAt,
   onBlockLimit,
+  onOpenShortcuts,
+  onPasteBody,
 }: NewsDocumentToolbarProps) {
   const t = useTranslations('news');
   const guidance = useNewsMediaGuidanceText();
+  const mod = useMemo(() => modKeyLabel(), []);
   const {
     activeEditor,
     toolbarRevision,
@@ -208,6 +214,7 @@ export function NewsDocumentToolbar({
           className={activeEditor?.isActive('bold') ? `${styles.button} ${styles.buttonActive}` : styles.button}
           disabled={!canFormat}
           aria-label={t('form.bold')}
+          title={`${t('form.bold')} · ${mod}B`}
           aria-pressed={activeEditor?.isActive('bold') ?? false}
           onClick={() => runCommand(() => activeEditor?.chain().focus().toggleBold().run())}
         >
@@ -218,6 +225,7 @@ export function NewsDocumentToolbar({
           className={activeEditor?.isActive('italic') ? `${styles.button} ${styles.buttonActive}` : styles.button}
           disabled={!canFormat}
           aria-label={t('form.italic')}
+          title={`${t('form.italic')} · ${mod}I`}
           aria-pressed={activeEditor?.isActive('italic') ?? false}
           onClick={() => runCommand(() => activeEditor?.chain().focus().toggleItalic().run())}
         >
@@ -228,6 +236,7 @@ export function NewsDocumentToolbar({
           className={activeEditor?.isActive('underline') ? `${styles.button} ${styles.buttonActive}` : styles.button}
           disabled={!canFormat}
           aria-label={t('form.underline')}
+          title={`${t('form.underline')} · ${mod}U`}
           aria-pressed={activeEditor?.isActive('underline') ?? false}
           onClick={() => runCommand(() => activeEditor?.chain().focus().toggleUnderline().run())}
         >
@@ -258,6 +267,7 @@ export function NewsDocumentToolbar({
           className={activeEditor?.isActive('link') ? `${styles.button} ${styles.buttonActive}` : styles.button}
           disabled={!canFormat}
           aria-label={t('form.insertLink')}
+          title={`${t('form.insertLink')} · ${mod}K`}
           onClick={openLinkDialog}
         >
           {t('form.link')}
@@ -292,6 +302,32 @@ export function NewsDocumentToolbar({
           onClose={() => setInsertOpen(false)}
         />
       </div>
+
+      {onPasteBody ? (
+        <button
+          type="button"
+          className={styles.button}
+          disabled={busy || readOnly}
+          aria-label={t('paste.toolbarAction')}
+          title={`${t('paste.toolbarAction')} · ${mod}⇧B`}
+          onClick={onPasteBody}
+        >
+          {t('paste.toolbarLabel')}
+        </button>
+      ) : null}
+
+      {onOpenShortcuts ? (
+        <button
+          type="button"
+          className={styles.button}
+          disabled={busy}
+          aria-label={t('shortcuts.openHelp')}
+          title={t('shortcuts.openHelp')}
+          onClick={onOpenShortcuts}
+        >
+          ?
+        </button>
+      ) : null}
 
       <span className={styles.status}>
         {canFormat ? t('toolbar.formattingActive') : t('toolbar.formattingHint')}

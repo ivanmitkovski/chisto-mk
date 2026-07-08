@@ -13,6 +13,13 @@ export type SnackState = {
   title: string;
   message: string;
   id?: string;
+  /** Optional inline action (e.g. Undo); pressing it also dismisses the snack. */
+  action?: {
+    label: string;
+    onAction: () => void;
+  };
+  /** Override auto-dismiss delay (ms) — e.g. longer for undoable actions. */
+  durationMs?: number;
 };
 
 type SnackProps = {
@@ -49,7 +56,7 @@ export function Snack({ snack, onClose, durationMs = 3200 }: SnackProps) {
 
     const timeoutId = window.setTimeout(() => {
       onClose();
-    }, durationMs);
+    }, snack.durationMs ?? durationMs);
 
     return () => window.clearTimeout(timeoutId);
   }, [durationMs, onClose, snack]);
@@ -83,9 +90,28 @@ export function Snack({ snack, onClose, durationMs = 3200 }: SnackProps) {
                   <p className={styles.message}>{snack.message}</p>
                 ) : null}
               </div>
-              <button type="button" className={styles.closeButton} onClick={onClose} aria-label={t('dismissNotification')}>
-                <Icon name="x" size={16} />
-              </button>
+              <div className={styles.actions}>
+                {snack.action ? (
+                  <button
+                    type="button"
+                    className={styles.actionButton}
+                    onClick={() => {
+                      snack.action?.onAction();
+                      onClose();
+                    }}
+                  >
+                    {snack.action.label}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className={styles.closeButton}
+                  onClick={onClose}
+                  aria-label={t('dismissNotification')}
+                >
+                  <Icon name="x" size={16} />
+                </button>
+              </div>
             </div>
           </motion.section>
         ) : null}

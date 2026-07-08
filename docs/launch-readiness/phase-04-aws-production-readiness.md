@@ -29,6 +29,8 @@ GitHub Actions `api-deploy.yml` on `main`. See [GITHUB_ACTIONS.md](../../infra/t
 
 Post-deploy: `GET https://api.chisto.mk/health/ready` returns `status: ok`, `redis: ok`, `s3: ok`.
 
+RDS master password rotation is automated: `chisto-prod-rds-password-sync` Lambda syncs `DATABASE_URL` on `RotationSucceeded` and reconciles every 15 minutes. Manual fallback: `infra/scripts/sync-production-database-url.sh`.
+
 ## Session and realtime prerequisites
 
 Before scaling API `desiredCount` ≥ 2:

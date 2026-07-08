@@ -14,7 +14,6 @@ type NewsListBlockEditorProps = {
   block: ListBlock;
   readOnly: boolean;
   busy: boolean;
-  variant?: 'classic' | 'document';
   onChange: (block: ListBlock) => void;
 };
 
@@ -26,12 +25,10 @@ export function NewsListBlockEditor({
   block,
   readOnly,
   busy,
-  variant = 'classic',
   onChange,
 }: NewsListBlockEditorProps) {
   const t = useTranslations('news');
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  const isDocument = variant === 'document';
 
   function updateItem(itemIndex: number, value: string) {
     const items = [...block.items];
@@ -55,6 +52,27 @@ export function NewsListBlockEditor({
     requestAnimationFrame(() => inputRefs.current[insertAt]?.focus());
   }
 
+  /** Pasting multi-line text splits into one list item per line. */
+  function handleItemPaste(event: React.ClipboardEvent<HTMLInputElement>, itemIndex: number) {
+    if (readOnly) return;
+    const text = event.clipboardData.getData('text/plain');
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim())
+      .filter(Boolean);
+    if (lines.length <= 1) return;
+    event.preventDefault();
+    const items = [...block.items];
+    const current = items[itemIndex] ?? '';
+    items[itemIndex] = current ? `${current}${lines[0]}` : lines[0]!;
+    const rest = lines.slice(1);
+    items.splice(itemIndex + 1, 0, ...rest);
+    const capped = items.slice(0, MAX_LIST_ITEMS);
+    onChange({ ...block, items: capped });
+    const focusIndex = Math.min(itemIndex + rest.length, capped.length - 1);
+    requestAnimationFrame(() => inputRefs.current[focusIndex]?.focus());
+  }
+
   function handleItemKeyDown(
     event: KeyboardEvent<HTMLInputElement>,
     itemIndex: number,
@@ -75,14 +93,12 @@ export function NewsListBlockEditor({
     }
   }
 
-  const rootClass = [styles.root, isDocument ? styles.rootDocument : styles.rootClassic]
-    .filter(Boolean)
-    .join(' ');
+  const rootClass = `${styles.root} ${styles.rootDocument}`;
 
   return (
     <div className={rootClass}>
       {!readOnly ? (
-        <div className={isDocument ? styles.typeRowDocument : styles.typeRow} role="group" aria-label={t('form.listTypeAria')}>
+        <div className={styles.typeRowDocument} role="group" aria-label={t('form.listTypeAria')}>
           <div className={styles.typeToggle}>
             <Button
               type="button"
@@ -123,10 +139,11 @@ export function NewsListBlockEditor({
                 inputRefs.current[itemIndex] = node;
               }}
               type="text"
-              className={isDocument ? styles.itemInputDocument : styles.itemInputClassic}
+              className={styles.itemInputDocument}
               value={item}
               onChange={(e) => updateItem(itemIndex, e.target.value)}
               onKeyDown={(e) => handleItemKeyDown(e, itemIndex, item)}
+              onPaste={(e) => handleItemPaste(e, itemIndex)}
               disabled={readOnly || busy}
               maxLength={500}
               placeholder={t('form.listItemPlaceholder')}

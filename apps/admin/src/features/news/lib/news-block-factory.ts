@@ -1,6 +1,6 @@
 import { createBlockId, type NewsBodyBlock } from '@chisto/news-content';
 
-/** Stable across SSR and client hydration — API does not persist block ids. */
+/** Stable ids assigned on load; persisted in translations.body JSON (ADR-1). */
 function createStableBlockId(index: number): string {
   return `block-${index}`;
 }
@@ -31,6 +31,18 @@ export function createVideoBlock(): NewsBodyBlock {
 
 export function createGalleryBlock(): NewsBodyBlock {
   return { id: createBlockId(), type: 'gallery', items: [{ mediaId: '' }, { mediaId: '' }] };
+}
+
+export function createQuoteBlock(text = ''): NewsBodyBlock {
+  return { id: createBlockId(), type: 'quote', text };
+}
+
+export function createDividerBlock(): NewsBodyBlock {
+  return { id: createBlockId(), type: 'divider' };
+}
+
+export function createEmbedBlock(url = '', provider: 'youtube' | 'vimeo' = 'youtube'): NewsBodyBlock {
+  return { id: createBlockId(), type: 'embed', provider, url };
 }
 
 export function ensureBlocksHaveIds(blocks: NewsBodyBlock[]): NewsBodyBlock[] {

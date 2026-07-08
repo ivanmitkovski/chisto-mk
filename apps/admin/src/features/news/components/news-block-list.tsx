@@ -25,7 +25,12 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS, getEventCoordinates } from '@dnd-kit/utilities';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  clipboardToNewsBlocks,
+  isBodyEmptyOrSkeleton,
+  type ClipboardImportResult,
+} from '@chisto/news-content';
+import { useCallback, useEffect, useMemo, useRef, useState, memo } from 'react';
 import { Icon, useToast } from '@/components/ui';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 import { useNewsBlockDragAnnouncements } from '../hooks/use-news-block-drag-announcements';
@@ -35,14 +40,44 @@ import {
   setBlockDragPickupContext,
   snapBlockOverlayToPickup,
 } from '../lib/news-block-drag-overlay-modifiers';
-import { createBlockFromType } from '../lib/news-block-insert-config';
+import {
+  createBlockFromType,
+  type BlockInsertType,
+} from '../lib/news-block-insert-config';
+import {
+  duplicateBlockAt,
+  insertImportedBlocksAt,
+  isTransformableBlock,
+  mergeParagraphWithPrevious,
+  paragraphBlocksFromPlainText,
+  removeBlockAt,
+  replaceBlockAt,
+  replaceBlockWithMany,
+  restoreBlockAt,
+  splitHtmlIntoParagraphBlocks,
+  transformBlockAt,
+  type TransformTarget,
+} from '../lib/news-block-operations';
+import { isStructuredImport, readClipboardForImport, type ClipboardImportPayload } from '../lib/news-structured-paste';
+import { recordBlockInsertRecent } from '../lib/news-block-insert-recents';
+import {
+  buildSlashInsertSections,
+  templateBlocksForSlash,
+} from '../lib/news-block-slash-sections';
 import { MAX_BODY_BLOCKS } from '../lib/news-post-policy';
 import { insertBlockIntoBody, NewsBlockInserter } from './news-block-inserter';
+import {
+  NewsBlockInsertMenuPanel,
+  type NewsBlockInsertMenuSection,
+} from './news-block-insert-menu';
 import { NewsBlockInsertStarter } from './news-block-insert-starter';
 import { NewsBlockDragOverlayRow } from './news-block-drag-overlay-row';
 import { NewsBlockDragOverlayPortal } from './news-block-drag-overlay-portal';
 import { NewsBlockRemoveDialog } from './news-block-remove-dialog';
+import { NewsPasteConfirmDialog } from './news-paste-confirm-dialog';
+import { NewsBlockTransformMenu } from './news-block-transform-menu';
 import { NewsBodyBlockEditor } from './news-body-block-editor';
+import type { NewsFormLocale } from '../types';
 import styles from './news-block-list.module.css';
 
 type NewsBlockListProps = {
@@ -51,12 +86,13 @@ type NewsBlockListProps = {
   media: NewsMediaDto[];
   readOnly: boolean;
   actionsDisabled: boolean;
-  documentMode?: boolean;
   uploadingBlockKind?: 'inline_image' | 'inline_video' | null;
   uploadValidationErrors?: Partial<Record<'inline_image' | 'inline_video', string>>;
   onChange: (blocks: NewsBodyBlock[]) => void;
   onUploadForBlock?: (blockIndex: number, file: File, blockType: 'image' | 'video') => void;
   onUploadForGallerySlot?: (blockIndex: number, itemIndex: number, file: File) => void;
+  onPasteImageAt?: (insertIndex: number, file: File) => void;
+  pasteBodyRef?: React.RefObject<((raw: ClipboardImportPayload | null) => Promise<void>) | null>;
   uploadingGallerySlot?: { blockIndex: number; itemIndex: number } | null | undefined;
   blockUploadPreview?: { blockIndex: number; url: string } | null | undefined;
 };
@@ -66,42 +102,72 @@ type SortableRowProps = {
   sortableIds: string[];
   block: NewsBodyBlock;
   index: number;
-  total: number;
   media: NewsMediaDto[];
   readOnly: boolean;
   actionsDisabled: boolean;
   activeIndex: number;
-  documentMode?: boolean;
   uploadingBlockKind?: 'inline_image' | 'inline_video' | null | undefined;
   uploadValidationErrors?: Partial<Record<'inline_image' | 'inline_video', string>> | undefined;
   uploadingGallerySlot?: { blockIndex: number; itemIndex: number } | null | undefined;
   blockUploadPreview?: { blockIndex: number; url: string } | null | undefined;
+  autoFocus: boolean;
+  slashOpen: boolean;
+  slashFilter: string;
+  onSlashFilterChange: (query: string) => void;
+  onAutoFocused: () => void;
+  onSlashMenu: () => void;
+  onSlashClose: () => void;
+  onSlashSelect: (type: BlockInsertType) => void;
+  onSlashTemplate: (templateId: Exclude<import('../lib/news-content-templates').NewsContentTemplateId, 'blank'>) => void;
+  onInsertParagraphAfter: () => void;
+  onCreateBlockAfter: () => void;
+  onMergeWithPrevious: () => void;
+  onMultiParagraphPaste: (raw: { html: string; plain: string }) => boolean;
+  onPasteImageFile: (file: File) => boolean;
   onChange: (block: NewsBodyBlock) => void;
   onRequestRemove: () => void;
+  onDuplicate: () => void;
+  onTransform: (target: TransformTarget) => void;
   onUploadForBlock?: ((file: File) => void) | undefined;
   onUploadForGallerySlot?: ((itemIndex: number, file: File) => void) | undefined;
 };
 
-function SortableBlockRow({
+function SortableBlockRowInner({
   sortableId,
   sortableIds,
   block,
   index,
-  total,
   media,
   readOnly,
   actionsDisabled,
   activeIndex,
-  documentMode = false,
   uploadingBlockKind,
   uploadValidationErrors,
   uploadingGallerySlot,
   blockUploadPreview,
+  autoFocus,
+  slashOpen,
+  slashFilter,
+  onSlashFilterChange,
+  onAutoFocused,
+  onSlashMenu,
+  onSlashClose,
+  onSlashSelect,
+  onSlashTemplate,
+  onInsertParagraphAfter,
+  onCreateBlockAfter,
+  onMergeWithPrevious,
+  onMultiParagraphPaste,
+  onPasteImageFile,
   onChange,
   onRequestRemove,
+  onDuplicate,
+  onTransform,
   onUploadForBlock,
   onUploadForGallerySlot,
 }: SortableRowProps) {
+  const slashPanelRef = useRef<HTMLDivElement>(null);
+  const slashAnchorRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('news');
   const rowRef = useRef<HTMLDivElement>(null);
   const [placeholderHeight, setPlaceholderHeight] = useState<number | undefined>();
@@ -139,6 +205,26 @@ function SortableBlockRow({
         : uploadValidationErrors?.[uploadKind] ?? null;
 
   useEffect(() => {
+    if (!slashOpen) return;
+    function onDocClick(event: MouseEvent) {
+      if (!slashAnchorRef.current?.contains(event.target as Node)) onSlashClose();
+    }
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [onSlashClose, slashOpen]);
+
+  const slashSections = useMemo<NewsBlockInsertMenuSection[]>(
+    () =>
+      buildSlashInsertSections({
+        t,
+        filter: slashFilter,
+        onSelect: onSlashSelect,
+        onTemplate: onSlashTemplate,
+      }),
+    [onSlashSelect, onSlashTemplate, slashFilter, t],
+  );
+
+  useEffect(() => {
     if (isDragging && rowRef.current) {
       setPlaceholderHeight(rowRef.current.offsetHeight);
       return;
@@ -157,16 +243,12 @@ function SortableBlockRow({
     ...(isDragging && placeholderHeight ? { minHeight: placeholderHeight } : {}),
   };
 
-  const rowClass = [
-    styles.row,
-    documentMode ? styles.rowDocument : '',
-    isDragging ? styles.rowDragging : '',
-  ]
+  const rowClass = [styles.row, styles.rowDocument, isDragging ? styles.rowDragging : '']
     .filter(Boolean)
     .join(' ');
   const wrapClass = [
     styles.rowWrap,
-    documentMode ? styles.rowWrapDocument : '',
+    styles.rowWrapDocument,
     dropEdge === 'before' ? styles.rowDropBefore : '',
     dropEdge === 'after' ? styles.rowDropAfter : '',
   ]
@@ -180,13 +262,14 @@ function SortableBlockRow({
       className={wrapClass}
       data-sortable-id={sortableId}
       data-dragging={isDragging || undefined}
+      data-block-type={block.type}
     >
     <div className={rowClass}>
       {!readOnly ? (
         <button
           ref={setActivatorNodeRef}
           type="button"
-          className={documentMode ? styles.dragHandleDocument : styles.dragHandle}
+          className={styles.dragHandleDocument}
           aria-label={t('form.dragBlock')}
           disabled={dragDisabled}
           {...attributes}
@@ -199,20 +282,24 @@ function SortableBlockRow({
         <NewsBodyBlockEditor
           block={block}
           index={index}
-          total={total}
           media={media}
           readOnly={readOnly}
           busy={actionsDisabled}
-          variant="document"
           uploadBusy={blockUploadBusy}
           uploadError={uploadError}
           localPreviewSrc={
             blockUploadPreview?.blockIndex === index ? blockUploadPreview.url : null
           }
+          autoFocus={autoFocus}
+          onAutoFocused={onAutoFocused}
+          onInsertParagraphAfter={onInsertParagraphAfter}
+          onCreateBlockAfter={onCreateBlockAfter}
+          onMergeWithPrevious={onMergeWithPrevious}
+          onMultiParagraphPaste={onMultiParagraphPaste}
+          onPasteImageFile={onPasteImageFile}
+          onRemoveSelf={onRequestRemove}
+          onSlashMenu={onSlashMenu}
           onChange={onChange}
-          onRemove={onRequestRemove}
-          onMoveUp={() => {}}
-          onMoveDown={() => {}}
           {...(onUploadForBlock && (block.type === 'image' || block.type === 'video')
             ? { onUploadForBlock, onReplaceForBlock: onUploadForBlock }
             : {})}
@@ -223,34 +310,70 @@ function SortableBlockRow({
               }
             : {})}
         />
+        <div ref={slashAnchorRef} className={styles.slashMenuAnchor}>
+          <NewsBlockInsertMenuPanel
+            open={slashOpen}
+            sections={slashSections}
+            ariaLabel={t('form.insertBlock')}
+            panelRef={slashPanelRef}
+            filterQuery={slashFilter}
+            filterPlaceholder={t('insert.filterPlaceholder')}
+            emptyLabel={t('insert.filterEmpty')}
+            onFilterChange={onSlashFilterChange}
+            onClose={onSlashClose}
+          />
+        </div>
       </div>
       {!readOnly ? (
-        <button
-          type="button"
-          className={documentMode ? styles.removeBtnDocument : styles.removeBtn}
-          disabled={actionsDisabled}
-          onClick={onRequestRemove}
-          aria-label={t('form.removeBlock')}
-        >
-          <Icon name="x" size={14} strokeWidth={2} aria-hidden />
-        </button>
+        <div className={styles.rowActions}>
+          <NewsBlockTransformMenu
+            block={block}
+            disabled={actionsDisabled}
+            buttonClassName={styles.rowActionBtn}
+            onTransform={onTransform}
+          />
+          <button
+            type="button"
+            className={styles.rowActionBtn}
+            disabled={actionsDisabled}
+            onClick={onDuplicate}
+            aria-label={t('form.duplicateBlock')}
+            title={t('form.duplicateBlock')}
+          >
+            <Icon name="copy" size={14} strokeWidth={2} aria-hidden />
+          </button>
+          <button
+            type="button"
+            className={styles.removeBtnDocument}
+            disabled={actionsDisabled}
+            onClick={onRequestRemove}
+            aria-label={t('form.removeBlock')}
+            title={t('form.removeBlock')}
+          >
+            <Icon name="x" size={14} strokeWidth={2} aria-hidden />
+          </button>
+        </div>
       ) : null}
     </div>
     </div>
   );
 }
 
+const SortableBlockRow = memo(SortableBlockRowInner);
+
 export function NewsBlockList({
   blocks,
+  locale,
   media,
   readOnly,
   actionsDisabled,
-  documentMode = false,
   uploadingBlockKind,
   uploadValidationErrors,
   onChange,
   onUploadForBlock,
   onUploadForGallerySlot,
+  onPasteImageAt,
+  pasteBodyRef,
   uploadingGallerySlot = null,
   blockUploadPreview = null,
 }: NewsBlockListProps) {
@@ -261,7 +384,20 @@ export function NewsBlockList({
   const [overlayHeight, setOverlayHeight] = useState<number | undefined>();
   const pendingActivationOffset = useRef<{ x: number; y: number } | null>(null);
   const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(null);
+  const [pendingPaste, setPendingPaste] = useState<{
+    result: ClipboardImportResult;
+    index: number;
+  } | null>(null);
   const announcements = useNewsBlockDragAnnouncements(blocks);
+  const blocksRef = useRef(blocks);
+  blocksRef.current = blocks;
+  const [focusBlockId, setFocusBlockId] = useState<string | null>(null);
+  const [slashIndex, setSlashIndex] = useState<number | null>(null);
+  const [slashFilter, setSlashFilter] = useState('');
+
+  useEffect(() => {
+    if (slashIndex === null) setSlashFilter('');
+  }, [slashIndex]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { delay: 120, tolerance: 5 } }),
@@ -295,7 +431,217 @@ export function NewsBlockList({
   }
 
   function removeBlock(index: number) {
-    onChange(blocks.filter((_, i) => i !== index));
+    onChange(removeBlockAt(blocks, index));
+  }
+
+  /** Text blocks delete instantly with a 5s Undo; media and advanced blocks keep the confirm dialog. */
+  function requestRemove(index: number) {
+    const block = blocks[index];
+    if (!block) return;
+    if (isTransformableBlock(block)) {
+      onChange(removeBlockAt(blocks, index));
+      showToast({
+        tone: 'info',
+        title: t('toast.blockDeleted'),
+        message: '',
+        durationMs: 5000,
+        action: {
+          label: t('toast.undo'),
+          onAction: () => onChange(restoreBlockAt(blocksRef.current, index, block)),
+        },
+      });
+      return;
+    }
+    setPendingDeleteIndex(index);
+  }
+
+  function handleDuplicate(index: number) {
+    if (atBlockLimit) {
+      handleBlockLimit();
+      return;
+    }
+    onChange(duplicateBlockAt(blocks, index));
+  }
+
+  function handleTransform(index: number, target: TransformTarget) {
+    onChange(transformBlockAt(blocks, index, target));
+  }
+
+  function handleInsertParagraphAfter(index: number) {
+    if (atBlockLimit) {
+      handleBlockLimit();
+      return;
+    }
+    const paragraph = createBlockFromType('paragraph');
+    onChange(insertBlockIntoBody(blocks, index + 1, paragraph));
+    setFocusBlockId(paragraph.id ?? null);
+  }
+
+  function handleMergeWithPrevious(index: number) {
+    if (index <= 0) return;
+    const prev = blocks[index - 1];
+    const current = blocks[index];
+    if (!prev || !current || prev.type !== 'paragraph' || current.type !== 'paragraph') {
+      if (current?.type === 'paragraph' && !current.text.trim() && !current.html?.trim()) {
+        onChange(removeBlockAt(blocks, index));
+      }
+      return;
+    }
+    onChange(mergeParagraphWithPrevious(blocks, index));
+    if (prev.id) setFocusBlockId(prev.id);
+  }
+
+  function showPasteUndo(snapshot: NewsBodyBlock[]) {
+    showToast({
+      tone: 'info',
+      title: t('paste.appliedTitle'),
+      message: '',
+      durationMs: 5000,
+      action: {
+        label: t('toast.undo'),
+        onAction: () => onChange(snapshot),
+      },
+    });
+  }
+
+  function applyImportedBlocks(
+    replacements: NewsBodyBlock[],
+    index: number,
+    mode: 'replace' | 'insert',
+  ) {
+    const snapshot = blocksRef.current;
+    if (mode === 'replace') {
+      const capped = replacements.slice(0, MAX_BODY_BLOCKS);
+      onChange(capped);
+      const last = capped[capped.length - 1];
+      if (last?.id) setFocusBlockId(last.id);
+      showPasteUndo(snapshot);
+      return;
+    }
+
+    if (atBlockLimit) {
+      handleBlockLimit();
+      return;
+    }
+
+    const available = MAX_BODY_BLOCKS - snapshot.length + 1;
+    const capped = replacements.slice(0, Math.max(1, available));
+    const next = insertImportedBlocksAt(snapshot, index, capped);
+    onChange(next);
+    const last = capped[capped.length - 1];
+    if (last?.id) setFocusBlockId(last.id);
+    showPasteUndo(snapshot);
+  }
+
+  function offerStructuredPaste(result: ClipboardImportResult, index: number) {
+    if (isBodyEmptyOrSkeleton(blocksRef.current)) {
+      applyImportedBlocks(result.blocks, index, 'replace');
+      if (result.truncated) {
+        showToast({
+          tone: 'warning',
+          title: t('toast.validationTitle'),
+          message: t('paste.truncatedWarning'),
+        });
+      }
+      return;
+    }
+    setPendingPaste({ result, index });
+  }
+
+  function handleStructuredPaste(
+    index: number,
+    raw: { html: string; plain: string },
+  ): boolean {
+    const current = blocks[index];
+    if (!current || current.type !== 'paragraph') return false;
+    if (current.text.trim() || current.html?.trim()) return false;
+
+    const imported = clipboardToNewsBlocks(raw, { maxBlocks: MAX_BODY_BLOCKS });
+    if (imported && isStructuredImport(imported.blocks)) {
+      offerStructuredPaste(imported, index);
+      return true;
+    }
+
+    let replacements = raw.html ? splitHtmlIntoParagraphBlocks(raw.html) : [];
+    if (replacements.length <= 1 && raw.plain.includes('\n')) {
+      replacements = paragraphBlocksFromPlainText(raw.plain);
+    }
+    if (replacements.length <= 1) return false;
+
+    onChange(replaceBlockWithMany(blocks, index, replacements));
+    const last = replacements[replacements.length - 1];
+    setFocusBlockId(last?.id ?? null);
+    return true;
+  }
+
+  const pasteBodyFromClipboard = useCallback(async (raw: ClipboardImportPayload | null = null) => {
+    if (readOnly || actionsDisabled) return;
+
+    const clipboard = raw ?? (await readClipboardForImport());
+    if (!clipboard) {
+      showToast({
+        tone: 'warning',
+        title: t('toast.validationTitle'),
+        message: t('paste.clipboardUnavailable'),
+      });
+      return;
+    }
+
+    const imported = clipboardToNewsBlocks(clipboard, { maxBlocks: MAX_BODY_BLOCKS });
+    if (!imported || !isStructuredImport(imported.blocks)) {
+      showToast({
+        tone: 'warning',
+        title: t('toast.validationTitle'),
+        message: t('paste.unstructuredWarning'),
+      });
+      return;
+    }
+    const index = Math.max(0, blocksRef.current.length - 1);
+    offerStructuredPaste(imported, index);
+  }, [actionsDisabled, readOnly, t, showToast]);
+
+  useEffect(() => {
+    if (!pasteBodyRef) return;
+    pasteBodyRef.current = pasteBodyFromClipboard;
+    return () => {
+      pasteBodyRef.current = null;
+    };
+  }, [pasteBodyFromClipboard, pasteBodyRef]);
+
+  function handlePasteImageFile(index: number, file: File): boolean {
+    if (!onPasteImageAt) return false;
+    if (atBlockLimit) {
+      handleBlockLimit();
+      return true;
+    }
+    onPasteImageAt(index + 1, file);
+    return true;
+  }
+
+  function handleSlashSelect(index: number, type: BlockInsertType) {
+    setSlashIndex(null);
+    setSlashFilter('');
+    recordBlockInsertRecent(type);
+    const block = createBlockFromType(type);
+    onChange(replaceBlockAt(blocksRef.current, index, block));
+    if (block.type === 'heading' || block.type === 'paragraph' || block.type === 'list' || block.type === 'quote' || block.type === 'embed') {
+      setFocusBlockId(block.id ?? null);
+    }
+  }
+
+  function handleSlashTemplate(
+    index: number,
+    templateId: Exclude<import('../lib/news-content-templates').NewsContentTemplateId, 'blank'>,
+  ) {
+    setSlashIndex(null);
+    setSlashFilter('');
+    const templateBlocks = templateBlocksForSlash(templateId, locale as NewsFormLocale);
+    if (templateBlocks.length === 0) return;
+    const available = MAX_BODY_BLOCKS - blocks.length + 1;
+    const replacements = templateBlocks.slice(0, Math.max(1, available));
+    onChange(replaceBlockWithMany(blocksRef.current, index, replacements));
+    const last = replacements[replacements.length - 1];
+    setFocusBlockId(last?.id ?? null);
   }
 
   function handleInsert(index: number, block: NewsBodyBlock) {
@@ -362,16 +708,6 @@ export function NewsBlockList({
 
   return (
     <div className={styles.root} data-dragging-active={activeId ? 'true' : undefined}>
-      {!documentMode && !activeId ? (
-        <NewsBlockInserter
-          index={0}
-          readOnly={readOnly}
-          atBlockLimit={atBlockLimit}
-          prominent={blocks.length === 0}
-          onInsert={handleInsert}
-          onBlockLimit={handleBlockLimit}
-        />
-      ) : null}
       <DndContext
         sensors={sensors}
         collisionDetection={newsBlockCollisionDetection}
@@ -400,18 +736,32 @@ export function NewsBlockList({
                 sortableIds={ids}
                 block={block}
                 index={index}
-                total={blocks.length}
                 media={media}
                 readOnly={readOnly}
                 actionsDisabled={actionsDisabled}
                 activeIndex={activeIndex}
-                documentMode={documentMode}
                 uploadingBlockKind={uploadingBlockKind}
                 uploadValidationErrors={uploadValidationErrors}
                 uploadingGallerySlot={uploadingGallerySlot}
                 blockUploadPreview={blockUploadPreview}
+                autoFocus={focusBlockId !== null && ids[index] === focusBlockId}
+                slashOpen={slashIndex === index}
+                slashFilter={slashFilter}
+                onSlashFilterChange={setSlashFilter}
+                onAutoFocused={() => setFocusBlockId(null)}
+                onSlashMenu={() => setSlashIndex(index)}
+                onSlashClose={() => setSlashIndex(null)}
+                onSlashSelect={(type) => handleSlashSelect(index, type)}
+                onSlashTemplate={(templateId) => handleSlashTemplate(index, templateId)}
+                onInsertParagraphAfter={() => handleInsertParagraphAfter(index)}
+                onCreateBlockAfter={() => handleInsertParagraphAfter(index)}
+                onMergeWithPrevious={() => handleMergeWithPrevious(index)}
+                onMultiParagraphPaste={(raw) => handleStructuredPaste(index, raw)}
+                onPasteImageFile={(file) => handlePasteImageFile(index, file)}
                 onChange={(next) => updateBlock(index, next)}
-                onRequestRemove={() => setPendingDeleteIndex(index)}
+                onRequestRemove={() => requestRemove(index)}
+                onDuplicate={() => handleDuplicate(index)}
+                onTransform={(target) => handleTransform(index, target)}
                 {...(onUploadForBlock
                   ? {
                       onUploadForBlock: (file: File) =>
@@ -425,7 +775,7 @@ export function NewsBlockList({
                     }
                   : {})}
               />
-              {!documentMode && !activeId ? (
+              {!activeId ? (
                 <NewsBlockInserter
                   index={index + 1}
                   readOnly={readOnly}
@@ -449,7 +799,6 @@ export function NewsBlockList({
               <NewsBlockDragOverlayRow
                 block={activeBlock}
                 media={media}
-                documentMode={documentMode}
                 width={overlayWidth}
                 height={overlayHeight}
               />
@@ -457,7 +806,7 @@ export function NewsBlockList({
           </DragOverlay>
         </NewsBlockDragOverlayPortal>
       </DndContext>
-      {blocks.length === 0 && !readOnly && documentMode ? (
+      {blocks.length === 0 && !readOnly ? (
         <NewsBlockInsertStarter
           disabled={actionsDisabled || atBlockLimit}
           onInsert={(type) => {
@@ -468,8 +817,6 @@ export function NewsBlockList({
             onChange(insertBlockIntoBody(blocks, 0, createBlockFromType(type)));
           }}
         />
-      ) : blocks.length === 0 && !readOnly ? (
-        <p className={styles.emptyHint}>{t('form.emptyBodyHint')}</p>
       ) : null}
 
       <NewsBlockRemoveDialog
@@ -484,6 +831,36 @@ export function NewsBlockList({
           setPendingDeleteIndex(null);
         }}
         onClose={() => setPendingDeleteIndex(null)}
+      />
+
+      <NewsPasteConfirmDialog
+        open={pendingPaste !== null}
+        result={pendingPaste?.result ?? null}
+        onClose={() => setPendingPaste(null)}
+        onReplace={() => {
+          if (!pendingPaste) return;
+          applyImportedBlocks(pendingPaste.result.blocks, pendingPaste.index, 'replace');
+          if (pendingPaste.result.truncated) {
+            showToast({
+              tone: 'warning',
+              title: t('toast.validationTitle'),
+              message: t('paste.truncatedWarning'),
+            });
+          }
+          setPendingPaste(null);
+        }}
+        onInsert={() => {
+          if (!pendingPaste) return;
+          applyImportedBlocks(pendingPaste.result.blocks, pendingPaste.index, 'insert');
+          if (pendingPaste.result.truncated) {
+            showToast({
+              tone: 'warning',
+              title: t('toast.validationTitle'),
+              message: t('paste.truncatedWarning'),
+            });
+          }
+          setPendingPaste(null);
+        }}
       />
     </div>
   );

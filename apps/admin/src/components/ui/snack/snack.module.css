@@ -6,11 +6,12 @@
   display: grid;
   gap: var(--space-2);
   pointer-events: none;
-  max-width: min(28rem, calc(100vw - 2 * var(--snack-viewport-inset)));
+  max-width: min(24rem, calc(100vw - 2 * var(--snack-viewport-inset)));
 }
 
 .snack {
-  min-width: min(26rem, calc(100vw - 2rem));
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-snack-surface-border);
@@ -18,19 +19,21 @@
   box-shadow: var(--shadow-snack);
   color: var(--color-snack-title-fg);
   pointer-events: auto;
+  overflow: hidden;
 }
 
 .content {
-  display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  align-items: start;
+  display: flex;
+  align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: 0.875rem var(--space-3) 0.875rem var(--space-4);
+  min-width: 0;
 }
 
 .iconWrap {
   width: 2rem;
   height: 2rem;
+  margin-top: 0.0625rem;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -40,8 +43,10 @@
 
 .textWrap {
   display: grid;
-  gap: var(--space-1);
+  gap: 0.125rem;
+  flex: 1 1 auto;
   min-width: 0;
+  padding-top: 0.1875rem;
 }
 
 .title {
@@ -51,7 +56,7 @@
   line-height: var(--line-height-snug);
   letter-spacing: -0.01em;
   color: var(--color-snack-title-fg);
-  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
 .message {
@@ -63,29 +68,71 @@
   overflow-wrap: anywhere;
 }
 
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  margin-left: var(--space-1);
+  margin-top: -0.125rem;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0.92;
+  transition:
+    background var(--motion-duration-fast) var(--motion-ease-out),
+    opacity var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.actionButton:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.actionButton:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .closeButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: var(--touch-target-min);
-  height: var(--touch-target-min);
-  margin: calc((var(--touch-target-min) - 1rem) / -2) calc((var(--touch-target-min) - 1rem) / -2) 0 0;
+  width: 2rem;
+  height: 2rem;
   border: none;
   background: transparent;
   color: var(--color-snack-close);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: color var(--motion-duration-fast) var(--motion-ease-out);
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-out),
+    background var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.closeButton:hover {
+  color: var(--color-snack-close-hover);
+  background: color-mix(in srgb, currentColor 8%, transparent);
 }
 
 .closeButton:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
-}
-
-.closeButton:hover {
-  color: var(--color-snack-close-hover);
 }
 
 .toneSuccess {
@@ -98,6 +145,11 @@
   color: var(--color-success-fg);
 }
 
+.toneSuccess .actionButton {
+  color: var(--color-success-fg);
+  border-color: color-mix(in srgb, var(--color-success-fg) 28%, transparent);
+}
+
 .toneError {
   background: var(--color-snack-danger-surface);
   border-color: var(--color-snack-danger-border);
@@ -106,6 +158,11 @@
 .toneError .iconWrap {
   background: var(--color-snack-danger-bg);
   color: var(--color-snack-danger-fg);
+}
+
+.toneError .actionButton {
+  color: var(--color-snack-danger-fg);
+  border-color: color-mix(in srgb, var(--color-snack-danger-fg) 28%, transparent);
 }
 
 .toneWarning {
@@ -118,6 +175,11 @@
   color: var(--color-snack-warning-fg);
 }
 
+.toneWarning .actionButton {
+  color: var(--color-snack-warning-fg);
+  border-color: color-mix(in srgb, var(--color-snack-warning-fg) 28%, transparent);
+}
+
 .toneInfo {
   background: var(--color-snack-info-surface);
   border-color: var(--color-snack-info-border);
@@ -126,6 +188,11 @@
 .toneInfo .iconWrap {
   background: var(--color-snack-info-bg);
   color: var(--color-snack-info-fg);
+}
+
+.toneInfo .actionButton {
+  color: var(--color-snack-info-fg);
+  border-color: color-mix(in srgb, var(--color-snack-info-fg) 28%, transparent);
 }
 
 @media (max-width: 48rem) {
@@ -138,12 +205,13 @@
   }
 
   .snack {
-    min-width: 100%;
+    min-width: 0;
     max-width: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .actionButton,
   .closeButton {
     transition: none;
   }

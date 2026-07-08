@@ -162,3 +162,21 @@ module "observability" {
   redis_replication_group_id = module.elasticache.replication_group_id
   tags                       = local.common_tags
 }
+
+module "rds_password_sync" {
+  source = "../../modules/rds-password-sync"
+
+  name_prefix           = var.name_prefix
+  aws_region            = var.aws_region
+  rds_secret_arn        = module.rds.master_user_secret_arn
+  app_secret_arn        = module.secrets.secret_arn
+  secrets_kms_key_arn   = module.kms.secrets_key_arn
+  db_host               = module.rds.db_endpoint
+  db_port               = module.rds.db_port
+  db_name               = module.rds.db_name
+  ecs_cluster_name      = module.ecs.cluster_name
+  ecs_service_name      = module.ecs.service_name
+  alarm_sns_topic_arn   = module.observability.sns_topic_arn
+  log_retention_in_days = var.log_retention_in_days
+  tags                  = local.common_tags
+}

@@ -57,11 +57,13 @@
   }
 }
 
+/* Canvas typography mirrors the shared .proseNews scale (see tokens.css). */
 .proseDocument {
-  font-size: 1.0625rem;
-  line-height: 1.65;
-  color: var(--text-primary);
+  font-size: var(--news-prose-font-size);
+  line-height: var(--news-prose-line-height);
+  color: var(--news-prose-color);
   font-feature-settings: 'kern' 1, 'liga' 1;
+  overflow-wrap: break-word;
 }
 
 .proseDocument :global(.ProseMirror) {

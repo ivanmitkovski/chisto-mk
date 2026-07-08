@@ -12,17 +12,14 @@ export function useNewsPostForm(initial?: Partial<NewsPostFormValues>) {
     featured: initial?.featured ?? false,
     translations: initial?.translations ?? emptyTranslations(),
   });
-  const [dirty, setDirty] = useState(false);
 
   const onChange = useCallback(<K extends keyof NewsPostFormValues>(key: K, value: NewsPostFormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
-    setDirty(true);
   }, []);
 
   const reset = useCallback((next: NewsPostFormValues) => {
     setValues(next);
-    setDirty(false);
   }, []);
 
-  return { values, dirty, onChange, reset, setDirty };
+  return { values, onChange, reset };
 }

@@ -19,6 +19,12 @@ export function blockTypeLabel(
       return t('form.blockVideo');
     case 'gallery':
       return t('form.blockGallery');
+    case 'quote':
+      return t('form.blockQuote');
+    case 'divider':
+      return t('form.blockDivider');
+    case 'embed':
+      return t('form.blockEmbed');
     default:
       return t('form.blockParagraph');
   }
@@ -49,6 +55,12 @@ export function blockPreviewText(block: NewsBodyBlock): string {
       return '';
     case 'html':
       return stripHtml(block.html).slice(0, 140);
+    case 'quote':
+      return block.text.trim().slice(0, 140);
+    case 'divider':
+      return '—';
+    case 'embed':
+      return block.url.trim().slice(0, 140);
     default:
       return '';
   }

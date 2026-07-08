@@ -2,11 +2,18 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { Icon } from '@/components/ui';
 import { localeCompleteness } from '../lib/news-locale-utils';
+import { MAX_EXCERPT_LENGTH, MAX_TITLE_LENGTH } from '../lib/news-post-policy';
 import type { NewsMediaDto } from '../news-api-types';
 import type { NewsFormLocale, NewsPostFormValues } from '../types';
 import { NEWS_LOCALES } from '../types';
 import styles from './news-document-header.module.css';
+
+/** Counters stay hidden until the field is at 80% of its hard limit. */
+function counterVisible(length: number, max: number): boolean {
+  return length >= max * 0.8;
+}
 
 type NewsDocumentHeaderProps = {
   values: NewsPostFormValues;
@@ -78,15 +85,20 @@ export function NewsDocumentHeader({
               type="button"
               role="tab"
               aria-selected={selected}
+              aria-label={`${loc.toUpperCase()} — ${
+                scores[loc] ? t('localeStatus.complete') : t('localeStatus.incomplete')
+              }`}
               className={selected ? styles.localeActive : styles.localeTab}
               disabled={busy}
               onClick={() => onLocaleChange(loc)}
             >
               {loc.toUpperCase()}
               <span
-                className={scores[loc] ? styles.dotComplete : styles.dotIncomplete}
+                className={scores[loc] ? styles.ringComplete : styles.ringIncomplete}
                 aria-hidden
-              />
+              >
+                {scores[loc] ? <Icon name="check" size={9} strokeWidth={3} /> : null}
+              </span>
             </button>
           );
         })}
@@ -94,6 +106,7 @@ export function NewsDocumentHeader({
 
       <textarea
         ref={titleRef}
+        id="news-document-title"
         className={styles.title}
         rows={1}
         value={content.title}
@@ -101,11 +114,17 @@ export function NewsDocumentHeader({
         disabled={busy || readOnly}
         placeholder={t('form.titlePlaceholder')}
         aria-label={t('form.title')}
-        maxLength={200}
+        maxLength={MAX_TITLE_LENGTH}
       />
+      {counterVisible(content.title.length, MAX_TITLE_LENGTH) ? (
+        <p className={styles.counter} aria-live="polite">
+          {content.title.length} / {MAX_TITLE_LENGTH}
+        </p>
+      ) : null}
 
       <textarea
         ref={excerptRef}
+        id="news-document-excerpt"
         className={styles.excerpt}
         rows={1}
         value={content.excerpt}
@@ -113,8 +132,13 @@ export function NewsDocumentHeader({
         disabled={busy || readOnly}
         placeholder={t('form.excerptPlaceholder')}
         aria-label={t('form.excerpt')}
-        maxLength={500}
+        maxLength={MAX_EXCERPT_LENGTH}
       />
+      {counterVisible(content.excerpt.length, MAX_EXCERPT_LENGTH) ? (
+        <p className={styles.counter} aria-live="polite">
+          {content.excerpt.length} / {MAX_EXCERPT_LENGTH}
+        </p>
+      ) : null}
 
       <hr className={styles.divider} aria-hidden />
     </header>

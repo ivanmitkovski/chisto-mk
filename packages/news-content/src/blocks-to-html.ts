@@ -1,5 +1,6 @@
 import type { EnrichedGalleryBlock, EnrichedGalleryItem, NewsBodyBlock, ResolvedNewsBodyBlock } from './types';
 import { sanitizeHtmlBlock, sanitizeInlineHtml } from './sanitize/html-sanitize';
+import { buildEmbedIframeHtml } from './sanitize/embed-allowlist';
 
 function escapeHtml(text: string): string {
   return text
@@ -82,6 +83,27 @@ export function blocksToEncodedHtml(blocks: readonly (NewsBodyBlock | ResolvedNe
           });
         if (figures.length > 0) {
           parts.push(`<div class="news-gallery">${figures.join('')}</div>`);
+        }
+        break;
+      }
+      case 'quote': {
+        const text = block.text.trim();
+        if (text) {
+          let html = `<blockquote><p>${escapeHtml(text)}</p>`;
+          if (block.attribution?.trim()) {
+            html += `<cite>${escapeHtml(block.attribution.trim())}</cite>`;
+          }
+          html += '</blockquote>';
+          parts.push(html);
+        }
+        break;
+      }
+      case 'divider':
+        parts.push('<hr />');
+        break;
+      case 'embed': {
+        if (block.url.trim()) {
+          parts.push(buildEmbedIframeHtml(block.url.trim()));
         }
         break;
       }

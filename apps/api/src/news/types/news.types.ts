@@ -8,7 +8,10 @@ export type NewsBodyBlock =
   | { id?: string; type: 'list'; ordered: boolean; items: string[] }
   | { id?: string; type: 'image'; mediaId: string; caption?: string }
   | { id?: string; type: 'video'; mediaId: string; caption?: string }
-  | { id?: string; type: 'gallery'; items: Array<{ mediaId: string; caption?: string }> };
+  | { id?: string; type: 'gallery'; items: Array<{ mediaId: string; caption?: string }> }
+  | { id?: string; type: 'quote'; text: string; attribution?: string }
+  | { id?: string; type: 'divider' }
+  | { id?: string; type: 'embed'; provider: 'youtube' | 'vimeo'; url: string };
 
 export type NewsLocaleContent = {
   title: string;

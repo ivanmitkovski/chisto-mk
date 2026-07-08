@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { NewsContentLintPanel } from './news-content-lint-panel';
 import { NewsEditorMetaPanel } from './news-editor-meta-panel';
 import { NewsInspectorCoverPanel } from './news-inspector-cover-panel';
 import { NewsInspectorSection } from './news-inspector-section';
@@ -35,6 +36,7 @@ export type NewsInspectorPanelsProps = {
   onAltTextChange: (mediaId: string, altLocale: NewsFormLocale, value: string) => void;
   onBeforeRestore: () => Promise<void>;
   onRestored: (post: NewsPostAdminDto) => void;
+  onLintJump?: ((target: import('./news-content-lint-panel').NewsLintJumpTarget, locale: NewsFormLocale) => void) | undefined;
 };
 
 export function NewsInspectorPanels({
@@ -59,6 +61,7 @@ export function NewsInspectorPanels({
   onAltTextChange,
   onBeforeRestore,
   onRestored,
+  onLintJump,
 }: NewsInspectorPanelsProps) {
   const t = useTranslations('news');
   const showMedia = media.length > 0 || !readOnly;
@@ -74,7 +77,18 @@ export function NewsInspectorPanels({
         />
       </div>
 
+      <NewsInspectorSection title={t('lint.label')} defaultOpen>
+        <NewsContentLintPanel
+          values={values}
+          locale={locale}
+          hasCover={hasCover}
+          media={media}
+          onJump={onLintJump}
+        />
+      </NewsInspectorSection>
+
       <NewsInspectorSection title={t('inspector.coverTitle')} defaultOpen={!hasCover}>
+        <div id="news-inspector-cover">
         <NewsInspectorCoverPanel
           locale={locale}
           hasCover={hasCover}
@@ -85,6 +99,7 @@ export function NewsInspectorPanels({
           busy={busy}
           onAltTextChange={onAltTextChange}
         />
+        </div>
       </NewsInspectorSection>
 
       <NewsInspectorSection
@@ -129,12 +144,14 @@ export function NewsInspectorPanels({
           onBeforeRestore={onBeforeRestore}
           onRestored={onRestored}
           activeLocale={locale}
+          currentValues={values}
           embedded
         />
       </NewsInspectorSection>
 
       {showMedia ? (
         <NewsInspectorSection title={t('form.mediaLibrary')} defaultOpen={media.length > 0}>
+          <div id="news-inspector-media">
           <NewsMediaLibrary
             media={media}
             bodyBlockCount={bodyBlockCount}
@@ -145,6 +162,7 @@ export function NewsInspectorPanels({
             onAltTextChange={onAltTextChange}
             embedded
           />
+          </div>
         </NewsInspectorSection>
       ) : null}
     </div>

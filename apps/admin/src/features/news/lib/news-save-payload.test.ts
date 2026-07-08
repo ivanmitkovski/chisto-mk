@@ -20,22 +20,42 @@ const baseValues = (): NewsPostFormValues => ({
 });
 
 describe('prepareNewsSavePayload', () => {
-  it('strips client block ids and redundant paragraph html', () => {
+  it('keeps stable block ids while dropping redundant paragraph html', () => {
     const values = baseValues();
     values.translations.en.body = [
       { id: 'client-id-1', type: 'paragraph', text: 'Hello world', html: '<p>Hello world</p>' },
     ];
 
     expect(prepareNewsSavePayload(values).translations.en.body).toEqual([
-      { type: 'paragraph', text: 'Hello world' },
+      { id: 'client-id-1', type: 'paragraph', text: 'Hello world' },
+    ]);
+  });
+
+  it('persists ids for every normalized block type (ADR-1 round trip)', () => {
+    const values = baseValues();
+    values.translations.en.body = [
+      { id: 'p1', type: 'paragraph', text: 'Hello' },
+      { id: 'h1', type: 'heading', level: 3, text: 'Section' },
+      { id: 'l1', type: 'list', ordered: true, items: ['One'] },
+      { id: 'i1', type: 'image', mediaId: 'm1', caption: ' Cap ' },
+      { id: 'g1', type: 'gallery', items: [{ mediaId: 'm1' }, { mediaId: 'm2' }] },
+    ];
+
+    expect(prepareNewsSavePayload(values).translations.en.body.map((b) => b.id)).toEqual([
+      'p1',
+      'h1',
+      'l1',
+      'i1',
+      'g1',
     ]);
   });
 
   it('treats tipTap html wrapping as unchanged for fingerprint', () => {
     const plain = baseValues();
+    plain.translations.en.body = [{ id: 'same-id', type: 'paragraph', text: 'Hello world' }];
     const withHtml = baseValues();
     withHtml.translations.en.body = [
-      { id: 'another-id', type: 'paragraph', text: 'Hello world', html: '<p>Hello world</p>' },
+      { id: 'same-id', type: 'paragraph', text: 'Hello world', html: '<p>Hello world</p>' },
     ];
 
     expect(newsFormSaveFingerprint(plain)).toBe(newsFormSaveFingerprint(withHtml));

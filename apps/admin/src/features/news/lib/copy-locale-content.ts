@@ -47,6 +47,20 @@ export function copyBodyBlocksFromSource(blocks: NewsBodyBlock[]): NewsBodyBlock
         ...(block.caption ? { caption: block.caption } : {}),
       };
     }
+    if (block.type === 'quote') {
+      return {
+        id,
+        type: 'quote',
+        text: block.text,
+        ...(block.attribution ? { attribution: block.attribution } : {}),
+      };
+    }
+    if (block.type === 'divider') {
+      return { id, type: 'divider' };
+    }
+    if (block.type === 'embed') {
+      return { id, type: 'embed', provider: block.provider, url: block.url };
+    }
     return block;
   });
 }

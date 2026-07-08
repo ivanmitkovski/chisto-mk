@@ -18,13 +18,15 @@
       "require": "./dist/sanitize/index.js",
       "default": "./src/sanitize/index.ts"
     },
-    "./render": "./src/render/index.ts"
+    "./render": "./src/render/index.ts",
+    "./render/external-link-indicator.css": "./src/render/external-link-indicator.css"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run"
   },
   "dependencies": {
+    "node-html-parser": "^9.0.0",
     "sanitize-html": "^2.17.4"
   },
   "peerDependencies": {
@@ -32,8 +34,8 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/sanitize-html": "^2.16.1",
     "@types/react": "^19.0.1",
+    "@types/sanitize-html": "^2.16.1",
     "typescript": "^5.7.2",
     "vitest": "^3.2.4"
   }

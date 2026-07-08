@@ -7,7 +7,6 @@ import {
   blockAttachedMedia,
   blockGalleryMedia,
   blockPreviewText,
-  blockTypeLabel,
 } from '../lib/news-block-display';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 import styles from './news-block-drag-snapshot.module.css';
@@ -15,7 +14,6 @@ import styles from './news-block-drag-snapshot.module.css';
 type NewsBlockDragSnapshotProps = {
   block: NewsBodyBlock;
   media: NewsMediaDto[];
-  documentMode?: boolean;
 };
 
 function paragraphHtml(block: NewsBodyBlock): string {
@@ -25,11 +23,7 @@ function paragraphHtml(block: NewsBodyBlock): string {
   return '';
 }
 
-export function NewsBlockDragSnapshot({
-  block,
-  media,
-  documentMode = false,
-}: NewsBlockDragSnapshotProps) {
+export function NewsBlockDragSnapshot({ block, media }: NewsBlockDragSnapshotProps) {
   const t = useTranslations('news');
   const preview = blockPreviewText(block);
   const attached = blockAttachedMedia(block, media);
@@ -37,18 +31,7 @@ export function NewsBlockDragSnapshot({
   const visibleGallery = galleryItems.slice(0, 4);
   const galleryOverflow = Math.max(0, galleryItems.length - visibleGallery.length);
 
-  const snapshotClass = documentMode
-    ? `${styles.snapshot} ${styles.snapshotDocument}`
-    : styles.snapshot;
-
-  if (!documentMode) {
-    return (
-      <div className={styles.classicBlock}>
-        <span className={styles.classicType}>{blockTypeLabel(block, t)}</span>
-        <div className={snapshotClass}>{renderBody()}</div>
-      </div>
-    );
-  }
+  const snapshotClass = `${styles.snapshot} ${styles.snapshotDocument}`;
 
   return <div className={snapshotClass}>{renderBody()}</div>;
 
@@ -61,7 +44,7 @@ export function NewsBlockDragSnapshot({
         }
         return (
           <div
-            className={documentMode ? styles.paragraphDocument : styles.paragraphClassic}
+            className={styles.paragraphDocument}
             dangerouslySetInnerHTML={{ __html: html }}
           />
         );
@@ -81,7 +64,7 @@ export function NewsBlockDragSnapshot({
         }
         const ListTag = block.ordered ? 'ol' : 'ul';
         return (
-          <ListTag className={documentMode ? styles.listDocument : styles.listClassic}>
+          <ListTag className={styles.listDocument}>
             {items.map((item, index) => (
               <li key={`${index}-${item.slice(0, 24)}`} className={styles.listItem}>
                 {item}
@@ -143,7 +126,7 @@ export function NewsBlockDragSnapshot({
         return <p className={styles.htmlPreview}>{preview}</p>;
       default:
         return preview ? (
-          <p className={documentMode ? styles.paragraphDocument : styles.paragraphClassic}>{preview}</p>
+          <p className={styles.paragraphDocument}>{preview}</p>
         ) : (
           <p className={styles.empty}>{t('drag.emptyPreview')}</p>
         );

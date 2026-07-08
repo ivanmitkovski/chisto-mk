@@ -76,6 +76,18 @@ export function embedUrlFromVideoLink(url: string): string | null {
   return youtubeEmbedUrl(normalized) ?? vimeoEmbedUrl(normalized);
 }
 
+export function embedProviderFromUrl(url: string): 'youtube' | 'vimeo' | null {
+  if (!isAllowedEmbedUrl(url)) return null;
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    if (host.includes('youtube') || host === 'youtu.be') return 'youtube';
+    if (host.includes('vimeo')) return 'vimeo';
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 export function buildEmbedIframeHtml(embedUrl: string): string {
   return `<div class="news-embed"><iframe src="${embedUrl}" title="Embedded video" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
 }

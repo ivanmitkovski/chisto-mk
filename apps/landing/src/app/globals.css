@@ -800,36 +800,4 @@
       animation: none !important;
     }
   }
-
-  @keyframes about-team-bio-open {
-    from {
-      height: 0;
-      opacity: 0;
-    }
-    to {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
-  }
-
-  @keyframes about-team-bio-close {
-    from {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
-    to {
-      height: 0;
-      opacity: 0;
-    }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .about-team-bio[data-state="open"] {
-      animation: about-team-bio-open 300ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .about-team-bio[data-state="closed"] {
-      animation: about-team-bio-close 300ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-  }
 }

@@ -2,6 +2,7 @@ import {
   ensureBlockIds,
   hasVisibleText,
   sanitizeBodyBlocks,
+  stripEmptyBlocks,
   stripHtmlToPlainText,
   type NewsBodyBlock,
 } from '@chisto/news-content';
@@ -14,9 +15,9 @@ export function normalizeTranslationsBody(translations: {
   sq: { title: string; excerpt: string; body: NewsBodyBlock[] };
 }) {
   return {
-    en: { ...translations.en, body: sanitizeBodyBlocks(translations.en.body ?? []) },
-    mk: { ...translations.mk, body: sanitizeBodyBlocks(translations.mk.body ?? []) },
-    sq: { ...translations.sq, body: sanitizeBodyBlocks(translations.sq.body ?? []) },
+    en: { ...translations.en, body: stripEmptyBlocks(sanitizeBodyBlocks(translations.en.body ?? [])) },
+    mk: { ...translations.mk, body: stripEmptyBlocks(sanitizeBodyBlocks(translations.mk.body ?? [])) },
+    sq: { ...translations.sq, body: stripEmptyBlocks(sanitizeBodyBlocks(translations.sq.body ?? [])) },
   };
 }
 

@@ -23,7 +23,11 @@ import {
   newsMediaValidationMessage,
   validateNewsMediaFile,
 } from '../lib/news-media-validation';
-import { validateNewsPostForm } from '../lib/news-post-policy';
+import {
+  validateNewsPostForAutosave,
+  validateNewsPostForSave,
+  validateNewsPostForm,
+} from '../lib/news-post-policy';
 import { prepareNewsSavePayload } from '../lib/news-save-payload';
 import type { NewsBodyBlock, NewsMediaDto, NewsPostAdminDto } from '../news-api-types';
 import type { NewsFormLocale, NewsPostFormValues } from '../types';
@@ -45,7 +49,6 @@ function mergeUploadedMedia(post: NewsPostAdminDto, uploaded: NewsMediaDto): New
 
 type FormApi = {
   values: NewsPostFormValues;
-  dirty: boolean;
   reset: (next: NewsPostFormValues) => void;
   onChange: <K extends keyof NewsPostFormValues>(key: K, value: NewsPostFormValues[K]) => void;
 };
@@ -88,6 +91,7 @@ export function useNewsPostMutations({
   const [unpublishOpen, setUnpublishOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [conflictOpen, setConflictOpen] = useState(false);
   const [liveMediaPending, setLiveMediaPending] = useState(false);
 
   const formValuesRef = useRef(form.values);
@@ -145,11 +149,15 @@ export function useNewsPostMutations({
     async (options?: { silent?: boolean }): Promise<boolean> => {
       if (saveInFlightRef.current) return false;
 
-      const isPublished = post.status === 'published';
-      const validationError = validateNewsPostForm(form.values, {
-        mode: isPublished ? 'publish' : 'save',
-        hasCover: Boolean(post.coverMediaId),
-      });
+      const postSnapshot = {
+        status: post.status,
+        coverMediaId: post.coverMediaId,
+        media: post.media,
+      };
+      // Silent autosave only persists content; schedule/publish rules apply on explicit save.
+      const validationError = options?.silent
+        ? validateNewsPostForAutosave(form.values, postSnapshot)
+        : validateNewsPostForSave(form.values, postSnapshot);
       if (validationError) {
         if (!options?.silent) {
           showToast({
@@ -168,12 +176,7 @@ export function useNewsPostMutations({
 
         const latest = await fetchNewsPost(post.id);
         if (latest.updatedAt !== post.updatedAt) {
-          showToast({
-            tone: 'warning',
-            title: t('toast.conflictTitle'),
-            message: t('toast.conflictMessage'),
-          });
-          await reloadLatest();
+          setConflictOpen(true);
           return false;
         }
 
@@ -181,13 +184,14 @@ export function useNewsPostMutations({
         const nextScheduledAt = fromDatetimeLocalValue(payload.scheduledAt);
         const scheduledChanged =
           payload.scheduledAt.trim() !== toDatetimeLocalValue(post.scheduledAt);
+        const includeSchedule = !options?.silent && scheduledChanged;
         const updated = await updateNewsPost(post.id, {
           slug: payload.slug,
           category: payload.category,
           translations: payload.translations,
           featured: payload.featured,
           expectedUpdatedAt: post.updatedAt,
-          ...(scheduledChanged ? { scheduledAt: nextScheduledAt } : {}),
+          ...(includeSchedule ? { scheduledAt: nextScheduledAt } : {}),
         });
         onPostChange(updated);
         form.reset(postToFormValues(updated));
@@ -198,17 +202,11 @@ export function useNewsPostMutations({
         return true;
       } catch (error) {
         if (error instanceof ApiError && error.status === 409) {
-          showToast({
-            tone: 'warning',
-            title: t('toast.conflictTitle'),
-            message: t('toast.conflictMessage'),
-          });
-          await reloadLatest();
+          setConflictOpen(true);
           return false;
         }
-        if (!options?.silent) {
-          showError(error);
-        }
+        // Always surface API failures — silent autosave otherwise only shows "Autosave failed".
+        showError(error);
         return false;
       } finally {
         saveInFlightRef.current = false;
@@ -221,10 +219,11 @@ export function useNewsPostMutations({
       onPostChange,
       post.coverMediaId,
       post.id,
+      post.media,
+      post.scheduledAt,
       post.status,
       post.updatedAt,
       refresh,
-      reloadLatest,
       showError,
       showToast,
       t,
@@ -641,6 +640,56 @@ export function useNewsPostMutations({
     [isDirty, mergePostMedia, post.status, showError, showToast, t],
   );
 
+  const resolveConflictReload = useCallback(async () => {
+    setConflictOpen(false);
+    await reloadLatest();
+  }, [reloadLatest]);
+
+  const resolveConflictOverwrite = useCallback(async () => {
+    setConflictOpen(false);
+    saveInFlightRef.current = true;
+    setSaving(true);
+    try {
+      await flushBeforeAction?.();
+      const latest = await fetchNewsPost(post.id);
+      const payload = prepareNewsSavePayload(formValuesRef.current);
+      const nextScheduledAt = fromDatetimeLocalValue(payload.scheduledAt);
+      const scheduledChanged =
+        payload.scheduledAt.trim() !== toDatetimeLocalValue(post.scheduledAt);
+      const updated = await updateNewsPost(post.id, {
+        slug: payload.slug,
+        category: payload.category,
+        translations: payload.translations,
+        featured: payload.featured,
+        expectedUpdatedAt: latest.updatedAt,
+        ...(scheduledChanged ? { scheduledAt: nextScheduledAt } : {}),
+      });
+      onPostChange(updated);
+      form.reset(postToFormValues(updated));
+      showToast({ tone: 'success', title: t('toast.saved'), message: '' });
+      refresh();
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        setConflictOpen(true);
+        return;
+      }
+      showError(error);
+    } finally {
+      saveInFlightRef.current = false;
+      setSaving(false);
+    }
+  }, [
+    flushBeforeAction,
+    form,
+    onPostChange,
+    post.id,
+    post.scheduledAt,
+    refresh,
+    showError,
+    showToast,
+    t,
+  ]);
+
   const busy = saving || lifecycleBusy || uploadingKind !== null;
 
   return {
@@ -681,5 +730,9 @@ export function useNewsPostMutations({
     setArchiveOpen,
     deleteOpen,
     setDeleteOpen,
+    conflictOpen,
+    setConflictOpen,
+    resolveConflictReload,
+    resolveConflictOverwrite,
   };
 }

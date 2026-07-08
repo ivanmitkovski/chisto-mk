@@ -36,7 +36,12 @@ Optional secrets for post-deploy checks: `PRODUCTION_API_BASE`, `PRODUCTION_AUTH
 
 ## RDS password drift
 
-RDS uses AWS-managed master password rotation. When ECS tasks fail with `P1000` / `28P01`, sync `DATABASE_URL` in `chisto/production/api` from the RDS managed secret:
+RDS uses AWS-managed master password rotation (every 7 days). Terraform provisions `chisto-prod-rds-password-sync` Lambda to:
+
+1. **Immediately** sync `DATABASE_URL` and redeploy ECS when `RotationSucceeded` fires for the RDS managed secret.
+2. **Reconcile every 15 minutes** — detect drift and sync if passwords diverged (safety net).
+
+Manual recovery (if automation fails or alarms fire):
 
 ```bash
 bash infra/scripts/sync-production-database-url.sh

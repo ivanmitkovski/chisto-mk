@@ -98,7 +98,8 @@
   background: transparent;
   outline: none;
   font: inherit;
-  font-size: 1.0625rem;
+  font-size: var(--news-prose-font-size, 1.0625rem);
+  color: var(--news-prose-color, var(--text-primary));
   line-height: 1.5;
   color: var(--text-primary);
 }

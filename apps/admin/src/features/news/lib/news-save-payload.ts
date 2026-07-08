@@ -1,5 +1,6 @@
 import {
   MIN_GALLERY_ITEMS,
+  normalizeInlineLinksInHtml,
   sanitizeHtmlBlock,
   sanitizeInlineHtml,
   stripEmptyBlocks,
@@ -8,6 +9,15 @@ import {
 } from '@chisto/news-content';
 import type { NewsPostFormValues } from '../types';
 import { NEWS_LOCALES } from '../types';
+
+/**
+ * Block ids are persisted in the stored translations.body JSON (the API's
+ * sanitizeBodyBlocks preserves ids it receives), keeping React keys and
+ * editor focus stable across save → reload. See ADR-1 in the upgrade plan.
+ */
+function withBlockId<T extends NewsBodyBlock>(source: NewsBodyBlock, block: T): T {
+  return source.id ? { ...block, id: source.id } : block;
+}
 
 function paragraphHtmlIsRedundant(text: string, sanitized: string): boolean {
   const htmlPlain = stripHtmlToPlainText(sanitized).trim();
@@ -25,7 +35,7 @@ function normalizeParagraphBlock(
     return text ? { type: 'paragraph', text } : { type: 'paragraph', text: '' };
   }
 
-  const sanitized = sanitizeInlineHtml(html);
+  const sanitized = normalizeInlineLinksInHtml(sanitizeInlineHtml(html));
   const htmlPlain = stripHtmlToPlainText(sanitized).trim();
 
   if (!sanitized || !htmlPlain) {
@@ -39,38 +49,38 @@ function normalizeParagraphBlock(
   return { type: 'paragraph', text: text || htmlPlain, html: sanitized };
 }
 
-/** Strips client-only block ids and normalizes body blocks for API + dirty comparison. */
+/** Normalizes body blocks for API + dirty comparison, keeping stable block ids. */
 export function normalizeBodyBlockForSave(block: NewsBodyBlock): NewsBodyBlock {
   switch (block.type) {
     case 'paragraph':
-      return normalizeParagraphBlock(block);
+      return withBlockId(block, normalizeParagraphBlock(block));
     case 'html':
-      return { type: 'html', html: sanitizeHtmlBlock(block.html ?? '') };
+      return withBlockId(block, { type: 'html', html: sanitizeHtmlBlock(block.html ?? '') });
     case 'heading': {
       const text = block.text.trim();
       const level = block.level === 2 || block.level === 3 ? block.level : 2;
-      return { type: 'heading', level, text };
+      return withBlockId(block, { type: 'heading', level, text });
     }
     case 'list':
-      return {
+      return withBlockId(block, {
         type: 'list',
         ordered: Boolean(block.ordered),
         items: block.items.map((item) => item.trim()).filter(Boolean),
-      };
+      });
     case 'image':
-      return {
+      return withBlockId(block, {
         type: 'image',
         mediaId: block.mediaId,
         ...(block.caption?.trim() ? { caption: block.caption.trim() } : {}),
-      };
+      });
     case 'video':
-      return {
+      return withBlockId(block, {
         type: 'video',
         mediaId: block.mediaId,
         ...(block.caption?.trim() ? { caption: block.caption.trim() } : {}),
-      };
+      });
     case 'gallery':
-      return {
+      return withBlockId(block, {
         type: 'gallery',
         items: block.items
           .filter((item) => item.mediaId?.trim())
@@ -78,7 +88,24 @@ export function normalizeBodyBlockForSave(block: NewsBodyBlock): NewsBodyBlock {
             mediaId: item.mediaId.trim(),
             ...(item.caption?.trim() ? { caption: item.caption.trim() } : {}),
           })),
-      };
+      });
+    case 'quote': {
+      const text = block.text.trim();
+      const attribution = block.attribution?.trim();
+      return withBlockId(block, {
+        type: 'quote',
+        text,
+        ...(attribution ? { attribution } : {}),
+      });
+    }
+    case 'divider':
+      return withBlockId(block, { type: 'divider' });
+    case 'embed':
+      return withBlockId(block, {
+        type: 'embed',
+        provider: block.provider,
+        url: block.url.trim(),
+      });
     default:
       return block;
   }
