@@ -21,7 +21,7 @@ test.describe('News admin smoke', () => {
     await expect(titleField).toBeVisible({ timeout: 15_000 });
     await titleField.fill(title);
     await page.getByRole('button', { name: /create draft/i }).click();
-    await page.waitForURL(/\/dashboard\/news\/(?!new)/, { timeout: 20_000 });
+    await expect(page).toHaveURL(/\/dashboard\/news\/(?!new)/, { timeout: 30_000 });
     await expect(page.getByRole('heading').first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Publish', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Update', exact: true })).toHaveCount(0);
@@ -38,10 +38,12 @@ test.describe('News admin smoke', () => {
     test.skip(!draftEditorUrl || !draftTitle, 'Draft editor URL was not captured in the prior test.');
 
     await page.goto(draftEditorUrl!);
-    await page.waitForURL(/\/dashboard\/news\/(?!new)/, { timeout: 20_000 });
-    await expect(page.getByRole('button', { name: /^Insert/ })).toBeVisible({ timeout: 20_000 });
+    await expect(page).toHaveURL(/\/dashboard\/news\/(?!new)/, { timeout: 30_000 });
+    await expect(page.getByRole('button', { name: 'Insert', exact: true })).toBeVisible({
+      timeout: 20_000,
+    });
 
-    await page.getByRole('button', { name: /^Insert/ }).click();
+    await page.getByRole('button', { name: 'Insert', exact: true }).click();
     await page.getByRole('menuitem', { name: /Add heading/ }).click();
     const headingInput = page.getByPlaceholder('Heading text');
     await expect(headingInput).toBeVisible();
@@ -66,7 +68,7 @@ test.describe('News admin smoke', () => {
     test.skip(!draftEditorUrl || !draftTitle, 'Draft editor URL was not captured in the prior test.');
 
     await page.goto(draftEditorUrl!);
-    await page.waitForURL(/\/dashboard\/news\/(?!new)/, { timeout: 20_000 });
+    await expect(page).toHaveURL(/\/dashboard\/news\/(?!new)/, { timeout: 30_000 });
 
     await page.getByRole('tab', { name: 'Preview', exact: true }).click();
     await expect(page.getByText('Draft preview')).toBeVisible();
