@@ -60,8 +60,12 @@ test.describe('News admin smoke', () => {
     await headingInput.fill('Smoke section');
     await headingInput.press('Enter');
 
+    const bodyEditor = page.locator('.ProseMirror').last();
+    await expect(bodyEditor).toBeVisible({ timeout: 10_000 });
+    await bodyEditor.click();
+
     const patchPromise = waitForNewsPostPatch(page, postId);
-    await page.keyboard.type('Body copy written by the smoke test.');
+    await bodyEditor.pressSequentially('Body copy written by the smoke test.', { delay: 10 });
 
     const saveButton = page.getByRole('button', { name: 'Save draft', exact: true });
     if (await saveButton.isEnabled()) {
