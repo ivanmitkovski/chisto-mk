@@ -1,4 +1,3 @@
-import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 
@@ -6,11 +5,11 @@ function SkeletonBar({ className }: { className?: string }) {
   return <div className={`animate-pulse rounded-lg bg-gray-200/90 ${className ?? ""}`} />;
 }
 
-export default async function NewsHubLoading() {
-  const t = await getTranslations("newsPage");
+/** Keep free of next-intl server APIs (see news/[slug]/loading.tsx). */
+export default function NewsHubLoading() {
   return (
     <Section className="relative overflow-hidden mesh-section-how" aria-busy="true">
-      <span className="sr-only">{t("loadingLabel")}</span>
+      <span className="sr-only">Loading</span>
       <Container className="relative z-10">
         <SkeletonBar className="h-6 w-20" />
         <SkeletonBar className="mt-3 h-10 w-full max-w-xl" />
@@ -24,9 +23,9 @@ export default async function NewsHubLoading() {
         <div className="mt-14 space-y-12">
           <div>
             <SkeletonBar className="h-4 w-24" />
-            <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200/90 md:grid md:grid-cols-2">
-              <SkeletonBar className="aspect-[21/9] rounded-none" />
-              <div className="space-y-4 p-8 md:p-10">
+            <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200/90">
+              <SkeletonBar className="aspect-[21/9] w-full rounded-none" />
+              <div className="space-y-4 p-8 md:p-10 lg:max-w-3xl">
                 <SkeletonBar className="h-5 w-32" />
                 <SkeletonBar className="h-8 w-full" />
                 <SkeletonBar className="h-4 w-full" />

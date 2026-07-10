@@ -57,6 +57,7 @@
   line-height: 1.3;
   letter-spacing: -0.01em;
   color: var(--news-prose-heading, #111827);
+  scroll-margin-top: var(--news-prose-scroll-margin, var(--scroll-margin-top, 5.75rem));
 }
 
 .heading3 {
@@ -67,6 +68,7 @@
   line-height: 1.35;
   letter-spacing: -0.005em;
   color: var(--news-prose-heading, #111827);
+  scroll-margin-top: var(--news-prose-scroll-margin, var(--scroll-margin-top, 5.75rem));
 }
 
 .heading2:first-child,
@@ -112,7 +114,7 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 0.5rem;
+  border-radius: var(--news-prose-radius, 0.5rem);
   background: #f3f4f6;
 }
 
@@ -127,7 +129,7 @@
 .htmlBlock blockquote {
   margin: 0;
   padding-left: 1rem;
-  border-left: 4px solid #d1d5db;
+  border-left: 4px solid var(--news-prose-accent, #d1d5db);
   color: #4b5563;
 }
 
@@ -140,7 +142,7 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 0.5rem;
+  border-radius: var(--news-prose-radius, 0.5rem);
   background: #f3f4f6;
 }
 
@@ -150,14 +152,14 @@
   justify-content: center;
   min-height: 12rem;
   border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
+  border-radius: var(--news-prose-radius, 0.5rem);
   color: #6b7280;
   font-size: 0.875rem;
 }
 
 .video {
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: var(--news-prose-radius, 0.5rem);
   background: #000;
 }
 
@@ -171,7 +173,7 @@
 }
 
 .list li::marker {
-  color: #9ca3af;
+  color: var(--news-prose-marker, #9ca3af);
 }
 
 .gallery {
@@ -204,7 +206,7 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  border-radius: 0.5rem;
+  border-radius: var(--news-prose-radius, 0.5rem);
   overflow: hidden;
 }
 
@@ -218,7 +220,7 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: 0.5rem;
+  border-radius: var(--news-prose-radius, 0.5rem);
   background: #f3f4f6;
 }
 
@@ -243,7 +245,7 @@
 .quote {
   margin-top: 1.5rem;
   padding-left: 1rem;
-  border-left: 4px solid #d1d5db;
+  border-left: 4px solid var(--news-prose-accent, #d1d5db);
   color: #4b5563;
 }
 
@@ -281,7 +283,7 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 0.5rem;
+  border-radius: var(--news-prose-radius, 0.5rem);
   background: #f3f4f6;
 }
 

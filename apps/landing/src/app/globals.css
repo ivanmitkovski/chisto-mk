@@ -316,6 +316,23 @@
     max-width: var(--copy-max);
   }
 
+  /**
+   * News article reading column — brand-aligned overrides for @chisto/news-content.
+   * Package defaults stay unchanged; set vars on a parent of `.news-prose` / `.proseNews`.
+   */
+  .prose-news {
+    --news-prose-color: #374151;
+    --news-prose-heading: #111827;
+    --news-prose-link: var(--color-primary-700);
+    --news-prose-link-hover: var(--color-primary-800);
+    --news-prose-font-size: 1.0625rem;
+    --news-prose-line-height: 1.7;
+    --news-prose-accent: var(--color-primary-500);
+    --news-prose-marker: color-mix(in srgb, var(--color-primary-700) 55%, #9ca3af);
+    --news-prose-radius: 0.75rem;
+    --news-prose-scroll-margin: var(--scroll-margin-top);
+  }
+
   .hairline-b {
     border-bottom: 1px solid var(--hairline);
   }

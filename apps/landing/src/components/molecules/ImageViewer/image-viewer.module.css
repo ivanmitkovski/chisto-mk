@@ -1,0 +1,50 @@
+@keyframes imageViewerFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.overlay {
+  animation: imageViewerFadeIn 200ms ease-out;
+}
+
+.content {
+  animation: imageViewerFadeIn 200ms ease-out;
+  touch-action: none;
+  overscroll-behavior: none;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.stageDragging {
+  will-change: transform, opacity;
+  transition: none;
+}
+
+.stageIdle {
+  transition: transform 180ms ease-out, opacity 180ms ease-out;
+}
+
+.chromeHiddenGradient {
+  pointer-events: none;
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2.5rem));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent);
+  z-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .content {
+    animation: none;
+  }
+
+  .stageIdle {
+    transition: none;
+  }
+}
