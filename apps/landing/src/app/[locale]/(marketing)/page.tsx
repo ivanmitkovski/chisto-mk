@@ -11,6 +11,7 @@ import { getAppStoreUrl, getGooglePlayUrl } from "@/lib/store-links";
 import { getSocialProfileUrls } from "@/lib/social-links";
 import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 import { LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
+import { getSiteUrl } from "@/lib/site-url";
 import { type AppLocale } from "@/i18n/routing";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -34,7 +35,7 @@ export default async function HomePage({ params }: Props) {
   const tFaq = await getTranslations({ locale, namespace: "faq" });
   const appStoreUrl = getAppStoreUrl();
   const googlePlayUrl = getGooglePlayUrl();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || LEGAL_PUBLIC_DEFAULTS.siteUrl;
+  const siteUrl = getSiteUrl();
 
   const faqItems = tFaq.raw("items") as { title: string; content: string }[];
   const socialProfileUrls = getSocialProfileUrls();

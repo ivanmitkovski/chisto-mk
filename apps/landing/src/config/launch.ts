@@ -39,6 +39,7 @@ export const SITEMAP_PATHS = [
   "/cookies",
   "/data",
   "/help",
+  "/faq",
   ...(isLaunchPageVisible("about") ? ["/about"] : []),
   ...(isLaunchPageVisible("news") ? ["/news"] : []),
   ...(isLaunchPageVisible("press") ? ["/press"] : []),

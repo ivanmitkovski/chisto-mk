@@ -100,7 +100,7 @@ export default async function EventSharePage({ params }: Props) {
     location: { "@type": "Place", name: card.siteLabel, address: { "@type": "PostalAddress", addressCountry: "MK" } },
     startDate: card.scheduledAt,
     ...(card.endAt ? { endDate: card.endAt } : {}),
-    organizer: { "@type": "Organization", name: "Chisto.mk", url: "https://chisto.mk" },
+    organizer: { "@type": "Organization", name: "Chisto.mk", url: siteBase },
   };
 
   return (

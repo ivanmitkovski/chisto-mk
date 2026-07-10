@@ -11,8 +11,13 @@ import { getAllNewsSlugs, getNewsPostBySlug, getRelatedNewsPosts } from "@/data/
 import { estimateReadMinutesFromParagraphBlocks } from "@/lib/news/reading-time";
 import { NewsFetchError } from "@/lib/news/news-fetch-error";
 import { isLaunchPageVisible } from "@/config/launch";
-import { routing, type AppLocale } from "@/i18n/routing";
+import { type AppLocale } from "@/i18n/routing";
 import { getSiteUrl } from "@/lib/site-url";
+import {
+  absoluteLocaleLanguages,
+  alternateOgLocales,
+  ogLocaleForAppLocale,
+} from "@/lib/seo/marketing-metadata";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -127,9 +132,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${post.title} | ${siteName}`;
   const description = post.excerpt;
-  const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, `/${l}/news/${slug}`]),
-  ) as Record<string, string>;
+  const languages = absoluteLocaleLanguages(`/news/${slug}`);
 
   const siteUrl = getSiteUrl();
   const canonical = `${siteUrl}/${locale}/news/${slug}`;
@@ -146,7 +149,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: post.publishedAt,
       ...(post.updatedAt ? { modifiedTime: post.updatedAt } : {}),
-      locale: locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US",
+      locale: ogLocaleForAppLocale(locale),
+      alternateLocale: alternateOgLocales(locale),
       siteName,
       url: canonical,
       ...(ogImages ? { images: ogImages } : {}),

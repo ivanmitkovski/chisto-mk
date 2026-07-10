@@ -10,7 +10,7 @@ import {
 describe("buildLocaleLegalUrls", () => {
   it("uses mk as default locale segment", () => {
     const urls = buildLocaleLegalUrls("mk");
-    expect(urls.websiteUrl).toBe("https://chisto.mk/mk");
+    expect(urls.websiteUrl).toBe("https://www.chisto.mk/mk");
     expect(urls.privacyPolicyUrl).toContain("/mk/privacy");
   });
 });
@@ -18,9 +18,9 @@ describe("buildLocaleLegalUrls", () => {
 describe("getLegalPlaceholderMap", () => {
   it("prefers locale URLs over legacy defaults when env is unset", () => {
     const map = getLegalPlaceholderMap("sq");
-    expect(map["[PRIVACY_POLICY_URL]"]).toBe("https://chisto.mk/sq/privacy");
+    expect(map["[PRIVACY_POLICY_URL]"]).toBe("https://www.chisto.mk/sq/privacy");
     expect(map["[COOKIE_PREFERENCES_URL]"]).toBe(
-      "https://chisto.mk/sq/cookies#cookie-settings",
+      "https://www.chisto.mk/sq/cookies#cookie-settings",
     );
   });
 });

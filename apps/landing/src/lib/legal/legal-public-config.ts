@@ -1,8 +1,8 @@
-import { getSiteUrl } from "@/lib/site-url";
+import { PRODUCTION_SITE_URL, getSiteUrl } from "@/lib/site-url";
 import type { AppLocale } from "@/i18n/routing";
 
 export const LEGAL_PUBLIC_DEFAULTS = {
-  siteUrl: "https://chisto.mk",
+  siteUrl: PRODUCTION_SITE_URL,
   dataRequestUrl: "info@ekohab.mk",
   legalEntityName: "Здружение за животна средина ЕКОХАБ Скопје",
   entityType: "citizens' environmental association",
@@ -14,10 +14,10 @@ export const LEGAL_PUBLIC_DEFAULTS = {
   privacyEmail: "info@ekohab.mk",
   contactAddress: "Скопје, Република Македонија",
   contactPhone: "+389 75 770 803",
-  privacyPolicyUrl: "https://chisto.mk/mk/privacy",
-  termsUrl: "https://chisto.mk/mk/terms",
-  cookiePolicyUrl: "https://chisto.mk/mk/cookies",
-  cookiePreferencesUrl: "https://chisto.mk/mk/cookies#cookie-settings",
+  privacyPolicyUrl: `${PRODUCTION_SITE_URL}/mk/privacy`,
+  termsUrl: `${PRODUCTION_SITE_URL}/mk/terms`,
+  cookiePolicyUrl: `${PRODUCTION_SITE_URL}/mk/cookies`,
+  cookiePreferencesUrl: `${PRODUCTION_SITE_URL}/mk/cookies#cookie-settings`,
   hostingProvider: "Amazon Web Services (AWS)",
   serverLocation: "AWS eu-central-1 (Frankfurt, Germany)",
   serverCountryOrRegion: "European Union / EEA",

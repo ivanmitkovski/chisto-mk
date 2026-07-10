@@ -147,6 +147,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/faq"
+                  className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
+                >
+                  {t("linkFaq")}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/contact"
                   className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                 >

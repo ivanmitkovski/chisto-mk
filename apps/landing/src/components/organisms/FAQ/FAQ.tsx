@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Badge } from "@/components/atoms/Badge";
@@ -58,6 +59,15 @@ export function FAQ() {
                 <FAQItem title={item.title} content={item.content} variant={item.variant} />
               </motion.div>
             ))}
+          </motion.div>
+
+          <motion.div className="mt-8" variants={fadeInUpTight}>
+            <Link
+              href="/faq"
+              className="text-sm font-semibold text-primary transition-colors hover:text-primary-700"
+            >
+              {t("seeAll")}
+            </Link>
           </motion.div>
         </motion.div>
       </Container>
