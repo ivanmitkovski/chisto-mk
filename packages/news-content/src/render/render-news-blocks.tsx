@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { EnrichedGalleryBlock, EnrichedGalleryItem, ResolvedNewsBodyBlock } from '../types';
 import { buildEmbedIframeHtml } from '../sanitize/embed-allowlist';
 import { sanitizeHtmlBlock, sanitizeInlineHtml } from '../sanitize/html-sanitize';
+import { collectHeadingAnchors } from './heading-toc';
 import './external-link-indicator.css';
 import styles from './render-news-blocks.module.css';
 
@@ -102,6 +103,10 @@ export function RenderNewsBlocks({
   renderImage = defaultRenderImage,
   renderGallery,
 }: RenderNewsBlocksOptions) {
+  const headingIdByIndex = new Map(
+    collectHeadingAnchors(blocks).map((anchor) => [anchor.blockIndex, anchor.id] as const),
+  );
+
   return (
     <div className={[styles.proseNews, 'news-prose', className].filter(Boolean).join(' ')}>
       {blocks.map((block, i) => {
@@ -141,15 +146,16 @@ export function RenderNewsBlocks({
         if (block.type === 'heading') {
           const text = block.text.trim();
           if (!text) return null;
+          const headingId = headingIdByIndex.get(i);
           if (block.level === 3) {
             return (
-              <h3 key={key} className={styles.heading3}>
+              <h3 key={key} id={headingId} className={styles.heading3}>
                 {text}
               </h3>
             );
           }
           return (
-            <h2 key={key} className={styles.heading2}>
+            <h2 key={key} id={headingId} className={styles.heading2}>
               {text}
             </h2>
           );
