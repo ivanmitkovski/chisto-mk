@@ -138,8 +138,9 @@ export function ImageViewer({
   }
 
   const titleText = active.caption?.trim() || active.alt.trim() || labels.dialog;
+  const slideLabelFn = labels.slide;
   const liveAnnouncement =
-    labels.slide?.(safeIndex + 1, items.length) ??
+    slideLabelFn?.(safeIndex + 1, items.length) ??
     (multi ? `${safeIndex + 1} / ${items.length}` : titleText);
 
   return (
@@ -277,7 +278,7 @@ export function ImageViewer({
             ) : null}
           </div>
 
-          {multi && labels.slide ? (
+          {multi && slideLabelFn ? (
             <div
               ref={thumbsRef}
               className={cn(
@@ -302,7 +303,7 @@ export function ImageViewer({
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
                   )}
                   onClick={() => onIndexChange?.(i)}
-                  aria-label={labels.slide(i + 1, items.length)}
+                  aria-label={slideLabelFn(i + 1, items.length)}
                   aria-current={i === safeIndex ? "true" : undefined}
                   tabIndex={chromeVisible ? 0 : -1}
                 >
