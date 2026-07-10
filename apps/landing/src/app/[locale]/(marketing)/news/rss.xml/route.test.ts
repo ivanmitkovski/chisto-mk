@@ -13,7 +13,7 @@ vi.mock("@/lib/news/fetch-news", () => ({
 }));
 
 vi.mock("@/lib/site-url", () => ({
-  getSiteUrl: () => "https://chisto.mk",
+  getSiteUrl: () => "https://www.chisto.mk",
 }));
 
 vi.mock("next-intl/server", () => ({
@@ -91,7 +91,7 @@ describe("news RSS route", () => {
     expect(response.headers.get("Content-Type")).toContain("application/rss+xml");
     expect(xml).toContain("<item>");
     expect(xml).toContain("<title>Chisto.mk launches on the App Store</title>");
-    expect(xml).toContain("https://chisto.mk/en/news/launch-2026");
+    expect(xml).toContain("https://www.chisto.mk/en/news/launch-2026");
     expect(xml).toContain("Apple&apos;s App Store");
     expect(xml).toContain("<content:encoded>");
     expect(xml).toContain("Full article body.");

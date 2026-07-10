@@ -10,6 +10,35 @@ type MarketingMetadataInput = {
   siteName: string;
 };
 
+const OG_LOCALE_BY_APP: Record<string, string> = {
+  mk: "mk_MK",
+  en: "en_US",
+  sq: "sq_AL",
+};
+
+/** Absolute hreflang map (mk/en/sq + x-default) for a locale-prefixed path. */
+export function absoluteLocaleLanguages(path: string): Record<string, string> {
+  const base = getSiteUrl().replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const suffix = normalizedPath === "/" ? "" : normalizedPath;
+
+  const languages = Object.fromEntries(
+    routing.locales.map((l) => [l, `${base}/${l}${suffix}`]),
+  ) as Record<string, string>;
+  languages["x-default"] = `${base}/${routing.defaultLocale}${suffix}`;
+  return languages;
+}
+
+export function ogLocaleForAppLocale(locale: string): string {
+  return OG_LOCALE_BY_APP[locale] ?? "en_US";
+}
+
+export function alternateOgLocales(locale: string): string[] {
+  return Object.entries(OG_LOCALE_BY_APP)
+    .filter(([appLocale]) => appLocale !== locale)
+    .map(([, og]) => og);
+}
+
 export function buildMarketingMetadata({
   locale,
   path,
@@ -20,16 +49,8 @@ export function buildMarketingMetadata({
   const base = getSiteUrl().replace(/\/$/, "");
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const canonical = `${base}/${locale}${normalizedPath === "/" ? "" : normalizedPath}`;
-
-  const languages = Object.fromEntries(
-    routing.locales.map((l) => [
-      l,
-      `${base}/${l}${normalizedPath === "/" ? "" : normalizedPath}`,
-    ]),
-  ) as Record<string, string>;
-  languages["x-default"] = `${base}/${routing.defaultLocale}${normalizedPath === "/" ? "" : normalizedPath}`;
-
-  const ogLocale = locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US";
+  const languages = absoluteLocaleLanguages(path);
+  const ogLocale = ogLocaleForAppLocale(locale);
 
   return {
     title,
@@ -54,6 +75,7 @@ export function buildMarketingMetadata({
       description,
       type: "website",
       locale: ogLocale,
+      alternateLocale: alternateOgLocales(locale),
       siteName,
       url: canonical,
     },

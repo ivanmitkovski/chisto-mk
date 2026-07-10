@@ -14,6 +14,7 @@ import {
 } from "@/lib/legal/substitute-placeholders";
 import { type AppLocale } from "@/i18n/routing";
 import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
+import { buildWebPageJsonLd } from "@/lib/seo/webpage-json-ld";
 
 type CookieRow = {
   name: string;
@@ -40,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CookiesPage({ params }: Props) {
   const { locale } = await params;
   const appLocale = locale as AppLocale;
+  const tMeta = await getTranslations({ locale, namespace: "metadata" });
   const t = await getTranslations("cookiesPage");
   const map = getLegalPlaceholderMap(appLocale);
   const sections = substituteLegalSections(t.raw("sections") as LegalSection[], map);
@@ -47,9 +49,20 @@ export default async function CookiesPage({ params }: Props) {
   const effectiveLabel = t("effectiveDateLabel").trim();
   const effectiveRaw = t("effectiveDate").trim();
   const showEffectiveDate = effectiveLabel.length > 0 && effectiveRaw.length > 0;
+  const jsonLd = buildWebPageJsonLd({
+    locale,
+    path: "/cookies",
+    name: tMeta("cookies.title"),
+    description: tMeta("cookies.description"),
+    siteName: tMeta("siteName"),
+  });
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <LegalLayout
         badge={t("badge")}
         title={t("title")}

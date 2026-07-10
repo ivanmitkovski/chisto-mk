@@ -8,6 +8,7 @@ import {
 } from "@/lib/legal/substitute-placeholders";
 import { type AppLocale } from "@/i18n/routing";
 import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
+import { buildWebPageJsonLd } from "@/lib/seo/webpage-json-ld";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -26,26 +27,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PrivacyPage({ params }: Props) {
   const { locale } = await params;
   const appLocale = locale as AppLocale;
+  const tMeta = await getTranslations({ locale, namespace: "metadata" });
   const t = await getTranslations("privacyPage");
   const map = getLegalPlaceholderMap(appLocale);
   const sections = substituteLegalSections(t.raw("sections") as LegalSection[], map);
   const effectiveLabel = t("effectiveDateLabel").trim();
   const effectiveRaw = t("effectiveDate").trim();
   const showEffectiveDate = effectiveLabel.length > 0 && effectiveRaw.length > 0;
+  const jsonLd = buildWebPageJsonLd({
+    locale,
+    path: "/privacy",
+    name: tMeta("privacy.title"),
+    description: tMeta("privacy.description"),
+    siteName: tMeta("siteName"),
+  });
 
   return (
-    <LegalLayout
-      badge={t("badge")}
-      title={t("title")}
-      lastUpdatedLabel={t("lastUpdatedLabel")}
-      lastUpdated={substituteLegalText(t("lastUpdated"), map)}
-      {...(showEffectiveDate
-        ? {
-            effectiveDateLabel: effectiveLabel,
-            effectiveDate: substituteLegalText(effectiveRaw, map),
-          }
-        : {})}
-      sections={sections}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <LegalLayout
+        badge={t("badge")}
+        title={t("title")}
+        lastUpdatedLabel={t("lastUpdatedLabel")}
+        lastUpdated={substituteLegalText(t("lastUpdated"), map)}
+        {...(showEffectiveDate
+          ? {
+              effectiveDateLabel: effectiveLabel,
+              effectiveDate: substituteLegalText(effectiveRaw, map),
+            }
+          : {})}
+        sections={sections}
+      />
+    </>
   );
 }

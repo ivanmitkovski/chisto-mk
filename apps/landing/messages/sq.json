@@ -40,6 +40,10 @@
     "help": {
       "title": "Qendra e ndihmës | Chisto.mk",
       "description": "Mësoni si të përdorni Chisto.mk: fillimi, raportimi i ndotjes dhe bashkimin në aksione pastrimi."
+    },
+    "faq": {
+      "title": "Pyetjet e shpeshta | Chisto.mk",
+      "description": "Përgjigje për Chisto.mk: raportimi i ndotjes, harta publike, aksionet e pastrimit, privatësia dhe partneritetet në Maqedoni."
     }
   },
   "nav": {
@@ -144,6 +148,7 @@
   "faq": {
     "badge": "FAQ",
     "title": "Pyetje të shpeshta",
+    "seeAll": "Shiko të gjitha pyetjet",
     "items": [
       {
         "title": "Çfarë është Chisto.mk?",
@@ -200,6 +205,7 @@
     "linkPress": "Media",
     "linkContact": "Kontakt",
     "linkHelp": "Qendra e ndihmës",
+    "linkFaq": "Pyetjet e shpeshta",
     "terms": "Kushtet e përdorimit",
     "privacy": "Politika e privatësisë",
     "cookies": "Politika e cookies",

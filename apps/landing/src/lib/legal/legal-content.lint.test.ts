@@ -32,13 +32,13 @@ function walkStrings(node: unknown, out: string[]) {
 describe("buildLocaleLegalUrls", () => {
   it("builds locale-prefixed legal URLs", () => {
     const urls = buildLocaleLegalUrls("en");
-    expect(urls.privacyPolicyUrl).toBe("https://chisto.mk/en/privacy");
-    expect(urls.termsUrl).toBe("https://chisto.mk/en/terms");
-    expect(urls.cookiePolicyUrl).toBe("https://chisto.mk/en/cookies");
+    expect(urls.privacyPolicyUrl).toBe("https://www.chisto.mk/en/privacy");
+    expect(urls.termsUrl).toBe("https://www.chisto.mk/en/terms");
+    expect(urls.cookiePolicyUrl).toBe("https://www.chisto.mk/en/cookies");
     expect(urls.cookiePreferencesUrl).toBe(
-      "https://chisto.mk/en/cookies#cookie-settings",
+      "https://www.chisto.mk/en/cookies#cookie-settings",
     );
-    expect(urls.websiteUrl).toBe("https://chisto.mk/en");
+    expect(urls.websiteUrl).toBe("https://www.chisto.mk/en");
   });
 });
 

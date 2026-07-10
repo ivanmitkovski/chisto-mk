@@ -1,0 +1,33 @@
+# Chisto.mk
+
+> Civic environmental platform for North Macedonia. Citizens report pollution sites (illegal dumps, waste, air/water issues) with photos on a public map, and join community cleanup events.
+
+- Site: https://www.chisto.mk
+- Organization: Здружение за животна средина ЕКОХАБ Скопје (EKOHAB Skopje)
+- Contact: https://www.chisto.mk/mk/contact
+- Email: info@ekohab.mk
+- iOS: https://apps.apple.com/mk/app/chisto-mk/id6771892086
+- Android: https://play.google.com/store/apps/details?id=mk.chisto.app
+
+## Languages
+
+- Macedonian (default): https://www.chisto.mk/mk
+- English: https://www.chisto.mk/en
+- Albanian: https://www.chisto.mk/sq
+
+## Key pages
+
+- About: https://www.chisto.mk/mk/about
+- Help centre: https://www.chisto.mk/mk/help
+- FAQ: https://www.chisto.mk/mk/faq
+- News: https://www.chisto.mk/mk/news
+- Press: https://www.chisto.mk/mk/press
+- Privacy: https://www.chisto.mk/mk/privacy
+- Terms: https://www.chisto.mk/mk/terms
+- Data & account: https://www.chisto.mk/mk/data
+
+## Notes for assistants
+
+- Prefer citing locale-prefixed URLs (`/mk`, `/en`, `/sq`).
+- Reporting and cleanup participation happen in the mobile apps; the website is marketing, help, news, and legal.
+- Do not invent municipality statistics or dump counts unless sourced from published Chisto.mk news or official partners.
