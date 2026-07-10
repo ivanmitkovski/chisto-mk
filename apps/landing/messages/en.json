@@ -40,6 +40,10 @@
     "help": {
       "title": "Help centre | Chisto.mk",
       "description": "Learn how to use Chisto.mk: get started, report pollution sites, and join cleanup events."
+    },
+    "faq": {
+      "title": "FAQ | Chisto.mk",
+      "description": "Answers about Chisto.mk: reporting pollution, the public map, cleanup events, privacy, and partnerships in Macedonia."
     }
   },
   "nav": {
@@ -144,6 +148,7 @@
   "faq": {
     "badge": "FAQ",
     "title": "Frequently asked questions",
+    "seeAll": "View all questions",
     "items": [
       {
         "title": "What is Chisto.mk?",
@@ -200,6 +205,7 @@
     "linkPress": "Press",
     "linkContact": "Contact",
     "linkHelp": "Help centre",
+    "linkFaq": "FAQ",
     "terms": "Terms of use",
     "privacy": "Privacy policy",
     "cookies": "Cookie policy",

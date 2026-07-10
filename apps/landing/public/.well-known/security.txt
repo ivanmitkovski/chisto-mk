@@ -1,0 +1,5 @@
+Contact: mailto:info@ekohab.mk
+Expires: 2027-07-10T00:00:00.000Z
+Preferred-Languages: mk, en, sq
+Canonical: https://www.chisto.mk/.well-known/security.txt
+Policy: https://www.chisto.mk/mk/privacy
