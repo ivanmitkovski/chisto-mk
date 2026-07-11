@@ -30,9 +30,43 @@ export class NewsBodyBlockDto {
   @IsString()
   id?: string;
 
-  @ApiProperty({ enum: ['paragraph', 'html', 'heading', 'list', 'image', 'video', 'gallery'] })
-  @IsIn(['paragraph', 'html', 'heading', 'list', 'image', 'video', 'gallery'])
-  type!: 'paragraph' | 'html' | 'heading' | 'list' | 'image' | 'video' | 'gallery';
+  @ApiProperty({
+    enum: [
+      'paragraph',
+      'html',
+      'heading',
+      'list',
+      'image',
+      'video',
+      'gallery',
+      'quote',
+      'divider',
+      'embed',
+    ],
+  })
+  @IsIn([
+    'paragraph',
+    'html',
+    'heading',
+    'list',
+    'image',
+    'video',
+    'gallery',
+    'quote',
+    'divider',
+    'embed',
+  ])
+  type!:
+    | 'paragraph'
+    | 'html'
+    | 'heading'
+    | 'list'
+    | 'image'
+    | 'video'
+    | 'gallery'
+    | 'quote'
+    | 'divider'
+    | 'embed';
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -67,6 +101,24 @@ export class NewsBodyBlockDto {
   @IsOptional()
   @IsString()
   caption?: string;
+
+  /** Quote attribution (optional). */
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  attribution?: string;
+
+  /** Embed provider — validated against URL in the service layer. */
+  @ApiPropertyOptional({ enum: ['youtube', 'vimeo'] })
+  @IsOptional()
+  @IsIn(['youtube', 'vimeo'])
+  provider?: 'youtube' | 'vimeo';
+
+  /** Embed URL (YouTube / Vimeo). */
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  url?: string;
 }
 
 export class NewsLocaleContentDto {
