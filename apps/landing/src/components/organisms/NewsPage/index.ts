@@ -1,8 +1,10 @@
 export { NewsArticle } from "./NewsArticle";
+export { NewsArticleCover } from "./NewsArticleCover";
 export { NewsLanding } from "./NewsLanding";
 export { LatestNewsSection } from "./LatestNewsSection";
 export { NewsRelatedPosts } from "./NewsRelatedPosts";
 export { NewsShareBar } from "./NewsShareBar";
+export { NewsArticleToc, shouldShowNewsArticleToc } from "./NewsArticleToc";
 export { NewsBackLink, NewsReadMoreLink } from "./NewsReadMoreLink";
 export type { NewsArticleCopy } from "./NewsArticle";
 export type { NewsLandingCopy } from "./NewsLanding";

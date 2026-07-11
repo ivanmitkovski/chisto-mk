@@ -22,7 +22,9 @@ import {
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export const dynamicParams = true;
-export const revalidate = 60;
+// next-intl + on-demand ISR for new slugs throws DYNAMIC_SERVER_USAGE (HTTP 500).
+// Keep the route dynamic; fetch() still caches via revalidate/tags.
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   try {
@@ -256,10 +258,13 @@ export default async function NewsArticlePage({ params }: Props) {
           galleryNext: t("galleryNext"),
           galleryUnavailable: t("galleryUnavailable"),
           galleryAriaLabel: t("galleryAriaLabel"),
+          viewImage: t("viewImage"),
           breadcrumbHome: t("breadcrumbHome"),
           breadcrumbNews: t("breadcrumbNews"),
           breadcrumbAriaLabel: t("breadcrumbAriaLabel"),
           updatedLabel: (date) => t("updatedLabel", { date }),
+          tocLabel: t("tocLabel"),
+          tocMobileTrigger: t("tocMobileTrigger"),
         }}
       />
       <CTASection />

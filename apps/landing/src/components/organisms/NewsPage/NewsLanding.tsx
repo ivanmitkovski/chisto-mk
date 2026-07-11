@@ -1,7 +1,10 @@
 import { Suspense } from "react";
 import { PageLoadingSkeleton } from "@/components/molecules/PageLoadingSkeleton";
 import Image from "next/image";
-import { newsCoverFrameClass } from "@/lib/images/news-cover-display";
+import {
+  NEWS_COVER_FRAME_SURFACE,
+  newsCoverFrameClass,
+} from "@/lib/images/news-cover-display";
 import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { Link, type AppLocale } from "@/i18n/routing";
 import type { NewsCategory, ResolvedNewsPost } from "@/data/news-posts";
@@ -183,10 +186,10 @@ export function NewsLanding({
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {copy.featuredLabel}
               </p>
-              <article className="group mt-4 overflow-hidden rounded-2xl border border-gray-200/90 bg-white/80 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-sm transition-[border-color,box-shadow,ring-color] duration-300 hover:border-primary/25 hover:shadow-lg hover:ring-primary/20 md:grid md:grid-cols-2 md:gap-0">
+              <article className="group mt-4 overflow-hidden rounded-2xl border border-gray-200/90 bg-white/80 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-sm transition-[border-color,box-shadow,ring-color] duration-300 hover:border-primary/25 hover:shadow-lg hover:ring-primary/20">
                 <Link
                   href={`/news/${featuredPost.slug}`}
-                  className={newsCoverFrameClass()}
+                  className={newsCoverFrameClass("w-full")}
                   aria-label={featuredPost.title}
                 >
                   {featuredPost.coverImage ? (
@@ -195,14 +198,17 @@ export function NewsLanding({
                       alt={featuredPost.title}
                       fill
                       className={`${newsImageObjectFitClass(featuredPost.coverImage, "cover")} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
-                      sizes="(min-width: 768px) 50vw, 100vw"
+                      sizes="(min-width: 1280px) 80rem, 100vw"
                       unoptimized={shouldUseUnoptimizedNewsImage(featuredPost.coverImage)}
+                      priority
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-gray-100 transition-transform duration-500 ease-out group-hover:scale-[1.02]" />
+                    <div
+                      className={`absolute inset-0 ${NEWS_COVER_FRAME_SURFACE} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
+                    />
                   )}
                 </Link>
-                <div className="flex flex-col justify-center p-8 md:p-10">
+                <div className="flex flex-col justify-center p-8 md:p-10 lg:max-w-3xl">
                   <div className="flex flex-wrap items-center gap-2 gap-y-1">
                     <CategoryPill label={categoryLabel(featuredPost.category)} />
                     <time className="text-sm text-gray-500" dateTime={featuredPost.publishedAt}>

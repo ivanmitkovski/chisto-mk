@@ -31,6 +31,10 @@ vi.mock("./NewsRelatedPosts", () => ({
   NewsRelatedPosts: () => null,
 }));
 
+vi.mock("@/components/molecules/ReadingProgressBar", () => ({
+  ReadingProgressBar: () => null,
+}));
+
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string, values?: { index?: number; total?: number }) => {
     if (key === "gallerySlideLabel" && values) {
@@ -60,10 +64,13 @@ const articleCopy = {
   galleryNext: "Next image",
   galleryUnavailable: "Gallery unavailable",
   galleryAriaLabel: "Image gallery",
+  viewImage: "View image",
   breadcrumbHome: "Home",
   breadcrumbNews: "News",
   breadcrumbAriaLabel: "Breadcrumb",
   updatedLabel: (date: string) => `Updated ${date}`,
+  tocLabel: "On this page",
+  tocMobileTrigger: "Table of contents",
 };
 
 const fullBlockPost: ResolvedNewsPost = {
@@ -131,6 +138,10 @@ describe("NewsArticle", () => {
     expect(screen.getByRole("heading", { level: 1, name: "All block types" })).toBeInTheDocument();
     expect(screen.getByText("Opening paragraph.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Section title" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Section title" })).toHaveAttribute(
+      "id",
+      "section-title",
+    );
     expect(screen.getByText("First item")).toBeInTheDocument();
     expect(document.querySelector("iframe")).toHaveAttribute(
       "src",
@@ -174,5 +185,83 @@ describe("NewsArticle", () => {
     fireEvent.click(screen.getByLabelText("One"));
     expect(screen.getByRole("button", { name: "Close gallery" })).toBeInTheDocument();
     expect(screen.getByLabelText("Image 1 of 2")).toBeInTheDocument();
+  });
+
+  it("shows TOC when the article has at least three h2 headings", () => {
+    render(
+      <NewsArticle
+        locale="en"
+        post={{
+          ...fullBlockPost,
+          body: [
+            { type: "heading", level: 2, text: "Alpha" },
+            { type: "paragraph", text: "A" },
+            { type: "heading", level: 2, text: "Beta" },
+            { type: "paragraph", text: "B" },
+            { type: "heading", level: 2, text: "Gamma" },
+            { type: "paragraph", text: "C" },
+          ],
+        }}
+        relatedPosts={[]}
+        copy={articleCopy}
+        categoryLabel="Release"
+        relatedCategoryLabel={() => "Release"}
+        jsonLd="{}"
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Table of contents" })).toBeInTheDocument();
+    const alphaLinks = screen.getAllByRole("link", { name: "Alpha" });
+    expect(alphaLinks.length).toBeGreaterThan(0);
+    expect(alphaLinks[0]).toHaveAttribute("href", "#alpha");
+    expect(screen.getAllByRole("link", { name: "Beta" })[0]).toHaveAttribute("href", "#beta");
+    expect(screen.getAllByRole("link", { name: "Gamma" })[0]).toHaveAttribute("href", "#gamma");
+  });
+
+  it("hides TOC for short articles", () => {
+    render(
+      <NewsArticle
+        locale="en"
+        post={{
+          ...fullBlockPost,
+          body: [
+            { type: "heading", level: 2, text: "Only one" },
+            { type: "paragraph", text: "Short." },
+          ],
+        }}
+        relatedPosts={[]}
+        copy={articleCopy}
+        categoryLabel="Release"
+        relatedCategoryLabel={() => "Release"}
+        jsonLd="{}"
+      />,
+    );
+
+    expect(screen.queryByRole("navigation", { name: "On this page" })).not.toBeInTheDocument();
+  });
+
+  it("opens image viewer when the cover is clicked", () => {
+    render(
+      <NewsArticle
+        locale="en"
+        post={{
+          ...fullBlockPost,
+          coverImage: "https://cdn.example.com/cover.jpg",
+          coverAltText: "Hero cover",
+          body: [{ type: "paragraph", text: "Body." }],
+        }}
+        relatedPosts={[]}
+        copy={articleCopy}
+        categoryLabel="Release"
+        relatedCategoryLabel={() => "Release"}
+        jsonLd="{}"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "View image" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close gallery" })).toBeInTheDocument();
+    // Cover thumbnail + viewer image both present
+    expect(screen.getAllByRole("img", { name: "Hero cover" }).length).toBeGreaterThanOrEqual(1);
   });
 });

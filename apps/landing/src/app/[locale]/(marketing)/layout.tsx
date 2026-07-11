@@ -4,12 +4,17 @@ import { CookieConsentChrome } from "@/components/organisms/CookieConsent";
 import { Header } from "@/components/organisms/Header";
 import { Footer } from "@/components/organisms/Footer";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
+import { setRequestLocale } from "next-intl/server";
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <CookieConsentProvider>
       <Header />
