@@ -70,6 +70,38 @@ if (missingResend.length > 0) {
   console.warn(`launch-check: missing Resend env (forms will fail): ${missingResend.join(", ")}`);
 }
 
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.LANDING_SITE_URL || "")
+  .trim()
+  .replace(/\/$/, "");
+if (siteUrl.startsWith("https://")) {
+  try {
+    const insights = await fetch(`${siteUrl}/_vercel/insights/script.js`, {
+      method: "HEAD",
+      redirect: "manual",
+    });
+    const type = insights.headers.get("content-type") ?? "";
+    if (insights.status === 200 && !type.includes("text/html")) {
+      pass("Vercel Web Analytics script reachable");
+    } else {
+      // Warn (don't fail CI): the route only exists after Analytics is enabled *and*
+      // a production deploy completes — probing the live site from a PR is racy.
+      console.warn(
+        `launch-check: Vercel Web Analytics script missing at ${siteUrl}/_vercel/insights/script.js ` +
+          `(HTTP ${insights.status}, content-type=${type || "n/a"}). ` +
+          "Enable Web Analytics on chisto-mk-landing, then redeploy production.",
+      );
+    }
+  } catch (err) {
+    console.warn(
+      `launch-check: could not probe Vercel Web Analytics script: ${err instanceof Error ? err.message : err}`,
+    );
+  }
+} else {
+  console.warn(
+    "launch-check: skip Web Analytics probe (set NEXT_PUBLIC_SITE_URL or LANDING_SITE_URL)",
+  );
+}
+
 if (failed) {
   process.exit(1);
 }
