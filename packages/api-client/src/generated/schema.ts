@@ -7137,7 +7137,7 @@ export interface components {
         NewsBodyBlockDto: {
             id?: string;
             /** @enum {string} */
-            type: "paragraph" | "html" | "heading" | "list" | "image" | "video" | "gallery";
+            type: "paragraph" | "html" | "heading" | "list" | "image" | "video" | "gallery" | "quote" | "divider" | "embed";
             text?: string;
             html?: string;
             /** @enum {number} */
@@ -7147,6 +7147,10 @@ export interface components {
             items?: string[];
             mediaId?: string;
             caption?: string;
+            attribution?: string;
+            /** @enum {string} */
+            provider?: "youtube" | "vimeo";
+            url?: string;
         };
         DraftNewsLocaleContentDto: {
             title?: string;

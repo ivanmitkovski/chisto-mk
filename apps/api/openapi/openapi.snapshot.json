@@ -27548,7 +27548,10 @@
               "list",
               "image",
               "video",
-              "gallery"
+              "gallery",
+              "quote",
+              "divider",
+              "embed"
             ]
           },
           "text": {
@@ -27578,6 +27581,19 @@
             "type": "string"
           },
           "caption": {
+            "type": "string"
+          },
+          "attribution": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "youtube",
+              "vimeo"
+            ]
+          },
+          "url": {
             "type": "string"
           }
         },
