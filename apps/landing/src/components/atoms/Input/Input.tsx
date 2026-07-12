@@ -1,5 +1,6 @@
 import { forwardRef, InputHTMLAttributes, useId } from "react";
 import { cn } from "@/lib/utils/cn";
+import { formControlClassName, formControlErrorClassName } from "./form-control";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string | undefined;
@@ -19,14 +20,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           aria-invalid={error ? true : undefined}
           aria-describedby={errorId}
           className={cn(
-            "w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary",
-            error && "border-red-400 focus:border-red-400 focus:ring-red-400",
+            formControlClassName,
+            error && formControlErrorClassName,
             className,
           )}
           {...props}
         />
         {error ? (
-          <p id={errorId} className="mt-1 text-xs text-red-500" role="alert">
+          <p id={errorId} className="mt-1.5 text-sm text-red-500" role="alert">
             {error}
           </p>
         ) : null}

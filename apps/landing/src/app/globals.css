@@ -122,6 +122,24 @@
     color: #000;
   }
 
+  /**
+   * iOS Safari zooms the viewport when a focused text control renders below 16px.
+   * Floor at 16px without disabling pinch-zoom (never use maximum-scale=1 for this).
+   * Tailwind utilities like text-base still win when set; this covers unstyled controls.
+   */
+  :where(
+    input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not(
+        [type="radio"]
+      ):not([type="range"]):not([type="file"]):not([type="image"]):not([type="hidden"]):not(
+        [type="color"]
+      ),
+    textarea,
+    select
+  ) {
+    font-size: max(16px, 1em);
+  }
+
+
   .skip-link {
     position: absolute;
     left: 1rem;
