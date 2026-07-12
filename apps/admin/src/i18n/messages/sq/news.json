@@ -220,7 +220,10 @@
     "release": "Version i ri",
     "partnership": "Partneritet",
     "community": "Komunitet",
-    "product": "Produkt"
+    "product": "Produkt",
+    "media": "Media",
+    "events": "Ngjarje",
+    "impact": "Ndikim"
   },
   "status": {
     "draft": "Draft",

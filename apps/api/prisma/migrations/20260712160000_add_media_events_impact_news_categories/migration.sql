@@ -1,0 +1,4 @@
+-- AlterEnum
+ALTER TYPE "NewsCategory" ADD VALUE 'MEDIA';
+ALTER TYPE "NewsCategory" ADD VALUE 'EVENTS';
+ALTER TYPE "NewsCategory" ADD VALUE 'IMPACT';

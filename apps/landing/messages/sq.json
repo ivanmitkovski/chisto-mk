@@ -356,7 +356,10 @@
       "release": "Publikim",
       "partnership": "Partneritet",
       "community": "Komunitet",
-      "product": "Produkt"
+      "product": "Produkt",
+      "media": "Media",
+      "events": "Ngjarje",
+      "impact": "Ndikim"
     },
     "emptyTitle": "Postime të reja së shpejti",
     "emptyBody": "Po e përgatisim këtë seksion. Na ndiqni në rrjetet sociale ose na kontaktoni nëse keni një histori për të ndarë.",
@@ -400,7 +403,10 @@
       "release": "Publikim",
       "partnership": "Partneritet",
       "community": "Komunitet",
-      "product": "Produkt"
+      "product": "Produkt",
+      "media": "Media",
+      "events": "Ngjarje",
+      "impact": "Ndikim"
     },
     "emptyTitle": "Ende pa postime",
     "emptyBody": "Kur publikojmë përditësime, do të shfaqen këtu dhe në qendrën e lajmeve.",

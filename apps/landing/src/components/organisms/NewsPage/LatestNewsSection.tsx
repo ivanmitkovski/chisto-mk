@@ -9,6 +9,7 @@ import { Section } from "@/components/layout/Section";
 import { isLaunchPageVisible } from "@/config/launch";
 import { getLatestNewsPosts, type NewsCategory } from "@/data/news-posts";
 import { NewsFetchError } from "@/lib/news/news-fetch-error";
+import { newsCategoryLabel } from "@/lib/news/news-category-label";
 import { EmptyStatePanel } from "@/components/molecules/EmptyStatePanel";
 import { PageErrorPanel } from "@/components/molecules/PageErrorPanel";
 import { NewsReadMoreLink } from "@/components/organisms/NewsPage/NewsReadMoreLink";
@@ -80,7 +81,8 @@ export async function LatestNewsSection({ locale }: LatestNewsSectionProps) {
     );
   }
 
-  const categoryLabel = (category: NewsCategory) => t(`category.${category}`);
+  const categoryLabel = (category: NewsCategory) =>
+    newsCategoryLabel(category, (c) => t(`category.${c}`));
 
   return (
     <Section className="relative overflow-hidden mesh-section-features">

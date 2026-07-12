@@ -1293,7 +1293,10 @@ exports.NewsCategory = exports.$Enums.NewsCategory = {
   RELEASE: 'RELEASE',
   PARTNERSHIP: 'PARTNERSHIP',
   COMMUNITY: 'COMMUNITY',
-  PRODUCT: 'PRODUCT'
+  PRODUCT: 'PRODUCT',
+  MEDIA: 'MEDIA',
+  EVENTS: 'EVENTS',
+  IMPACT: 'IMPACT'
 };
 
 exports.NewsPostStatus = exports.$Enums.NewsPostStatus = {

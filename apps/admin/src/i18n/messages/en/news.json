@@ -220,7 +220,10 @@
     "release": "Release",
     "partnership": "Partnership",
     "community": "Community",
-    "product": "Product"
+    "product": "Product",
+    "media": "Media",
+    "events": "Events",
+    "impact": "Impact"
   },
   "status": {
     "draft": "Draft",

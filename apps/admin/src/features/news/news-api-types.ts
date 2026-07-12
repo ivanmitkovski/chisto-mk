@@ -22,7 +22,25 @@ export type NewsTranslations = Record<
   }
 >;
 
-export type NewsCategoryApi = 'release' | 'partnership' | 'community' | 'product';
+export type NewsCategoryApi =
+  | 'release'
+  | 'partnership'
+  | 'community'
+  | 'product'
+  | 'media'
+  | 'events'
+  | 'impact';
+
+export const NEWS_CATEGORY_API_VALUES: readonly NewsCategoryApi[] = [
+  'release',
+  'partnership',
+  'community',
+  'product',
+  'media',
+  'events',
+  'impact',
+] as const;
+
 export type NewsPostStatusApi = 'draft' | 'scheduled' | 'published' | 'archived';
 
 export type NewsMediaDto = {

@@ -9,7 +9,14 @@ import {
 } from './e2e-fixture';
 import { NewsFetchError } from './news-fetch-error';
 
-export type NewsCategory = 'release' | 'partnership' | 'community' | 'product';
+export type NewsCategory =
+  | 'release'
+  | 'partnership'
+  | 'community'
+  | 'product'
+  | 'media'
+  | 'events'
+  | 'impact';
 
 import type { NewsBodyBlock as SharedNewsBodyBlock } from '@chisto/news-content';
 

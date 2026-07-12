@@ -220,7 +220,10 @@
     "release": "Издание",
     "partnership": "Партнерство",
     "community": "Заедница",
-    "product": "Производ"
+    "product": "Производ",
+    "media": "Медиуми",
+    "events": "Настани",
+    "impact": "Влијание"
   },
   "status": {
     "draft": "Нацрт",

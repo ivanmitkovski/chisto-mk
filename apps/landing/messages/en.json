@@ -356,7 +356,10 @@
       "release": "Release",
       "partnership": "Partnership",
       "community": "Community",
-      "product": "Product"
+      "product": "Product",
+      "media": "Media",
+      "events": "Events",
+      "impact": "Impact"
     },
     "emptyTitle": "Fresh posts soon",
     "emptyBody": "We are preparing this section. Follow our social channels or contact us if you have a story to share.",
@@ -400,7 +403,10 @@
       "release": "Release",
       "partnership": "Partnership",
       "community": "Community",
-      "product": "Product"
+      "product": "Product",
+      "media": "Media",
+      "events": "Events",
+      "impact": "Impact"
     },
     "emptyTitle": "No posts yet",
     "emptyBody": "When we publish updates, they will appear here and on the news hub.",

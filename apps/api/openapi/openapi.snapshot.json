@@ -18768,7 +18768,10 @@
                 "release",
                 "partnership",
                 "community",
-                "product"
+                "product",
+                "media",
+                "events",
+                "impact"
               ],
               "type": "string"
             }
@@ -18965,7 +18968,10 @@
                 "release",
                 "partnership",
                 "community",
-                "product"
+                "product",
+                "media",
+                "events",
+                "impact"
               ],
               "type": "string"
             }
@@ -27649,7 +27655,10 @@
               "release",
               "partnership",
               "community",
-              "product"
+              "product",
+              "media",
+              "events",
+              "impact"
             ]
           },
           "translations": {
@@ -27673,7 +27682,10 @@
               "release",
               "partnership",
               "community",
-              "product"
+              "product",
+              "media",
+              "events",
+              "impact"
             ]
           },
           "translations": {

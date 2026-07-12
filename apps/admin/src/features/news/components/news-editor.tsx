@@ -15,6 +15,7 @@ import { copyLocaleFromSource } from '../lib/copy-locale-content';
 import { newsFormEditorFingerprint } from '../lib/news-save-payload';
 import { newsApiErrorMessage } from '../lib/news-api-messages';
 import { mediaReferencedInBody } from '../lib/news-locale-utils';
+import { newsCategoryLabel } from '../lib/news-category-label';
 import type { NewsPostAdminDto } from '../news-api-types';
 import { postToFormValues } from '../lib/post-to-form-values';
 import type { NewsFormLocale } from '../types';
@@ -171,7 +172,7 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     online,
   });
 
-  const categoryLabel = t(`category.${form.values.category}`);
+  const categoryLabel = newsCategoryLabel(form.values.category, (c) => t(`category.${c}`));
 
   const statusDescription = useMemo(
     () =>
