@@ -18728,6 +18728,45 @@
         ]
       }
     },
+    "/news/media/{id}": {
+      "get": {
+        "operationId": "PublicNewsController_mediaRedirect",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to a short-lived signed S3 GET URL (Location header)"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Media not found or post is not published"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Redirect to a freshly signed URL for published news media",
+        "tags": [
+          "news"
+        ]
+      }
+    },
     "/news/posts": {
       "get": {
         "operationId": "PublicNewsController_list",

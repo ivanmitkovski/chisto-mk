@@ -21,7 +21,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "**.amazonaws.com" },
       { protocol: "https", hostname: "**.cloudfront.net" },
+      { protocol: "https", hostname: "api.chisto.mk" },
     ],
+  },
+  async rewrites() {
+    // Browsers still request /favicon.ico by default; App Router icons live at /icon.png.
+    return [{ source: "/favicon.ico", destination: "/icon.png" }];
   },
   async headers() {
     return [

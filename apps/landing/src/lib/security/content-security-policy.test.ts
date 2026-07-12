@@ -23,6 +23,12 @@ describe('buildLandingContentSecurityPolicy', () => {
     }
   });
 
+  it('allows HTTPS media for inline news video blocks', () => {
+    const csp = buildLandingContentSecurityPolicy(false);
+    const mediaSrc = csp.split('; ').find((directive) => directive.startsWith('media-src'));
+    expect(mediaSrc).toBe("media-src 'self' blob: https:");
+  });
+
   it('keeps default-src strict and does not widen frames via default-src', () => {
     const csp = buildLandingContentSecurityPolicy(false);
     expect(csp.startsWith("default-src 'self'")).toBe(true);

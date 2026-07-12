@@ -38,6 +38,7 @@ export function buildLandingContentSecurityPolicy(isDev: boolean): string {
     "style-src 'self' 'unsafe-inline'",
     // News covers may come from any HTTPS CDN host the admin configures; images are low-risk.
     "img-src 'self' data: blob: https:",
+    "media-src 'self' blob: https:",
     "font-src 'self'",
     // 'self' covers /_vercel/insights/{view,event}; CDN used in local debug mode.
     "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://va.vercel-scripts.com",
