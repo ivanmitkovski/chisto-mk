@@ -44,6 +44,11 @@ export class NewsMediaSignedUrlService implements OnModuleDestroy {
         : DEFAULT_NEWS_MEDIA_SIGNED_URL_TTL_SECONDS;
   }
 
+  /** Configured (or default) signed GET URL lifetime in seconds. */
+  getSignedUrlTtlSeconds(): number {
+    return this.ttlSeconds;
+  }
+
   async onModuleDestroy(): Promise<void> {
     if (this.redis) {
       await this.redis.quit().catch(() => undefined);

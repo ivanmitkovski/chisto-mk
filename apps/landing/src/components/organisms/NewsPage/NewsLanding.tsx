@@ -1,11 +1,9 @@
 import { Suspense } from "react";
 import { PageLoadingSkeleton } from "@/components/molecules/PageLoadingSkeleton";
-import Image from "next/image";
 import {
   NEWS_COVER_FRAME_SURFACE,
   newsCoverFrameClass,
 } from "@/lib/images/news-cover-display";
-import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { Link, type AppLocale } from "@/i18n/routing";
 import type { NewsCategory, ResolvedNewsPost } from "@/data/news-posts";
 import { Badge } from "@/components/atoms/Badge";
@@ -14,6 +12,7 @@ import { Section } from "@/components/layout/Section";
 import { NewsCategoryFilter } from "./NewsCategoryFilter";
 import { NewsFetchErrorPanel } from "./NewsFetchErrorPanel";
 import { NewsHubPagination } from "./NewsHubPagination";
+import { NewsImage } from "./NewsImage";
 import { NewsReadMoreLink } from "./NewsReadMoreLink";
 
 const DATE_LOCALES: Record<AppLocale, string> = {
@@ -86,13 +85,12 @@ function PostGridCard({
         aria-label={post.title}
       >
         {post.coverImage ? (
-          <Image
+          <NewsImage
             src={post.coverImage}
             alt={post.title}
-            fill
-            className={`${newsImageObjectFitClass(post.coverImage, "cover")} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
+            role="cover"
+            className="transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-gray-50 transition-transform duration-500 ease-out group-hover:scale-[1.02]" />
@@ -193,13 +191,12 @@ export function NewsLanding({
                   aria-label={featuredPost.title}
                 >
                   {featuredPost.coverImage ? (
-                    <Image
+                    <NewsImage
                       src={featuredPost.coverImage}
                       alt={featuredPost.title}
-                      fill
-                      className={`${newsImageObjectFitClass(featuredPost.coverImage, "cover")} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
+                      role="cover"
+                      className="transition-transform duration-500 ease-out group-hover:scale-[1.02]"
                       sizes="(min-width: 1280px) 80rem, 100vw"
-                      unoptimized={shouldUseUnoptimizedNewsImage(featuredPost.coverImage)}
                       priority
                     />
                   ) : (

@@ -140,6 +140,12 @@ describe('buildEmbedIframeHtml', () => {
     expect(html).toContain('iframe');
     expect(html).toContain('referrerpolicy="strict-origin-when-cross-origin"');
   });
+
+  it('normalizes watch URLs to youtube-nocookie embed endpoints', () => {
+    const html = buildEmbedIframeHtml('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    expect(html).toContain('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(html).not.toContain('watch?v=');
+  });
 });
 
 describe('stripHtmlToPlainText', () => {
