@@ -20,6 +20,12 @@ function isPublicSharePath(pathname: string): boolean {
 export default function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Platform routes (Web Analytics / Speed Insights). Never run next-intl here —
+  // a rewrite or locale redirect would serve HTML for `/_vercel/insights/script.js`.
+  if (pathname.startsWith("/_vercel")) {
+    return NextResponse.next();
+  }
+
   if (isPublicSharePath(pathname)) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-locale", defaultLocale);
@@ -32,5 +38,6 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Keep `_vercel` out of the matcher too (defense in depth with the early return).
   matcher: ["/", "/((?!api|_next|_vercel|.*\\..*).*)"],
 };

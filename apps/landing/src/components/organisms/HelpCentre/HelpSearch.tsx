@@ -166,7 +166,7 @@ export function HelpSearch({
           aria-activedescendant={
             selectedIndex >= 0 && flatOrder[selectedIndex] ? `help-result-${flatOrder[selectedIndex]!.slug}` : undefined
           }
-          className="w-full rounded-2xl border border-gray-200/90 bg-white py-3.5 pl-12 pr-12 text-[0.9375rem] text-gray-900 shadow-inner shadow-black/[0.02] outline-none ring-primary/25 transition-shadow placeholder:text-gray-400 focus:border-primary/30 focus:ring-2"
+          className="w-full rounded-2xl border border-gray-200/90 bg-white py-3.5 pl-12 pr-12 text-base leading-normal text-gray-900 shadow-inner shadow-black/[0.02] outline-none ring-primary/25 transition-shadow placeholder:text-gray-400 focus:border-primary/30 focus:ring-2"
         />
         {query.trim().length > 0 ? (
           <button

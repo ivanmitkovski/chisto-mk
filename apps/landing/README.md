@@ -44,6 +44,16 @@ Serves `/.well-known/apple-app-site-association` and `assetlinks.json` for mobil
 
 Press assets: `/press` on production.
 
+## Web Analytics
+
+Consent-gated via the cookie banner (`ConditionalVercelAnalytics`). Requires:
+
+1. Web Analytics enabled on the Vercel project (`vercel project web-analytics chisto-mk-landing`)
+2. A production redeploy **after** enablement so `/_vercel/insights/script.js` is served as JS
+
+Soft probe (warn only): set `NEXT_PUBLIC_SITE_URL` and run `pnpm launch:check`.  
+Strict probe (fails on missing JS): `VERIFY_ANALYTICS_URL=https://www.chisto.mk pnpm launch:check`
+
 ## Scripts
 
 | Command | Description |
