@@ -1,4 +1,21 @@
-import { NEWS_EMBED_FRAME_SRC_ORIGINS } from '@chisto/news-content/sanitize';
+/**
+ * Trusted iframe origins for news embeds.
+ * Keep in sync with `NEWS_EMBED_FRAME_SRC_ORIGINS` in
+ * `@chisto/news-content` (`packages/news-content/src/sanitize/embed-allowlist.ts`).
+ * Parity is enforced by `content-security-policy.test.ts`.
+ *
+ * Intentionally duplicated here so `next.config.ts` does not import the
+ * workspace package (Vercel landing builds resolve `require` to
+ * `@chisto/news-content/dist/...`, which is not built in that pipeline).
+ */
+export const LANDING_NEWS_EMBED_FRAME_SRC_ORIGINS = [
+  'https://www.youtube.com',
+  'https://youtube.com',
+  'https://www.youtube-nocookie.com',
+  'https://youtube-nocookie.com',
+  'https://player.vimeo.com',
+  'https://vimeo.com',
+] as const;
 
 /**
  * Landing CSP without nonces so pages stay statically generated (nonce CSP forces
@@ -10,10 +27,10 @@ import { NEWS_EMBED_FRAME_SRC_ORIGINS } from '@chisto/news-content/sanitize';
  * `unsafe-eval` is dev-only: webpack HMR and eval source maps need it.
  *
  * `frame-src` allows news article YouTube/Vimeo embeds (sanitized via
- * `@chisto/news-content`); keep origins in sync with NEWS_EMBED_FRAME_SRC_ORIGINS.
+ * `@chisto/news-content`); origins must stay aligned with the shared allowlist.
  */
 export function buildLandingContentSecurityPolicy(isDev: boolean): string {
-  const frameSrc = ["'self'", ...NEWS_EMBED_FRAME_SRC_ORIGINS].join(' ');
+  const frameSrc = ["'self'", ...LANDING_NEWS_EMBED_FRAME_SRC_ORIGINS].join(' ');
 
   return [
     "default-src 'self'",

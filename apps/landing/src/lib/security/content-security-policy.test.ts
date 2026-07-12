@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { NEWS_EMBED_FRAME_SRC_ORIGINS } from '@chisto/news-content/sanitize';
-import { buildLandingContentSecurityPolicy } from './content-security-policy';
+import {
+  buildLandingContentSecurityPolicy,
+  LANDING_NEWS_EMBED_FRAME_SRC_ORIGINS,
+} from './content-security-policy';
 
 describe('buildLandingContentSecurityPolicy', () => {
+  it('keeps landing frame-src origins in sync with the shared news embed allowlist', () => {
+    expect([...LANDING_NEWS_EMBED_FRAME_SRC_ORIGINS]).toEqual([...NEWS_EMBED_FRAME_SRC_ORIGINS]);
+  });
+
   it('allows trusted news video embeds in frame-src', () => {
     const csp = buildLandingContentSecurityPolicy(false);
     const frameSrc = csp.split('; ').find((directive) => directive.startsWith('frame-src'));
@@ -11,7 +18,7 @@ describe('buildLandingContentSecurityPolicy', () => {
     expect(frameSrc).toContain("frame-src 'self'");
     expect(frameSrc).toContain('https://www.youtube-nocookie.com');
     expect(frameSrc).toContain('https://player.vimeo.com');
-    for (const origin of NEWS_EMBED_FRAME_SRC_ORIGINS) {
+    for (const origin of LANDING_NEWS_EMBED_FRAME_SRC_ORIGINS) {
       expect(frameSrc).toContain(origin);
     }
   });
