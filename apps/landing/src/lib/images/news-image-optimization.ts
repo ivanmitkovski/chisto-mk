@@ -17,8 +17,11 @@ export function newsImageObjectFitClass(src: string, role: NewsImageRole = "inli
 }
 
 /**
- * Next.js image optimizer can fail on presigned S3/CloudFront URLs.
- * Local and stable public URLs are safe to optimize.
+ * Next.js image optimizer can fail on:
+ * - SVG assets
+ * - Presigned S3/CloudFront URLs
+ * - API media redirect URLs (`/news/media/:id` → 302 → S3) — browser must follow redirects
+ * Local and stable public CDN URLs are safe to optimize.
  */
 export function shouldUseUnoptimizedNewsImage(src: string): boolean {
   if (isSvgMediaUrl(src)) {
@@ -31,6 +34,12 @@ export function shouldUseUnoptimizedNewsImage(src: string): boolean {
 
   try {
     const url = new URL(src);
+    const path = url.pathname.toLowerCase();
+    // Stable public media redirects must be loaded by the browser (follow 302 → S3).
+    if (/\/news\/media\/[^/]+\/?$/.test(path)) {
+      return true;
+    }
+
     const host = url.hostname.toLowerCase();
     const allowedRemote = OPTIMIZABLE_REMOTE_SUFFIXES.some((suffix) => host.endsWith(suffix));
     if (!allowedRemote) return true;

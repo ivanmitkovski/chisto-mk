@@ -13,6 +13,7 @@ import type {
   NewsTranslations,
 } from '../types/news.types';
 import { NEWS_LOCALES } from '../types/news.types';
+import { publicNewsMediaUrl } from './news-public-media-url';
 
 const CATEGORY_TO_API: Record<NewsCategory, NewsCategoryApi> = {
   RELEASE: 'release',
@@ -106,6 +107,22 @@ export function toMediaDto(
   };
 }
 
+/** Public media DTO with a stable redirect URL (never embeds expiring S3 signatures). */
+export function toPublicMediaDto(media: NewsMedia, publicApiV1Base: string): NewsMediaDto {
+  return {
+    id: media.id,
+    kind: MEDIA_KIND_TO_API[media.kind],
+    url: publicNewsMediaUrl(publicApiV1Base, media.id),
+    mimeType: media.mimeType,
+    fileName: media.fileName,
+    width: media.width,
+    height: media.height,
+    durationSeconds: media.durationSeconds,
+    altText: (media.altText as NewsMediaDto['altText']) ?? null,
+    sortOrder: media.sortOrder,
+  };
+}
+
 export function toAdminDto(
   post: NewsPost & { media: NewsMedia[]; coverMedia?: NewsMedia | null },
   signedUrls: Map<string, string | null>,
@@ -134,12 +151,12 @@ export function toAdminDto(
 export function toPublicListItem(
   post: NewsPost & { coverMedia?: NewsMedia | null },
   locale: NewsLocale,
-  signedUrls: Map<string, string | null>,
+  publicApiV1Base: string,
 ): NewsPostListItemPublicDto {
   const translations = parseTranslations(post.translations);
   const content = translations[locale];
   const coverUrl =
-    post.coverMedia != null ? (signedUrls.get(post.coverMedia.objectKey) ?? null) : null;
+    post.coverMedia != null ? publicNewsMediaUrl(publicApiV1Base, post.coverMedia.id) : null;
   return {
     slug: post.slug,
     category: categoryToApi(post.category),
@@ -154,12 +171,12 @@ export function toPublicListItem(
 export function toPublicDto(
   post: NewsPost & { media: NewsMedia[]; coverMedia?: NewsMedia | null },
   locale: NewsLocale,
-  signedUrls: Map<string, string | null>,
+  publicApiV1Base: string,
 ): NewsPostPublicDto {
   const translations = parseTranslations(post.translations);
   const content = translations[locale];
   const coverUrl =
-    post.coverMedia != null ? (signedUrls.get(post.coverMedia.objectKey) ?? null) : null;
+    post.coverMedia != null ? publicNewsMediaUrl(publicApiV1Base, post.coverMedia.id) : null;
   return {
     slug: post.slug,
     category: categoryToApi(post.category),
@@ -169,6 +186,6 @@ export function toPublicDto(
     excerpt: content.excerpt,
     body: content.body,
     coverImageUrl: coverUrl,
-    media: post.media.map((m) => toMediaDto(m, signedUrls)),
+    media: post.media.map((m) => toPublicMediaDto(m, publicApiV1Base)),
   };
 }

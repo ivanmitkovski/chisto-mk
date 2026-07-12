@@ -1,6 +1,4 @@
-import Image from "next/image";
 import { newsCoverFrameClass } from "@/lib/images/news-cover-display";
-import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { getTranslations } from "next-intl/server";
 import { Link, type AppLocale } from "@/i18n/routing";
 import { Badge } from "@/components/atoms/Badge";
@@ -12,6 +10,7 @@ import { NewsFetchError } from "@/lib/news/news-fetch-error";
 import { newsCategoryLabel } from "@/lib/news/news-category-label";
 import { EmptyStatePanel } from "@/components/molecules/EmptyStatePanel";
 import { PageErrorPanel } from "@/components/molecules/PageErrorPanel";
+import { NewsImage } from "@/components/organisms/NewsPage/NewsImage";
 import { NewsReadMoreLink } from "@/components/organisms/NewsPage/NewsReadMoreLink";
 
 const DATE_LOCALES: Record<AppLocale, string> = {
@@ -110,13 +109,12 @@ export async function LatestNewsSection({ locale }: LatestNewsSectionProps) {
                   aria-label={post.title}
                 >
                   {post.coverImage ? (
-                    <Image
+                    <NewsImage
                       src={post.coverImage}
                       alt={post.title}
-                      fill
-                      className={`${newsImageObjectFitClass(post.coverImage, "cover")} transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
+                      role="cover"
+                      className="transition-transform duration-500 ease-out group-hover:scale-[1.02]"
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
                     />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-gray-50" />

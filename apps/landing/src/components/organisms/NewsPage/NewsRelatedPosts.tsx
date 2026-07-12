@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { NEWS_COVER_THUMB_FRAME_CLASS, NEWS_COVER_FRAME_SURFACE } from "@/lib/images/news-cover-display";
-import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import type { ResolvedNewsPost } from "@/data/news-posts";
 import { MarketingReveal } from "@/components/molecules/MarketingReveal";
+import { NewsImage } from "./NewsImage";
 import { NewsRelatedAnalyticsLink } from "./NewsRelatedAnalyticsLink";
 
 type NewsRelatedPostsProps = {
@@ -35,13 +34,12 @@ export function NewsRelatedPosts({ posts, title, categoryLabel, fromSlug }: News
               >
                 {post.coverImage ? (
                   <div className={`${NEWS_COVER_THUMB_FRAME_CLASS} ${NEWS_COVER_FRAME_SURFACE}`}>
-                    <Image
+                    <NewsImage
                       src={post.coverImage}
                       alt={post.title}
-                      fill
-                      className={`${newsImageObjectFitClass(post.coverImage, "cover")} transition-transform duration-300 group-hover:scale-[1.02]`}
+                      role="cover"
+                      className="transition-transform duration-300 group-hover:scale-[1.02]"
                       sizes="96px"
-                      unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
                     />
                   </div>
                 ) : (

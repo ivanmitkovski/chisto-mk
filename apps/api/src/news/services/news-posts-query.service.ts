@@ -1,16 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { NewsLocale } from '../types/news.types';
 import { NEWS_LOCALES } from '../types/news.types';
 import { toPublicDto, toPublicListItem, categoryFromApi } from './news-posts.mapper';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
+import {
+  newsMediaRedirectMaxAgeSeconds,
+  resolvePublicApiV1Base,
+} from './news-public-media-url';
 
 @Injectable()
 export class NewsPostsQueryService {
+  private readonly publicApiV1Base: string;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly signedUrls: NewsMediaSignedUrlService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.publicApiV1Base = resolvePublicApiV1Base(
+      configService.get<string>('EMAIL_PUBLIC_API_BASE_URL'),
+    );
+  }
 
   normalizeLocale(locale: string): NewsLocale {
     const lower = locale.toLowerCase();
@@ -45,13 +57,10 @@ export class NewsPostsQueryService {
       this.prisma.newsPost.count({ where }),
     ]);
 
-    const items = [];
-    for (const row of rows) {
-      const keys = row.coverMedia ? [row.coverMedia.objectKey] : [];
-      const signed = await this.signedUrls.signMany(keys);
-      items.push(toPublicListItem(row, loc, signed));
-    }
-    return { items, total };
+    return {
+      items: rows.map((row) => toPublicListItem(row, loc, this.publicApiV1Base)),
+      total,
+    };
   }
 
   async getPublishedBySlug(locale: string, slug: string) {
@@ -70,10 +79,41 @@ export class NewsPostsQueryService {
         message: 'News post not found',
       });
     }
-    const keys: string[] = row.media.map((m) => m.objectKey);
-    if (row.coverMedia) keys.push(row.coverMedia.objectKey);
-    const signed = await this.signedUrls.signMany(keys);
-    return toPublicDto(row, loc, signed);
+    return toPublicDto(row, loc, this.publicApiV1Base);
+  }
+
+  /**
+   * Fresh signed GET URL for published news media only.
+   * Used by the public redirect endpoint so cached HTML never embeds expiring signatures.
+   */
+  async getPublishedMediaSignedUrl(mediaId: string): Promise<string> {
+    const now = new Date();
+    const media = await this.prisma.newsMedia.findFirst({
+      where: {
+        id: mediaId,
+        post: this.publishedWhere(now),
+      },
+      select: { objectKey: true },
+    });
+    if (!media) {
+      throw new NotFoundException({
+        code: 'NEWS_MEDIA_NOT_FOUND',
+        message: 'News media not found',
+      });
+    }
+    const signed = await this.signedUrls.getSignedGetUrl(media.objectKey);
+    if (!signed) {
+      throw new NotFoundException({
+        code: 'NEWS_MEDIA_NOT_FOUND',
+        message: 'News media not available',
+      });
+    }
+    return signed;
+  }
+
+  /** Safe Cache-Control max-age for the public media redirect response. */
+  getMediaRedirectMaxAgeSeconds(): number {
+    return newsMediaRedirectMaxAgeSeconds(this.signedUrls.getSignedUrlTtlSeconds());
   }
 
   async listPublishedSlugs(): Promise<string[]> {
@@ -124,12 +164,8 @@ export class NewsPostsQueryService {
       include: { coverMedia: true },
     });
 
-    const items = [];
-    for (const row of rows) {
-      const keys = row.coverMedia ? [row.coverMedia.objectKey] : [];
-      const signed = await this.signedUrls.signMany(keys);
-      items.push(toPublicListItem(row, loc, signed));
-    }
-    return { items };
+    return {
+      items: rows.map((row) => toPublicListItem(row, loc, this.publicApiV1Base)),
+    };
   }
 }

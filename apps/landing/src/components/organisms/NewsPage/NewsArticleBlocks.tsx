@@ -1,8 +1,7 @@
-import Image from "next/image";
-import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { RenderNewsBlocks } from "@chisto/news-content/render";
 import type { ResolvedNewsBodyBlock } from "@/lib/news/fetch-news";
 import { NewsGalleryCarousel } from "./NewsGalleryCarousel";
+import { NewsImage } from "./NewsImage";
 
 type NewsArticleBlocksProps = {
   body: ResolvedNewsBodyBlock[];
@@ -34,15 +33,12 @@ export function NewsArticleBlocks({
         videoUnavailable: videoUnavailableLabel,
         galleryUnavailable: galleryUnavailableLabel,
       }}
-      renderImage={({ src, alt, loading, unoptimized }) => (
-        <Image
+      renderImage={({ src, alt, loading }) => (
+        <NewsImage
           src={src}
           alt={alt}
-          fill
-          className={newsImageObjectFitClass(src)}
           sizes="(min-width: 768px) 768px, 100vw"
           {...(loading ? { loading } : {})}
-          {...(unoptimized !== undefined ? { unoptimized } : { unoptimized: shouldUseUnoptimizedNewsImage(src) })}
         />
       )}
       renderGallery={({ items, className }) => (

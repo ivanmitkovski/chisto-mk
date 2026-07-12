@@ -97,10 +97,13 @@ function escapeHtmlAttr(value: string): string {
 }
 
 export function buildEmbedIframeHtml(embedUrl: string): string {
-  if (!isAllowedEmbedUrl(embedUrl)) return '';
+  // Always normalize watch/shorts/share URLs to proper embed endpoints.
+  const normalized = embedUrlFromVideoLink(embedUrl);
+  const candidate = normalized ?? embedUrl;
+  if (!isAllowedEmbedUrl(candidate)) return '';
   let safeSrc: string;
   try {
-    safeSrc = escapeHtmlAttr(new URL(embedUrl).href);
+    safeSrc = escapeHtmlAttr(new URL(candidate).href);
   } catch {
     return '';
   }

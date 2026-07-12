@@ -1,12 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import { shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import { useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { GalleryRenderItem } from "@chisto/news-content/render";
 import { ImageViewer } from "@/components/molecules/ImageViewer";
 import { cn } from "@/lib/utils/cn";
+import { NewsImage } from "./NewsImage";
 
 type NewsGalleryCarouselProps = {
   items: GalleryRenderItem[];
@@ -60,13 +59,11 @@ export function NewsGalleryCarousel({
                 onClick={() => openLightbox(index)}
                 aria-label={item.alt || item.caption || slideLabel(index + 1, items.length)}
               >
-                <Image
+                <NewsImage
                   src={item.src}
                   alt={item.alt}
-                  fill
                   className="object-cover"
                   sizes="(min-width: 768px) 448px, 85vw"
-                  unoptimized={shouldUseUnoptimizedNewsImage(item.src)}
                 />
               </button>
               {item.caption ? (

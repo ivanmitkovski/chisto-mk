@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { NEWS_COVER_FRAME_SURFACE } from "@/lib/images/news-cover-display";
-import { newsImageObjectFitClass, shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
+import { NewsImage } from "@/components/organisms/NewsPage/NewsImage";
 import { ImageViewer } from "@/components/molecules/ImageViewer";
 import { cn } from "@/lib/utils/cn";
 
@@ -44,17 +43,13 @@ export function NewsArticleCover({
             "print:cursor-default print:border-gray-300 print:shadow-none",
           )}
         >
-          <Image
+          <NewsImage
             src={src}
             alt={alt}
-            fill
-            className={cn(
-              newsImageObjectFitClass(src, "cover"),
-              "transition-transform duration-300 motion-safe:group-hover:scale-[1.02] motion-safe:group-active:scale-100",
-            )}
+            role="cover"
+            className="transition-transform duration-300 motion-safe:group-hover:scale-[1.02] motion-safe:group-active:scale-100"
             sizes="(min-width: 896px) 896px, 100vw"
             priority
-            unoptimized={shouldUseUnoptimizedNewsImage(src)}
           />
         </button>
         {showCaption ? (

@@ -33,6 +33,55 @@ export type ImageViewerProps = {
   labels: ImageViewerLabels;
 };
 
+function ViewerImage({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  const [retryNonce, setRetryNonce] = useState(0);
+  const didRetry = useRef(false);
+  const prevSrc = useRef(src);
+
+  useEffect(() => {
+    if (prevSrc.current === src) return;
+    prevSrc.current = src;
+    didRetry.current = false;
+    setFailed(false);
+    setRetryNonce(0);
+  }, [src]);
+
+  const onError = useCallback(() => {
+    if (!didRetry.current) {
+      didRetry.current = true;
+      setRetryNonce((n) => n + 1);
+      return;
+    }
+    setFailed(true);
+  }, []);
+
+  if (failed || !src) {
+    return (
+      <div
+        className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm text-white/70"
+        role="img"
+        aria-label={alt || undefined}
+      />
+    );
+  }
+
+  return (
+    <Image
+      key={`${src}:${retryNonce}`}
+      src={src}
+      alt={alt}
+      fill
+      className="object-contain pointer-events-none select-none"
+      sizes="100vw"
+      unoptimized={shouldUseUnoptimizedNewsImage(src)}
+      priority
+      draggable={false}
+      onError={onError}
+    />
+  );
+}
+
 export function ImageViewer({
   open,
   onOpenChange,
@@ -244,16 +293,7 @@ export function ImageViewer({
             ) : null}
 
             <div className="relative h-[min(72dvh,720px)] w-full max-w-5xl" role="presentation">
-              <Image
-                src={active.src}
-                alt={active.alt}
-                fill
-                className="object-contain pointer-events-none select-none"
-                sizes="100vw"
-                unoptimized={shouldUseUnoptimizedNewsImage(active.src)}
-                priority
-                draggable={false}
-              />
+              <ViewerImage src={active.src} alt={active.alt} />
             </div>
 
             {canNavigate && labels.next ? (

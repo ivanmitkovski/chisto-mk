@@ -27,6 +27,12 @@ describe("shouldUseUnoptimizedNewsImage", () => {
     ).toBe(true);
   });
 
+  it("skips optimizer for stable API media redirect URLs", () => {
+    expect(
+      shouldUseUnoptimizedNewsImage("https://api.chisto.mk/v1/news/media/media-1"),
+    ).toBe(true);
+  });
+
   it("skips optimizer for unknown remote hosts", () => {
     expect(shouldUseUnoptimizedNewsImage("https://example.com/image.jpg")).toBe(true);
   });
