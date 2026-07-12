@@ -10,6 +10,7 @@ import { NewsFetchErrorPanel } from "@/components/organisms/NewsPage/NewsFetchEr
 import { getAllNewsSlugs, getNewsPostBySlug, getRelatedNewsPosts } from "@/data/news-posts";
 import { estimateReadMinutesFromParagraphBlocks } from "@/lib/news/reading-time";
 import { NewsFetchError } from "@/lib/news/news-fetch-error";
+import { newsCategoryLabel } from "@/lib/news/news-category-label";
 import { isLaunchPageVisible } from "@/config/launch";
 import { type AppLocale } from "@/i18n/routing";
 import { getSiteUrl } from "@/lib/site-url";
@@ -207,7 +208,7 @@ export default async function NewsArticlePage({ params }: Props) {
   const tMeta = await getTranslations({ locale, namespace: "metadata" });
   const readMinutes = estimateReadMinutesFromParagraphBlocks(post.body);
   const siteUrl = getSiteUrl();
-  const categoryLabel = t(`newsCategory.${post.category}`);
+  const categoryLabel = newsCategoryLabel(post.category, (c) => t(`newsCategory.${c}`));
   const jsonLd = newsArticleJsonLd({
     siteUrl,
     locale: appLocale,
@@ -236,7 +237,9 @@ export default async function NewsArticlePage({ params }: Props) {
         post={post}
         relatedPosts={relatedPosts}
         categoryLabel={categoryLabel}
-        relatedCategoryLabel={(category) => t(`newsCategory.${category}`)}
+        relatedCategoryLabel={(category) =>
+          newsCategoryLabel(category, (c) => t(`newsCategory.${c}`))
+        }
         jsonLd={jsonLd}
         copy={{
           badge: t("badge"),

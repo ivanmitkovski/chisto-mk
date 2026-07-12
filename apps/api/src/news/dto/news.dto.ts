@@ -12,6 +12,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import type { NewsBodyBlock, NewsCategoryApi, NewsTranslations } from '../types/news.types';
+import { NEWS_CATEGORY_API_VALUES } from '../types/news.types';
 
 export class NewsGalleryItemDto {
   @ApiProperty()
@@ -197,8 +198,10 @@ export class CreateNewsPostDto {
   @IsString()
   slug?: string;
 
-  @ApiProperty({ enum: ['release', 'partnership', 'community', 'product'] })
-  @IsIn(['release', 'partnership', 'community', 'product'])
+  @ApiProperty({
+    enum: NEWS_CATEGORY_API_VALUES,
+  })
+  @IsIn(NEWS_CATEGORY_API_VALUES)
   category!: NewsCategoryApi;
 
   @ApiProperty({ type: DraftNewsTranslationsDto })
@@ -213,9 +216,11 @@ export class UpdateNewsPostDto {
   @IsString()
   slug?: string;
 
-  @ApiPropertyOptional({ enum: ['release', 'partnership', 'community', 'product'] })
+  @ApiPropertyOptional({
+    enum: NEWS_CATEGORY_API_VALUES,
+  })
   @IsOptional()
-  @IsIn(['release', 'partnership', 'community', 'product'])
+  @IsIn(NEWS_CATEGORY_API_VALUES)
   category?: NewsCategoryApi;
 
   @ApiPropertyOptional({ type: DraftNewsTranslationsDto })
@@ -263,10 +268,12 @@ export class ListNewsPostsQueryDto {
   @Min(0)
   offset?: number;
 
-  @ApiPropertyOptional({ enum: ['release', 'partnership', 'community', 'product'] })
+  @ApiPropertyOptional({
+    enum: NEWS_CATEGORY_API_VALUES,
+  })
   @IsOptional()
-  @IsIn(['release', 'partnership', 'community', 'product'])
-  category?: 'release' | 'partnership' | 'community' | 'product';
+  @IsIn(NEWS_CATEGORY_API_VALUES)
+  category?: NewsCategoryApi;
 }
 
 export class UploadNewsMediaQueryDto {
@@ -287,10 +294,12 @@ export class AdminListNewsPostsQueryDto {
   @IsIn(['draft', 'scheduled', 'published', 'archived'])
   status?: 'draft' | 'scheduled' | 'published' | 'archived';
 
-  @ApiPropertyOptional({ enum: ['release', 'partnership', 'community', 'product'] })
+  @ApiPropertyOptional({
+    enum: NEWS_CATEGORY_API_VALUES,
+  })
   @IsOptional()
-  @IsIn(['release', 'partnership', 'community', 'product'])
-  category?: 'release' | 'partnership' | 'community' | 'product';
+  @IsIn(NEWS_CATEGORY_API_VALUES)
+  category?: NewsCategoryApi;
 
   @ApiPropertyOptional()
   @IsOptional()

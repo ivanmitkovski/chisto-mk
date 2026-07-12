@@ -38,6 +38,19 @@ describe('CreateNewsPostDto', () => {
     expect(errors).toEqual([]);
   });
 
+  it('accepts the media category', async () => {
+    const payload = {
+      category: 'media',
+      translations: {
+        en: { title: 'test', excerpt: 'test', body: [{ type: 'paragraph', text: 'test' }] },
+        mk: { title: 'test', excerpt: 'test', body: [{ type: 'paragraph', text: 'test' }] },
+        sq: { title: 'test', excerpt: 'test', body: [{ type: 'paragraph', text: 'test' }] },
+      },
+    };
+    const errors = await validateCreatePayload(payload);
+    expect(errors).toEqual([]);
+  });
+
   it('rejects extra top-level form fields leaked from the admin form', async () => {
     const payload = {
       slug: '',

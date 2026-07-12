@@ -7165,13 +7165,13 @@ export interface components {
         CreateNewsPostDto: {
             slug?: string;
             /** @enum {string} */
-            category: "release" | "partnership" | "community" | "product";
+            category: "release" | "partnership" | "community" | "product" | "media" | "events" | "impact";
             translations: components["schemas"]["DraftNewsTranslationsDto"];
         };
         UpdateNewsPostDto: {
             slug?: string;
             /** @enum {string} */
-            category?: "release" | "partnership" | "community" | "product";
+            category?: "release" | "partnership" | "community" | "product" | "media" | "events" | "impact";
             translations?: components["schemas"]["DraftNewsTranslationsDto"];
             scheduledAt?: Record<string, never> | null;
             featured?: boolean;
@@ -23343,7 +23343,7 @@ export interface operations {
                 locale?: string;
                 limit?: number;
                 offset?: number;
-                category?: "release" | "partnership" | "community" | "product";
+                category?: "release" | "partnership" | "community" | "product" | "media" | "events" | "impact";
             };
             header?: never;
             path?: never;
@@ -23610,7 +23610,7 @@ export interface operations {
         parameters: {
             query?: {
                 status?: "draft" | "scheduled" | "published" | "archived";
-                category?: "release" | "partnership" | "community" | "product";
+                category?: "release" | "partnership" | "community" | "product" | "media" | "events" | "impact";
                 q?: string;
                 limit?: number;
                 offset?: number;

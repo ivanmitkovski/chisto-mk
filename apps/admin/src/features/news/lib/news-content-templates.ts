@@ -1,7 +1,11 @@
 import { createBlockId, type NewsBodyBlock } from '@chisto/news-content';
-import type { NewsCategoryApi } from '../news-api-types';
 
-export type NewsContentTemplateId = NewsCategoryApi | 'blank';
+export type NewsContentTemplateId =
+  | 'blank'
+  | 'release'
+  | 'partnership'
+  | 'community'
+  | 'product';
 
 export type NewsContentLocale = 'en' | 'mk' | 'sq';
 

@@ -1,6 +1,14 @@
 import type { NewsCategory } from '@/data/news-posts';
 
-const NEWS_CATEGORIES: NewsCategory[] = ['release', 'partnership', 'community', 'product'];
+export const NEWS_CATEGORIES: NewsCategory[] = [
+  'release',
+  'partnership',
+  'community',
+  'product',
+  'media',
+  'events',
+  'impact',
+];
 
 export function parseNewsHubCategory(value: string | null | undefined): NewsCategory | undefined {
   if (!value) return undefined;

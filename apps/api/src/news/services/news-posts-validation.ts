@@ -10,7 +10,7 @@ import {
   type NewsBodyBlock,
 } from '@chisto/news-content';
 import type { NewsCategoryApi } from '../types/news.types';
-import { NEWS_LOCALES, type NewsTranslations } from '../types/news.types';
+import { NEWS_CATEGORY_API_VALUES, NEWS_LOCALES, type NewsTranslations } from '../types/news.types';
 import { paragraphHasContent, paragraphPlainText } from './news-content-sanitize.service';
 
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -55,8 +55,7 @@ export function assertValidSlug(slug: string): void {
 }
 
 export function assertValidCategory(category: NewsCategoryApi): void {
-  const allowed: NewsCategoryApi[] = ['release', 'partnership', 'community', 'product'];
-  if (!allowed.includes(category)) {
+  if (!(NEWS_CATEGORY_API_VALUES as readonly string[]).includes(category)) {
     throw new BadRequestException({
       code: 'NEWS_INVALID_CATEGORY',
       message: 'Invalid news category',

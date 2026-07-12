@@ -21,7 +21,17 @@ export type NewsLocaleContent = {
 
 export type NewsTranslations = Record<NewsLocale, NewsLocaleContent>;
 
-export type NewsCategoryApi = 'release' | 'partnership' | 'community' | 'product';
+export const NEWS_CATEGORY_API_VALUES = [
+  'release',
+  'partnership',
+  'community',
+  'product',
+  'media',
+  'events',
+  'impact',
+] as const;
+
+export type NewsCategoryApi = (typeof NEWS_CATEGORY_API_VALUES)[number];
 
 export type NewsPostStatusApi = 'draft' | 'scheduled' | 'published' | 'archived';
 

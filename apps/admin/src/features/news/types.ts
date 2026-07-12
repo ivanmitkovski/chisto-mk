@@ -5,6 +5,7 @@ import type {
   NewsPostStatusApi,
   NewsTranslations,
 } from './news-api-types';
+import { NEWS_CATEGORY_API_VALUES } from './news-api-types';
 
 export type { NewsBodyBlock, NewsCategoryApi, NewsPostAdminDto, NewsPostStatusApi, NewsTranslations };
 
@@ -16,12 +17,7 @@ export type NewsPostFormValues = {
   translations: NewsTranslations;
 };
 
-export const NEWS_CATEGORIES: NewsCategoryApi[] = [
-  'release',
-  'partnership',
-  'community',
-  'product',
-];
+export const NEWS_CATEGORIES: readonly NewsCategoryApi[] = NEWS_CATEGORY_API_VALUES;
 
 export const NEWS_LOCALES = ['en', 'mk', 'sq'] as const;
 export type NewsFormLocale = (typeof NEWS_LOCALES)[number];

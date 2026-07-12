@@ -12,6 +12,7 @@ import {
   type NewsCategory,
 } from "@/data/news-posts";
 import { NewsFetchError } from "@/lib/news/news-fetch-error";
+import { newsCategoryLabel } from "@/lib/news/news-category-label";
 import { newsHubRedirectPath } from "@/lib/news/news-hub-page";
 import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 import { buildCollectionPageJsonLd } from "@/lib/seo/webpage-json-ld";
@@ -133,7 +134,7 @@ export default async function NewsPage({ params, searchParams }: Props) {
   const tMeta = await getTranslations({ locale, namespace: "metadata" });
   const siteUrl = getSiteUrl().replace(/\/$/, "");
 
-  const categoryLabel = (c: NewsCategory) => t(`newsCategory.${c}`);
+  const categoryLabel = (c: NewsCategory) => newsCategoryLabel(c, (cat) => t(`newsCategory.${cat}`));
 
   const collectionJsonLd = buildCollectionPageJsonLd({
     locale,
