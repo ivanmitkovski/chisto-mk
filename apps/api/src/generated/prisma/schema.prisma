@@ -1727,6 +1727,9 @@ enum NewsCategory {
   PARTNERSHIP
   COMMUNITY
   PRODUCT
+  MEDIA
+  EVENTS
+  IMPACT
 }
 
 enum NewsMediaKind {

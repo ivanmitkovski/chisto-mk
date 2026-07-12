@@ -12,6 +12,7 @@ import {
 } from '@/components/ui';
 import type { NewsPostAdminDto } from '../news-api-types';
 import { NEWS_LOCALES } from '../types';
+import { newsCategoryLabel } from '../lib/news-category-label';
 import styles from './news-workspace.module.css';
 
 type NewsListTableProps = {
@@ -104,10 +105,14 @@ export function NewsListTable({
     {
       key: 'category',
       header: t('table.category'),
-      render: (row) => <span className={styles.categoryText}>{t(`category.${row.category}`)}</span>,
+      render: (row) => (
+        <span className={styles.categoryText}>
+          {newsCategoryLabel(row.category, (c) => t(`category.${c}`))}
+        </span>
+      ),
       renderMobile: (row) => (
         <DataTableMobileField label={t('table.category')}>
-          {t(`category.${row.category}`)}
+          {newsCategoryLabel(row.category, (c) => t(`category.${c}`))}
         </DataTableMobileField>
       ),
     },

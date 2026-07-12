@@ -34,7 +34,7 @@ export function NewsCreatePage() {
       };
     }
     form.onChange('translations', translations);
-    if (nextId !== 'blank' && NEWS_CATEGORIES.includes(nextId)) {
+    if (nextId !== 'blank') {
       form.onChange('category', nextId);
     }
   }

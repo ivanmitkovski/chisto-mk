@@ -23,7 +23,7 @@ function shouldFlagUntranslated(enVal) {
   if (/^Chisto/i.test(enVal)) return false;
   if (/^(English|Македонски|Shqip)$/.test(enVal.trim())) return false;
   const loanwords =
-    /^(Apple Maps|Google Maps|OpenStreetMap|CARTO|Postmark|Twilio|Draft|Live|Outbox|Email|Admin|Moderator|Super admin|Super Admin|JSON|2FA|MFA|QR|IP|CSV|HTTP|SSE|UTC|RRULE|E\.164|Prometheus)$/i;
+    /^(Apple Maps|Google Maps|OpenStreetMap|CARTO|Postmark|Twilio|Draft|Live|Outbox|Email|Admin|Moderator|Super admin|Super Admin|JSON|2FA|MFA|QR|IP|CSV|HTTP|SSE|UTC|RRULE|E\.164|Prometheus|Media)$/i;
   if (loanwords.test(enVal.trim())) return false;
   if (/\(en\)|\(mk\)|quiz JSON/i.test(enVal)) return false;
   return true;

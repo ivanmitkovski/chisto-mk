@@ -19,6 +19,9 @@ const CATEGORY_TO_API: Record<NewsCategory, NewsCategoryApi> = {
   PARTNERSHIP: 'partnership',
   COMMUNITY: 'community',
   PRODUCT: 'product',
+  MEDIA: 'media',
+  EVENTS: 'events',
+  IMPACT: 'impact',
 };
 
 const CATEGORY_FROM_API: Record<NewsCategoryApi, NewsCategory> = {
@@ -26,6 +29,9 @@ const CATEGORY_FROM_API: Record<NewsCategoryApi, NewsCategory> = {
   partnership: 'PARTNERSHIP',
   community: 'COMMUNITY',
   product: 'PRODUCT',
+  media: 'MEDIA',
+  events: 'EVENTS',
+  impact: 'IMPACT',
 };
 
 const STATUS_TO_API: Record<NewsPostStatus, NewsPostStatusApi> = {

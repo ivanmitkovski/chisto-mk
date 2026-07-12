@@ -4,11 +4,10 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import type { NewsCategory } from "@/data/news-posts";
-import { parseNewsHubCategory } from "@/lib/news/news-hub-params";
+import { NEWS_CATEGORIES, parseNewsHubCategory } from "@/lib/news/news-hub-params";
+import { newsCategoryLabel } from "@/lib/news/news-category-label";
 import { trackNewsEvent } from "@/lib/analytics/track-news";
 import { cn } from "@/lib/utils/cn";
-
-const CATEGORIES: NewsCategory[] = ["release", "partnership", "community", "product"];
 
 type NewsCategoryFilterProps = {
   allLabel: string;
@@ -27,10 +26,6 @@ export function NewsCategoryFilter({ allLabel }: NewsCategoryFilterProps) {
   const searchParams = useSearchParams();
   const t = useTranslations("newsPage");
   const activeCategory = parseNewsHubCategory(searchParams.get("category"));
-
-  function categoryLabel(category: NewsCategory) {
-    return t(`newsCategory.${category}`);
-  }
 
   function hrefFor(category: NewsCategory | null) {
     const params = new URLSearchParams(searchParams.toString());
@@ -57,14 +52,14 @@ export function NewsCategoryFilter({ allLabel }: NewsCategoryFilterProps) {
       >
         {allLabel}
       </Link>
-      {CATEGORIES.map((category) => (
+      {NEWS_CATEGORIES.map((category) => (
         <Link
           key={category}
           href={hrefFor(category)}
           className={chipClass(activeCategory === category)}
           onClick={() => onFilterClick(category)}
         >
-          {categoryLabel(category)}
+          {newsCategoryLabel(category, (c) => t(`newsCategory.${c}`))}
         </Link>
       ))}
     </div>
