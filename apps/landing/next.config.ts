@@ -7,7 +7,9 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
  * CSP without nonces so pages stay statically generated (nonce CSP forces
  * dynamic rendering). `script-src 'unsafe-inline'` is required by Next.js
  * hydration inline scripts; JSON-LD blocks are inert data and unaffected.
- * va.vercel-scripts.com serves the Vercel Analytics debug script in preview.
+ * Production Web Analytics loads same-origin `/_vercel/insights/script.js`
+ * (requires Analytics enabled in the Vercel project + a redeploy).
+ * va.vercel-scripts.com is used by @vercel/analytics in development/debug mode.
  * `unsafe-eval` is dev-only: webpack HMR and eval source maps need it.
  */
 const isDev = process.env.NODE_ENV === "development";
@@ -19,6 +21,7 @@ const contentSecurityPolicy = [
   // News covers may come from any HTTPS CDN host the admin configures; images are low-risk.
   "img-src 'self' data: blob: https:",
   "font-src 'self'",
+  // 'self' covers /_vercel/insights/{view,event}; CDN used in local debug mode.
   "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://va.vercel-scripts.com",
   "object-src 'none'",
   "base-uri 'self'",

@@ -2,6 +2,9 @@
 /**
  * Pre-launch sanity checks for the landing app.
  * Run: pnpm --filter @chisto/landing launch:check
+ *
+ * Optional strict analytics probe:
+ *   VERIFY_ANALYTICS_URL=https://www.chisto.mk pnpm launch:check
  */
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -17,6 +20,42 @@ function fail(msg) {
 
 function pass(msg) {
   console.log(`launch-check: ${msg}`);
+}
+
+function warn(msg) {
+  console.warn(`launch-check: ${msg}`);
+}
+
+function isJsContentType(type) {
+  const t = (type ?? "").toLowerCase();
+  return t.includes("javascript") || t.includes("ecmascript");
+}
+
+async function probeInsightsScript(baseUrl, { strict }) {
+  const scriptUrl = `${baseUrl.replace(/\/$/, "")}/_vercel/insights/script.js`;
+  try {
+    const res = await fetch(scriptUrl, { method: "HEAD", redirect: "manual" });
+    const type = res.headers.get("content-type") ?? "";
+    if (res.ok && isJsContentType(type)) {
+      pass(`Web Analytics script OK (${type})`);
+      return;
+    }
+    const detail = `HTTP ${res.status}, content-type=${type || "n/a"}`;
+    const hint =
+      "Enable Web Analytics on chisto-mk-landing, then redeploy production.";
+    if (strict) {
+      fail(`Web Analytics script ${scriptUrl} → ${detail}. ${hint}`);
+    } else {
+      warn(`Vercel Web Analytics script missing at ${scriptUrl} (${detail}). ${hint}`);
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (strict) {
+      fail(`Web Analytics probe failed for ${scriptUrl}: ${message}`);
+    } else {
+      warn(`could not probe Vercel Web Analytics script: ${message}`);
+    }
+  }
 }
 
 const launchPath = join(root, "src/config/launch.ts");
@@ -56,18 +95,30 @@ if (!existsSync(join(root, "public/press/chisto-press-kit.zip"))) {
 }
 
 if (launchSrc.includes("LAUNCH_HOME_SECTIONS")) {
-  console.warn("launch-check: remove stale LAUNCH_HOME_SECTIONS reference from launch.ts");
+  warn("remove stale LAUNCH_HOME_SECTIONS reference from launch.ts");
 }
 for (const page of ["about: false", "news: false", "press: false"]) {
   if (launchSrc.includes(page)) {
-    console.warn(`launch-check: LAUNCH_PAGE_VISIBILITY.${page.split(":")[0]} is still false`);
+    warn(`LAUNCH_PAGE_VISIBILITY.${page.split(":")[0]} is still false`);
   }
 }
 
 const resendKeys = ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "RESEND_NOTIFY_TO"];
 const missingResend = resendKeys.filter((k) => !process.env[k]?.trim());
 if (missingResend.length > 0) {
-  console.warn(`launch-check: missing Resend env (forms will fail): ${missingResend.join(", ")}`);
+  warn(`missing Resend env (forms will fail): ${missingResend.join(", ")}`);
+}
+
+const verifyAnalyticsUrl = process.env.VERIFY_ANALYTICS_URL?.trim();
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.LANDING_SITE_URL || "").trim();
+if (verifyAnalyticsUrl) {
+  // Strict: used for production smoke checks; fails the script on missing JS.
+  await probeInsightsScript(verifyAnalyticsUrl, { strict: true });
+} else if (siteUrl.startsWith("https://")) {
+  // Soft: PR/CI may race a live enable+redeploy — warn only.
+  await probeInsightsScript(siteUrl, { strict: false });
+} else {
+  warn("skip Web Analytics probe (set NEXT_PUBLIC_SITE_URL, LANDING_SITE_URL, or VERIFY_ANALYTICS_URL)");
 }
 
 if (failed) {

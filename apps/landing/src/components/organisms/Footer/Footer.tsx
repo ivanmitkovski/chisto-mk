@@ -234,7 +234,7 @@ export function Footer() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     autoComplete="email"
-                    className="min-w-0 flex-1 border-0 bg-transparent py-2 pr-2 text-sm leading-normal text-gray-900 outline-none placeholder:text-gray-400"
+                    className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-2 text-base leading-normal text-gray-900 outline-none placeholder:text-gray-400"
                   />
                   <Button
                     type="submit"

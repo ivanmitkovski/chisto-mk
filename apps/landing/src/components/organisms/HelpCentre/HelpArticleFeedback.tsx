@@ -43,7 +43,7 @@ export function HelpArticleFeedback({ slug }: { slug: HelpArticleSlug }) {
           rows={3}
           onChange={(e) => setReason(e.target.value.slice(0, REASON_MAX))}
           placeholder={t("feedbackReasonPlaceholder")}
-          className="mt-4 w-full resize-y rounded-xl border border-gray-200/90 bg-white px-3 py-2 text-sm text-gray-900 shadow-inner outline-none ring-primary/20 focus:border-primary/35 focus:ring-2"
+          className="mt-4 w-full resize-y rounded-xl border border-gray-200/90 bg-white px-3.5 py-3 text-base leading-normal text-gray-900 shadow-inner outline-none ring-primary/20 placeholder:text-gray-400 focus:border-primary/35 focus:ring-2"
         />
         <p className="mt-4 text-sm text-gray-600">
           {t("feedbackContactIntro")}{" "}
