@@ -13,7 +13,7 @@ vi.mock("next/image", () => ({
     onError?: () => void;
     src: string;
   }) => (
-    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    // eslint-disable-next-line @next/next/no-img-element
     <img alt={alt} data-testid="news-img" onError={onError} src={src} />
   ),
 }));
