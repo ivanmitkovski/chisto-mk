@@ -6,41 +6,26 @@ import {
   ReportStatus,
   SiteResolutionStatus,
   SiteStatus,
-  UserStatus,
 } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
-import { projectPublicReporter } from '../../common/projections/public-identity.projection';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import {
   signPrivateObjectKeysDeduped,
   signPublicMediaUrlsDeduped,
 } from '../../storage/util/batch-private-object-sign';
-import type {
-  SitePublicShareCardResponseDto,
-  SitePublicShareEventDto,
-  SitePublicShareReporterDto,
-} from '../dto/site-public-share-card.dto';
-
-const MEDIA_CAP = 12;
-const EVENTS_CAP = 5;
-const EVIDENCE_CAP = 12;
-
-type ApprovedReportRow = {
-  title: string;
-  description: string | null;
-  mediaUrls: string[];
-  category: string | null;
-  severity: number | null;
-  cleanupEffort: string | null;
-  createdAt: Date;
-  reporterId: string | null;
-  reporter: {
-    firstName: string;
-    lastName: string;
-    avatarObjectKey: string | null;
-    status: UserStatus;
-  } | null;
-};
+import type { SitePublicShareCardResponseDto } from '../dto/site-public-share-card.dto';
+import {
+  SHARE_CARD_EVIDENCE_CAP,
+  SHARE_CARD_EVENTS_CAP,
+  buildShareEvents,
+  buildShareReporter,
+  collectShareMediaUrls,
+  pickPrimaryShareReport,
+  publicShareDescription,
+  publicShareSiteLabel,
+  publicShareTitle,
+  pushUniqueUrls,
+} from '../util/sites-share-card.helpers';
 
 @Injectable()
 export class SitesShareCardQueryService {
@@ -122,7 +107,7 @@ export class SitesShareCardQueryService {
             },
           },
           orderBy: { scheduledAt: 'asc' },
-          take: EVENTS_CAP,
+          take: SHARE_CARD_EVENTS_CAP,
           select: {
             id: true,
             title: true,
@@ -147,31 +132,26 @@ export class SitesShareCardQueryService {
       });
     }
 
-    const primaryReport = this.pickPrimaryReport(row.heroReport, row.reports);
-    const title = this.publicShareTitle(row.heroReport, row.reports, row.description);
-    const siteLabel = this.publicShareSiteLabel(row);
-    const description = this.publicDescription(row.description, primaryReport);
-
-    const rawMedia = this.collectMediaUrls(row.heroReport, row.reports);
+    const primaryReport = pickPrimaryShareReport(row.heroReport, row.reports);
+    const title = publicShareTitle(row.heroReport, row.reports, row.description);
+    const siteLabel = publicShareSiteLabel(row);
+    const description = publicShareDescription(row.description, primaryReport);
+    const rawMedia = collectShareMediaUrls(row.heroReport, row.reports);
     const evidenceRaw =
       row.status === SiteStatus.CLEANED
         ? await this.collectCleanupEvidenceUrls(id, row.resolutions)
         : [];
 
-    const flatToSign = [...rawMedia, ...evidenceRaw];
     const avatarKey = primaryReport?.reporter?.avatarObjectKey ?? null;
-
     const [mediaByUrl, avatarByKey] = await Promise.all([
-      signPublicMediaUrlsDeduped(flatToSign, (urls) => this.reportsUpload.signUrls(urls)),
+      signPublicMediaUrlsDeduped([...rawMedia, ...evidenceRaw], (urls) =>
+        this.reportsUpload.signUrls(urls),
+      ),
       signPrivateObjectKeysDeduped([avatarKey], (k) => this.reportsUpload.signPrivateObjectKey(k)),
     ]);
 
     const mediaUrls = rawMedia.map((u) => mediaByUrl.get(u) ?? u);
     const cleanupEvidenceUrls = evidenceRaw.map((u) => mediaByUrl.get(u) ?? u);
-    const ogImageUrl = mediaUrls[0] ?? cleanupEvidenceUrls[0] ?? null;
-
-    const reporter = this.buildReporter(primaryReport, avatarByKey);
-    const events = this.buildEvents(row.events, siteLabel);
 
     return {
       id: row.id,
@@ -191,10 +171,10 @@ export class SitesShareCardQueryService {
       sharesCount: row.sharesCount,
       savesCount: row.savesCount,
       reportedAt: primaryReport?.createdAt?.toISOString() ?? null,
-      reporter,
-      events,
+      reporter: buildShareReporter(primaryReport, avatarByKey),
+      events: buildShareEvents(row.events, siteLabel),
       cleanupEvidenceUrls,
-      ogImageUrl,
+      ogImageUrl: mediaUrls[0] ?? cleanupEvidenceUrls[0] ?? null,
     };
   }
 
@@ -205,18 +185,9 @@ export class SitesShareCardQueryService {
   ): Promise<string[]> {
     const seen = new Set<string>();
     const out: string[] = [];
-    const push = (url: string | null | undefined) => {
-      const u = typeof url === 'string' ? url.trim() : '';
-      if (u.length === 0 || seen.has(u)) return;
-      seen.add(u);
-      out.push(u);
-    };
-
     for (const resolution of resolutions) {
-      for (const url of resolution.mediaUrls ?? []) {
-        push(url);
-        if (out.length >= EVIDENCE_CAP) return out;
-      }
+      pushUniqueUrls(out, seen, resolution.mediaUrls ?? [], SHARE_CARD_EVIDENCE_CAP);
+      if (out.length >= SHARE_CARD_EVIDENCE_CAP) return out;
     }
 
     const events = await this.prisma.cleanupEvent.findMany({
@@ -226,145 +197,27 @@ export class SitesShareCardQueryService {
         evidencePhotos: {
           where: { kind: EventEvidenceKind.AFTER },
           select: { objectKey: true },
-          take: EVIDENCE_CAP,
+          take: SHARE_CARD_EVIDENCE_CAP,
         },
       },
       take: 20,
     });
 
     for (const event of events) {
-      for (const key of event.afterImageKeys) {
-        const publicUrl = this.reportsUpload.getPublicUrlsForKeys([key])[0] ?? key;
-        push(publicUrl);
-        if (out.length >= EVIDENCE_CAP) return out;
-      }
-      for (const photo of event.evidencePhotos) {
-        const publicUrl =
-          this.reportsUpload.getPublicUrlsForKeys([photo.objectKey])[0] ?? photo.objectKey;
-        push(publicUrl);
-        if (out.length >= EVIDENCE_CAP) return out;
-      }
+      const fromKeys = event.afterImageKeys.map(
+        (key) => this.reportsUpload.getPublicUrlsForKeys([key])[0] ?? key,
+      );
+      pushUniqueUrls(out, seen, fromKeys, SHARE_CARD_EVIDENCE_CAP);
+      if (out.length >= SHARE_CARD_EVIDENCE_CAP) return out;
+
+      const fromPhotos = event.evidencePhotos.map(
+        (photo) =>
+          this.reportsUpload.getPublicUrlsForKeys([photo.objectKey])[0] ?? photo.objectKey,
+      );
+      pushUniqueUrls(out, seen, fromPhotos, SHARE_CARD_EVIDENCE_CAP);
+      if (out.length >= SHARE_CARD_EVIDENCE_CAP) return out;
     }
 
     return out;
-  }
-
-  private pickPrimaryReport(
-    hero: ApprovedReportRow | null,
-    reports: ApprovedReportRow[],
-  ): ApprovedReportRow | null {
-    if (hero != null) return hero;
-    return reports[0] ?? null;
-  }
-
-  private publicShareTitle(
-    hero: { title: string } | null,
-    reports: { title: string }[],
-    description: string | null,
-  ): string {
-    const heroTitle = hero?.title?.trim();
-    if (heroTitle != null && heroTitle.length > 0) {
-      return heroTitle;
-    }
-    const reportTitle = reports[0]?.title?.trim();
-    if (reportTitle != null && reportTitle.length > 0) {
-      return reportTitle;
-    }
-    const desc = description?.trim();
-    if (desc != null && desc.length > 0) {
-      return desc.length > 120 ? `${desc.slice(0, 117)}…` : desc;
-    }
-    return 'Pollution site';
-  }
-
-  private publicShareSiteLabel(site: {
-    address: string | null;
-    description: string | null;
-  }): string {
-    const address = site.address?.trim();
-    if (address != null && address.length > 0) {
-      return address;
-    }
-    const description = site.description?.trim();
-    if (description != null && description.length > 0) {
-      return description.length > 120 ? `${description.slice(0, 117)}…` : description;
-    }
-    return 'Site';
-  }
-
-  private publicDescription(
-    siteDescription: string | null,
-    primary: ApprovedReportRow | null,
-  ): string | null {
-    const fromReport = primary?.description?.trim();
-    if (fromReport != null && fromReport.length > 0) {
-      return fromReport;
-    }
-    const fromSite = siteDescription?.trim();
-    if (fromSite != null && fromSite.length > 0) {
-      return fromSite;
-    }
-    return null;
-  }
-
-  private collectMediaUrls(
-    hero: { mediaUrls: string[] } | null,
-    reports: { mediaUrls: string[] }[],
-  ): string[] {
-    const seen = new Set<string>();
-    const out: string[] = [];
-    const push = (urls: string[] | undefined) => {
-      for (const raw of urls ?? []) {
-        const u = typeof raw === 'string' ? raw.trim() : '';
-        if (u.length === 0 || seen.has(u)) continue;
-        seen.add(u);
-        out.push(u);
-        if (out.length >= MEDIA_CAP) return;
-      }
-    };
-    push(hero?.mediaUrls);
-    for (const r of reports) {
-      if (out.length >= MEDIA_CAP) break;
-      push(r.mediaUrls);
-    }
-    return out;
-  }
-
-  private buildReporter(
-    primary: ApprovedReportRow | null,
-    avatarByKey: Map<string, string | null>,
-  ): SitePublicShareReporterDto | null {
-    if (primary == null) return null;
-    const view = projectPublicReporter(primary.reporterId, primary.reporter, undefined, false);
-    if (view == null) return null;
-    const key = primary.reporter?.avatarObjectKey ?? null;
-    return {
-      displayLabel: view.displayLabel,
-      avatarUrl: key != null ? (avatarByKey.get(key) ?? null) : null,
-      isDeleted: view.isDeleted,
-      isAnonymous: view.isAnonymous,
-    };
-  }
-
-  private buildEvents(
-    events: {
-      id: string;
-      title: string;
-      scheduledAt: Date;
-      participantCount: number;
-      maxParticipants: number | null;
-      lifecycleStatus: EcoEventLifecycleStatus;
-    }[],
-    city: string,
-  ): SitePublicShareEventDto[] {
-    return events.map((e) => ({
-      id: e.id,
-      title: e.title,
-      scheduledAt: e.scheduledAt.toISOString(),
-      city,
-      participantCount: e.participantCount,
-      maxParticipants: e.maxParticipants,
-      status: e.lifecycleStatus,
-    }));
   }
 }
