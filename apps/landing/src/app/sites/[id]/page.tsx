@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
-import { SharePageShell } from "@/components/layout/SharePageLayout/SharePageShell";
+import { defaultLocale, resolveShareLocale, type ShareLocale } from "@/i18n/config";
+import { SiteShareView, type SiteShareCard } from "@/components/share/site";
 import { chistoApiBase, chistoPublicSiteBase } from "@/lib/share-api";
 import { homeDownloadSectionUrl } from "@/lib/store-links";
 import { SiteShareAttribution } from "./SiteShareAttribution";
@@ -13,34 +13,44 @@ type Props = {
   searchParams: Promise<{ st?: string; cid?: string }>;
 };
 
-type ShareCard = {
-  id: string;
-  title: string;
-  siteLabel: string;
-  status: string;
-};
+class ShareCardUpstreamError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ShareCardUpstreamError";
+  }
+}
 
-async function loadShareCard(id: string): Promise<ShareCard | null> {
+async function loadShareCard(id: string): Promise<SiteShareCard | null> {
   const res = await fetch(`${chistoApiBase()}/sites/${encodeURIComponent(id)}/share-card`, {
-    next: { revalidate: 120 },
+    next: { revalidate: 60 },
   });
   if (res.status === 404) {
     return null;
   }
   if (!res.ok) {
-    return null;
+    throw new ShareCardUpstreamError(`share-card upstream ${res.status}`);
   }
-  return (await res.json()) as ShareCard;
+  return (await res.json()) as SiteShareCard;
+}
+
+function localeFromHeaders(h: Headers): ShareLocale {
+  return resolveShareLocale(h.get("x-locale"));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const card = await loadShareCard(id);
-  if (!card) {
+  const card = await loadShareCard(id).catch(() => "error" as const);
+  if (card === "error" || !card) {
     return { title: "Chisto.mk" };
   }
-  const description = `${card.siteLabel} · ${card.title}`;
+  const h = await headers();
+  const locale = localeFromHeaders(h);
+  const statusLabel = formatSiteStatus(card.status, locale);
+  const description =
+    card.description?.trim() ||
+    `${card.siteLabel} · ${statusLabel}`;
   const canonical = `${chistoPublicSiteBase()}/sites/${encodeURIComponent(id)}`;
+  // Prefer stable opengraph-image.tsx — signed CDN URLs expire (~15m) and break social previews.
   return {
     title: `${card.title} · Chisto.mk`,
     description,
@@ -50,7 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       url: canonical,
       siteName: "Chisto.mk",
-      locale: "mk_MK",
+      locale: locale === "en" ? "en_GB" : locale === "sq" ? "sq_MK" : "mk_MK",
       title: card.title,
       description,
     },
@@ -64,42 +74,60 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SiteSharePage({ params, searchParams }: Props) {
   const { id } = await params;
-  const { st } = await searchParams;
+  const { st, cid } = await searchParams;
   const card = await loadShareCard(id);
   if (!card) {
     notFound();
   }
 
   const h = await headers();
-  const rawLocale = h.get("x-locale");
-  const uiLocale: Locale = rawLocale && isLocale(rawLocale) ? rawLocale : defaultLocale;
+  const uiLocale = localeFromHeaders(h);
   const t = siteShareStrings(uiLocale);
 
   const siteBase = chistoPublicSiteBase();
-  const appDeepLink = `${siteBase}/sites/${encodeURIComponent(id)}${st ? `?st=${encodeURIComponent(st)}` : ""}`;
-  const webHome = `${siteBase}/${uiLocale}`;
-  const downloadUrl = homeDownloadSectionUrl(siteBase, uiLocale);
-  const statusLabel = formatSiteStatus(card.status, uiLocale);
-  const jsonLd = {
+  const deepLinkQuery = new URLSearchParams();
+  if (st) deepLinkQuery.set("st", st);
+  if (cid) deepLinkQuery.set("cid", cid);
+  const deepLinkQs = deepLinkQuery.toString();
+  const appDeepLink = `${siteBase}/sites/${encodeURIComponent(id)}${deepLinkQs ? `?${deepLinkQs}` : ""}`;
+  const marketingLocale = uiLocale === "sr" || uiLocale === "rom" ? defaultLocale : uiLocale;
+  const webHome = `${siteBase}/${marketingLocale}`;
+  const downloadUrl = homeDownloadSectionUrl(siteBase, marketingLocale);
+
+  const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Place",
     name: card.title,
-    description: card.siteLabel,
-    address: { "@type": "PostalAddress", addressCountry: "MK", name: card.siteLabel },
+    description: card.description ?? card.siteLabel,
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "MK",
+      name: card.address ?? card.siteLabel,
+    },
   };
+  if (Number.isFinite(card.latitude) && Number.isFinite(card.longitude)) {
+    jsonLd.geo = {
+      "@type": "GeoCoordinates",
+      latitude: card.latitude,
+      longitude: card.longitude,
+    };
+  }
+  if (card.ogImageUrl) {
+    jsonLd.image = card.ogImageUrl;
+  }
 
   return (
     <>
       <SiteShareAttribution token={st ?? null} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <SharePageShell
-        homeHref={webHome}
-        homeLabel={t.signInCta}
-        title={card.title}
-        lines={[card.siteLabel, `${t.statusPrefix}: ${statusLabel}`]}
-        primary={{ href: appDeepLink, label: t.openInApp }}
-        secondary={{ href: downloadUrl, label: t.getTheApp }}
-        footerLink={{ href: webHome, label: t.signInCta }}
+      <SiteShareView
+        card={card}
+        locale={uiLocale}
+        t={t}
+        openInAppHref={appDeepLink}
+        getAppHref={downloadUrl}
+        exploreHref={webHome}
+        siteBase={siteBase}
       />
     </>
   );

@@ -1,6 +1,11 @@
 import createMiddleware from "next-intl/middleware";
 import { type NextRequest, NextResponse } from "next/server";
-import { defaultLocale } from "./i18n/config";
+import {
+  defaultLocale,
+  isLocale,
+  resolveShareLocale,
+  type ShareLocale,
+} from "./i18n/config";
 import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -17,6 +22,31 @@ function isPublicSharePath(pathname: string): boolean {
   return SHARE_RESOURCE_ID.test(id);
 }
 
+/** Cookie → Accept-Language → default (includes share-only sr/rom). */
+function resolveShareRequestLocale(request: NextRequest): ShareLocale {
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  if (cookieLocale) {
+    const fromCookie = resolveShareLocale(cookieLocale);
+    if (cookieLocale === fromCookie || isLocale(cookieLocale)) {
+      return fromCookie;
+    }
+  }
+  const accept = request.headers.get("accept-language");
+  if (accept) {
+    for (const part of accept.split(",")) {
+      const tag = part.trim().split(";")[0]?.toLowerCase();
+      if (!tag) continue;
+      const primary = tag.split("-")[0];
+      if (!primary) continue;
+      const resolved = resolveShareLocale(primary);
+      if (primary === "sr" || primary === "rom" || isLocale(primary)) {
+        return resolved;
+      }
+    }
+  }
+  return defaultLocale;
+}
+
 export default function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -28,7 +58,7 @@ export default function middleware(request: NextRequest) {
 
   if (isPublicSharePath(pathname)) {
     const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("x-locale", defaultLocale);
+    requestHeaders.set("x-locale", resolveShareRequestLocale(request));
     return NextResponse.next({
       request: { headers: requestHeaders },
     });

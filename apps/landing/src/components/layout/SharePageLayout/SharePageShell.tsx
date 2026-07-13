@@ -35,15 +35,18 @@ export function SharePageShell({
   return (
     <SharePageLayout homeHref={homeHref} homeLabel={homeLabel}>
       {children}
-      <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{eyebrow}</p>
-      <h1 className="mt-2 text-2xl font-bold tracking-tight text-gray-900">{title}</h1>
-      <div className="mt-3 space-y-2 text-sm leading-relaxed text-gray-600">
+      <p className="text-xs font-semibold uppercase tracking-wider text-[#7A7A7A]">{eyebrow}</p>
+      <h1 className="mt-2 text-2xl font-bold tracking-tight text-[#121212]">{title}</h1>
+      <div className="mt-3 space-y-2 text-sm leading-relaxed text-[#4C4C4C]">
         {lines.map((line) => (
           <p key={line}>{line}</p>
         ))}
       </div>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link href={primary.href} className={cn(buttonVariants({ variant: "primary", size: "md" }))}>
+        <Link
+          href={primary.href}
+          className={cn(buttonVariants({ variant: "primary", size: "md" }), "min-h-14 text-[17px] font-semibold")}
+        >
           {primary.label}
         </Link>
         {secondary ? (
@@ -60,7 +63,7 @@ export function SharePageShell({
           <a
             href={footerLink.href}
             className={cn(
-              "font-medium text-primary underline-offset-2 hover:underline",
+              "font-medium text-primary-text underline-offset-2 hover:underline",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
             )}
           >

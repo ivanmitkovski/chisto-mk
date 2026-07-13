@@ -5514,6 +5514,26 @@ export interface components {
             sessionId?: string;
             metadata?: Record<string, never>;
         };
+        SitePublicShareReporterDto: {
+            /** @description Public display name (no email/phone/user id) */
+            displayLabel: Record<string, never> | null;
+            avatarUrl: Record<string, never> | null;
+            isDeleted: boolean;
+            /** @description True when identity should be shown as localized Anonymous */
+            isAnonymous: boolean;
+        };
+        SitePublicShareEventDto: {
+            id: string;
+            title: string;
+            /** @description ISO-8601 scheduled start */
+            scheduledAt: string;
+            /** @description Location line derived from site address */
+            city: string;
+            participantCount: number;
+            maxParticipants: Record<string, never> | null;
+            /** @description EcoEventLifecycleStatus */
+            status: string;
+        };
         SitePublicShareCardResponseDto: {
             /** @description Site id (Prisma cuid) */
             id: string;
@@ -5523,6 +5543,30 @@ export interface components {
             siteLabel: string;
             /** @enum {string} */
             status: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+            description?: Record<string, never> | null;
+            address?: Record<string, never> | null;
+            latitude: number;
+            longitude: number;
+            /** @description Signed media URLs (hero + approved reports), capped */
+            mediaUrls: string[];
+            /** @description Report category code */
+            category?: Record<string, never> | null;
+            /** @description Severity 1–5 */
+            severity?: Record<string, never> | null;
+            /** @description ReportCleanupEffort enum value */
+            cleanupEffort?: Record<string, never> | null;
+            upvotesCount: number;
+            commentsCount: number;
+            sharesCount: number;
+            savesCount: number;
+            /** @description ISO-8601 primary report createdAt */
+            reportedAt?: Record<string, never> | null;
+            reporter?: components["schemas"]["SitePublicShareReporterDto"] | null;
+            events: components["schemas"]["SitePublicShareEventDto"][];
+            /** @description Signed cleanup evidence URLs when cleaned */
+            cleanupEvidenceUrls: string[];
+            /** @description First signed media URL for in-page use only; do not use for OG (short-lived signed URLs) */
+            ogImageUrl?: Record<string, never> | null;
         };
         CleanupEvidenceSubmitterDto: {
             displayLabel?: Record<string, never> | null;
