@@ -1,6 +1,6 @@
 # Production Dockerfile for Chisto API
 # Build from repo root: docker build -f Dockerfile.prod -t chisto-api .
-FROM node:20-bookworm-slim AS base
+FROM node:26-bookworm-slim AS base
 # wget: required by ECS task-definition container health check (`wget -qO- http://localhost:3000/health`).
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
 RUN corepack enable && corepack prepare pnpm@10.27.0 --activate
@@ -31,7 +31,7 @@ FROM builder AS prisma-cli
 RUN pnpm --filter @chisto/prisma-cli deploy --prod --legacy /opt/prisma-cli \
   && cd /opt/prisma-cli && DATABASE_URL="postgresql://build:build@localhost:5432/build" node node_modules/prisma/build/index.js version
 
-FROM node:20-bookworm-slim AS runner
+FROM node:26-bookworm-slim AS runner
 ENV NODE_ENV=production
 # Patch distro packages with available security fixes (Trivy image scan).
 RUN apt-get update \
