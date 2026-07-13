@@ -27,6 +27,7 @@ export type SiteShareCopy = {
   cleanupEvidence: string;
   cleanedNoEvidenceBody: string;
   noPhotos: string;
+  photoUnavailable: string;
   openPhoto: string;
   photoCount: string;
   statusExplainer: Record<string, { title: string; body: string }>;
@@ -179,6 +180,7 @@ const TABLE: Record<ShareLocale, Omit<SiteShareCopy, "statusExplainer">> = {
     cleanupEvidence: "Докази по чистење",
     cleanedNoEvidenceBody: "Оваа локација е обележана како исчистена.",
     noPhotos: "Нема фотографии",
+    photoUnavailable: "Фотографијата е недостапна",
     openPhoto: "Отвори фотографија",
     photoCount: "фото",
     closeLightbox: "Затвори",
@@ -212,6 +214,7 @@ const TABLE: Record<ShareLocale, Omit<SiteShareCopy, "statusExplainer">> = {
     cleanupEvidence: "Cleanup evidence",
     cleanedNoEvidenceBody: "This site is marked as cleaned.",
     noPhotos: "No photos",
+    photoUnavailable: "Photo unavailable",
     openPhoto: "Open photo",
     photoCount: "photos",
     closeLightbox: "Close",
@@ -245,6 +248,7 @@ const TABLE: Record<ShareLocale, Omit<SiteShareCopy, "statusExplainer">> = {
     cleanupEvidence: "Evidenca e pastrimit",
     cleanedNoEvidenceBody: "Ky vend është shënuar si i pastruar.",
     noPhotos: "Nuk ka foto",
+    photoUnavailable: "Fotoja nuk është e disponueshme",
     openPhoto: "Hap foton",
     photoCount: "foto",
     closeLightbox: "Mbyll",
@@ -278,6 +282,7 @@ const TABLE: Record<ShareLocale, Omit<SiteShareCopy, "statusExplainer">> = {
     cleanupEvidence: "Докази после чишћења",
     cleanedNoEvidenceBody: "Ова локација је означена као очишћена.",
     noPhotos: "Нема фотографија",
+    photoUnavailable: "Фотографија није доступна",
     openPhoto: "Отвори фотографију",
     photoCount: "фото",
     closeLightbox: "Затвори",
@@ -311,6 +316,7 @@ const TABLE: Record<ShareLocale, Omit<SiteShareCopy, "statusExplainer">> = {
     cleanupEvidence: "Cleanup evidence",
     cleanedNoEvidenceBody: "This site is marked as cleaned.",
     noPhotos: "No photos",
+    photoUnavailable: "Photo unavailable",
     openPhoto: "Open photo",
     photoCount: "photos",
     closeLightbox: "Close",

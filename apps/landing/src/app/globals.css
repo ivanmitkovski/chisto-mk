@@ -16,6 +16,20 @@
   --color-primary-text: #086340;
   --color-on-primary: #121212;
 
+  /* Share / mobile AppColors — keep share landings aligned with the app. */
+  --color-app-bg: #F4F5F7;
+  --color-ink: #121212;
+  --color-ink-secondary: #4C4C4C;
+  --color-ink-muted: #7A7A7A;
+  --color-surface-muted: #F0F1F7;
+  --color-divider: #E5E7ED;
+  --color-status-mint: #EDFFF6;
+  --color-status-mint-border: #D0F0DF;
+  --color-status-warn: #FFF6E8;
+  --color-status-warn-border: #FFE1B3;
+  --color-status-danger: #FFF1F0;
+  --color-status-danger-border: #F7D2CF;
+
   --color-action: var(--color-primary);
   --color-action-hover: var(--color-primary-dark);
   --color-action-foreground: var(--color-on-primary);

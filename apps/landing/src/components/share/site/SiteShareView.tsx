@@ -72,8 +72,9 @@ export function SiteShareView({
       : card.reporter.displayLabel.trim();
 
   return (
-    <div className="min-h-dvh bg-[#F4F5F7] text-[#121212]">
-      <div className="mx-auto max-w-2xl px-4 pb-36 pt-8 sm:px-6 sm:pt-10">
+    <div className="min-h-dvh bg-app-bg text-ink">
+      {/* Mobile sticky CTAs stack (~2×56 + explore + safe-area); keep content clear. */}
+      <div className="mx-auto max-w-2xl px-4 pb-[calc(12.5rem+env(safe-area-inset-bottom))] pt-8 sm:px-6 sm:pb-40 sm:pt-10">
         <header className="mb-6 flex items-center gap-2">
           <Image
             src="/brand/chisto-mark.svg"
@@ -88,7 +89,7 @@ export function SiteShareView({
           </span>
         </header>
 
-        <article className="overflow-hidden rounded-[24px] border border-[#E5E7ED]/90 bg-white shadow-[var(--shadow-card)] ring-1 ring-black/[0.04]">
+        <article className="overflow-hidden rounded-[24px] border border-divider/90 bg-white shadow-[var(--shadow-card)] ring-1 ring-black/[0.04]">
           <div className="p-4 sm:p-6">
             <ShareHeroGallery
               urls={card.mediaUrls}
@@ -98,6 +99,7 @@ export function SiteShareView({
               closeLabel={t.closeLightbox}
               prevLabel={t.previousPhoto}
               nextLabel={t.nextPhoto}
+              unavailableLabel={t.photoUnavailable}
             />
 
             <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -116,11 +118,11 @@ export function SiteShareView({
               />
             </div>
 
-            <h1 className="mt-5 text-2xl font-bold tracking-tight text-[#121212] sm:text-[1.65rem]">
+            <h1 className="mt-5 text-2xl font-bold tracking-tight text-ink sm:text-[1.65rem]">
               {card.title}
             </h1>
             {card.description && card.description.trim() !== card.title.trim() ? (
-              <p className="mt-3 text-base leading-[1.45] text-[#4C4C4C]">{card.description}</p>
+              <p className="mt-3 text-base leading-[1.45] text-ink-secondary">{card.description}</p>
             ) : null}
 
             <div className="mt-5">
@@ -128,7 +130,7 @@ export function SiteShareView({
             </div>
 
             {card.reporter || card.reportedAt ? (
-              <div className="mt-6 border-t border-[#E5E7ED] pt-5">
+              <div className="mt-6 border-t border-divider pt-5">
                 <ShareReporterRow
                   reportedByLabel={t.reportedBy}
                   name={reporterName}
@@ -139,7 +141,7 @@ export function SiteShareView({
             ) : null}
 
             {card.events.length > 0 ? (
-              <div className="mt-6 border-t border-[#E5E7ED] pt-5">
+              <div className="mt-6 border-t border-divider pt-5">
                 <ShareEventsList
                   title={t.upcomingCleanups}
                   participantsLabel={t.participants}
@@ -151,7 +153,7 @@ export function SiteShareView({
             ) : null}
 
             {card.cleanupEvidenceUrls.length > 0 ? (
-              <div className="mt-6 border-t border-[#E5E7ED] pt-5">
+              <div className="mt-6 border-t border-divider pt-5">
                 <ShareEvidenceSection
                   title={t.cleanupEvidence}
                   urls={card.cleanupEvidenceUrls}
@@ -160,6 +162,7 @@ export function SiteShareView({
                   closeLabel={t.closeLightbox}
                   prevLabel={t.previousPhoto}
                   nextLabel={t.nextPhoto}
+                  unavailableLabel={t.photoUnavailable}
                 />
               </div>
             ) : null}
@@ -168,15 +171,15 @@ export function SiteShareView({
               <div
                 className={
                   card.status === "DISPUTED"
-                    ? "mt-6 rounded-2xl border border-[#F7D2CF]/90 bg-[#FFF1F0] p-3"
+                    ? "mt-6 rounded-2xl border border-status-danger-border/90 bg-status-danger p-3"
                     : card.status === "IN_PROGRESS" || card.status === "CLEANUP_SCHEDULED"
-                      ? "mt-6 rounded-2xl border border-[#FFE1B3]/90 bg-[#FFF6E8] p-3"
-                      : "mt-6 rounded-2xl border border-[#D0F0DF]/90 bg-[#EDFFF6] p-3"
+                      ? "mt-6 rounded-2xl border border-status-warn-border/90 bg-status-warn p-3"
+                      : "mt-6 rounded-2xl border border-status-mint-border/90 bg-status-mint p-3"
                 }
                 role="note"
               >
-                <p className="text-base font-semibold text-[#121212]">{explainer.title}</p>
-                <p className="mt-1 text-sm leading-[1.35] text-[#4C4C4C]">
+                <p className="text-base font-semibold text-ink">{explainer.title}</p>
+                <p className="mt-1 text-sm leading-[1.35] text-ink-secondary">
                   {card.status === "CLEANED" && card.cleanupEvidenceUrls.length === 0
                     ? t.cleanedNoEvidenceBody
                     : explainer.body}

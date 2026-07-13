@@ -6617,6 +6617,139 @@
         ]
       }
     },
+    "/sites/{id}/share-media/{index}": {
+      "get": {
+        "operationId": "SitesDetailController_redirectShareMedia",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "index",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to a short-lived signed S3 GET URL"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site or media slot not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Redirect to a freshly signed URL for public site share media",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/share-evidence/{index}": {
+      "get": {
+        "operationId": "SitesDetailController_redirectShareEvidence",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "index",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to a short-lived signed S3 GET URL"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site or evidence slot not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Redirect to a freshly signed URL for public site cleanup evidence",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/share-avatar": {
+      "get": {
+        "operationId": "SitesDetailController_redirectShareAvatar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to a short-lived signed S3 GET URL"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site or avatar not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Redirect to a freshly signed URL for the public share reporter avatar",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
     "/sites/{id}/cleanup-evidence": {
       "get": {
         "operationId": "SitesDetailController_findCleanupEvidence",
@@ -22448,7 +22581,8 @@
           },
           "avatarUrl": {
             "type": "object",
-            "nullable": true
+            "nullable": true,
+            "description": "Stable redirect URL for reporter avatar (`/sites/:id/share-avatar`)"
           },
           "isDeleted": {
             "type": "boolean"
@@ -22545,7 +22679,7 @@
             "type": "number"
           },
           "mediaUrls": {
-            "description": "Signed media URLs (hero + approved reports), capped",
+            "description": "Stable share-media redirect URLs (`/sites/:id/share-media/:index`); each request 302s to a fresh signed GET",
             "type": "array",
             "items": {
               "type": "string"
@@ -22598,7 +22732,7 @@
             }
           },
           "cleanupEvidenceUrls": {
-            "description": "Signed cleanup evidence URLs when cleaned",
+            "description": "Stable share-evidence redirect URLs when cleaned (`/sites/:id/share-evidence/:index`)",
             "type": "array",
             "items": {
               "type": "string"
@@ -22607,7 +22741,7 @@
           "ogImageUrl": {
             "type": "object",
             "nullable": true,
-            "description": "First signed media URL for in-page use only; do not use for OG (short-lived signed URLs)"
+            "description": "First stable media/evidence redirect URL for in-page use; OG tags use opengraph-image.tsx instead"
           }
         },
         "required": [

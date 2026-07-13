@@ -181,6 +181,10 @@ export class ReportsUploadService {
     return this.usersAvatar.signPrivateObjectKey(objectKey);
   }
 
+  getSignedUrlTtlSeconds(): number {
+    return this.reportSignedUrls.getSignedUrlTtlSeconds();
+  }
+
   resolveUserAvatarUrl(stored: string | null | undefined): Promise<string | null> {
     return this.usersAvatar.resolveUserAvatarUrl(stored);
   }

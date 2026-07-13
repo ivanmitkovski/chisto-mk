@@ -1,6 +1,7 @@
 /// <reference types="jest" />
 
 import { NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SiteStatus } from '../../src/prisma-client';
 import { SitesShareCardQueryService } from '../../src/sites/services/sites-share-card-query.service';
 import type { PrismaService } from '../../src/prisma/prisma.service';
@@ -15,9 +16,13 @@ describe('SitesShareCardQueryService.findPublicShareCard', () => {
       signUrls: jest.fn(async (urls: string[]) => urls.map((u) => `signed:${u}`)),
       signPrivateObjectKey: jest.fn(async () => 'signed-avatar'),
       getPublicUrlsForKeys: jest.fn((keys: string[]) => keys.map((k) => `https://cdn.example/${k}`)),
+      getSignedUrlTtlSeconds: jest.fn(() => 900),
       ...upload,
     } as unknown as ReportsUploadService;
-    return new SitesShareCardQueryService(prisma as PrismaService, reportsUpload);
+    const config = {
+      get: jest.fn(() => 'https://api.chisto.mk/v1'),
+    } as unknown as ConfigService;
+    return new SitesShareCardQueryService(prisma as PrismaService, reportsUpload, config);
   }
 
   const baseSite = {
@@ -62,7 +67,7 @@ describe('SitesShareCardQueryService.findPublicShareCard', () => {
     await expect(svc.findPublicShareCard('missing-id')).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('returns share payload with hero title, address-based site label, and reporter', async () => {
+  it('returns share payload with stable media redirects and reporter', async () => {
     const prisma = {
       site: {
         findFirst: jest.fn().mockResolvedValue(baseSite),
@@ -81,15 +86,15 @@ describe('SitesShareCardQueryService.findPublicShareCard', () => {
     expect(card.address).toBe('Skopje');
     expect(card.latitude).toBe(41.99);
     expect(card.longitude).toBe(21.43);
-    expect(card.mediaUrls).toEqual(['signed:https://cdn.example/a.jpg']);
+    expect(card.mediaUrls).toEqual(['https://api.chisto.mk/v1/sites/site1/share-media/0']);
     expect(card.category).toBe('ILLEGAL_LANDFILL');
     expect(card.severity).toBe(3);
     expect(card.cleanupEffort).toBe('THREE_TO_FIVE');
     expect(card.upvotesCount).toBe(3);
-    expect(card.ogImageUrl).toBe('signed:https://cdn.example/a.jpg');
+    expect(card.ogImageUrl).toBe('https://api.chisto.mk/v1/sites/site1/share-media/0');
     expect(card.reporter).toEqual({
       displayLabel: 'Ana Petrovska',
-      avatarUrl: 'signed-avatar',
+      avatarUrl: 'https://api.chisto.mk/v1/sites/site1/share-avatar',
       isDeleted: false,
       isAnonymous: false,
     });
@@ -149,11 +154,11 @@ describe('SitesShareCardQueryService.findPublicShareCard', () => {
     expect(card.siteLabel).toBe('Park area');
     expect(card.status).toBe(SiteStatus.CLEANED);
     expect(card.cleanupEvidenceUrls).toEqual([
-      'signed:https://cdn.example/after.jpg',
-      'signed:https://cdn.example/events/after1.jpg',
-      'signed:https://cdn.example/events/evidence1.jpg',
+      'https://api.chisto.mk/v1/sites/site2/share-evidence/0',
+      'https://api.chisto.mk/v1/sites/site2/share-evidence/1',
+      'https://api.chisto.mk/v1/sites/site2/share-evidence/2',
     ]);
-    expect(card.ogImageUrl).toBe('signed:https://cdn.example/after.jpg');
+    expect(card.ogImageUrl).toBe('https://api.chisto.mk/v1/sites/site2/share-evidence/0');
   });
 
   it('skips cleanup evidence collection when site is not CLEANED', async () => {
@@ -196,5 +201,19 @@ describe('SitesShareCardQueryService.findPublicShareCard', () => {
     expect(card.mediaUrls).toEqual([]);
     expect(card.ogImageUrl).toBeNull();
     expect(card.reporter).toBeNull();
+  });
+
+  it('signs a fresh URL for share-media redirect by index', async () => {
+    const signUrls = jest.fn(async (urls: string[]) => urls.map((u) => `signed:${u}`));
+    const prisma = {
+      site: { findFirst: jest.fn().mockResolvedValue(baseSite) },
+      cleanupEvent: { findMany: jest.fn() },
+    } as unknown as PrismaService;
+    const svc = buildService(prisma, { signUrls });
+
+    await expect(svc.getShareMediaSignedUrl('site1', 0)).resolves.toBe(
+      'signed:https://cdn.example/a.jpg',
+    );
+    await expect(svc.getShareMediaSignedUrl('site1', 1)).rejects.toBeInstanceOf(NotFoundException);
   });
 });

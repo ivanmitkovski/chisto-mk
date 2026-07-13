@@ -39,6 +39,9 @@ export function shouldUseUnoptimizedNewsImage(src: string): boolean {
     if (/\/news\/media\/[^/]+\/?$/.test(path)) {
       return true;
     }
+    if (/\/sites\/[^/]+\/share-(media|evidence)\/\d+\/?$/.test(path) || /\/sites\/[^/]+\/share-avatar\/?$/.test(path)) {
+      return true;
+    }
 
     const host = url.hostname.toLowerCase();
     const allowedRemote = OPTIMIZABLE_REMOTE_SUFFIXES.some((suffix) => host.endsWith(suffix));
