@@ -354,6 +354,20 @@ export function formatSiteStatus(status: string, locale: ShareLocale): string {
   return status.replace(/_/g, " ").toLowerCase();
 }
 
+export function formatEventLifecycleStatus(status: string, locale: ShareLocale): string {
+  const labels: Record<string, Record<ShareLocale, string>> = {
+    UPCOMING: { mk: "Претстоен", en: "Upcoming", sq: "I ardhshëm", sr: "Предстојећи", rom: "Upcoming" },
+    IN_PROGRESS: { mk: "Во тек", en: "In progress", sq: "Në progres", sr: "У току", rom: "In progress" },
+    COMPLETED: { mk: "Завршен", en: "Completed", sq: "Përfunduar", sr: "Завршен", rom: "Completed" },
+    CANCELLED: { mk: "Откажан", en: "Cancelled", sq: "Anuluar", sr: "Отказан", rom: "Cancelled" },
+  };
+  const row = labels[status];
+  if (row && locale in row) {
+    return row[locale];
+  }
+  return status.replace(/_/g, " ").toLowerCase();
+}
+
 export function formatReportCategory(category: string | null | undefined, locale: ShareLocale): string {
   if (!category) return "";
   const labels: Record<string, Record<ShareLocale, string>> = {

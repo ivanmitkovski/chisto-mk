@@ -6,6 +6,9 @@ const STATUS_STYLES: Record<string, { dot: string; bg: string; text: string }> =
   IN_PROGRESS: { dot: "bg-[#F5A623]", bg: "bg-[#FFF8EC]", text: "text-[#D4910C]" },
   CLEANED: { dot: "bg-primary", bg: "bg-status-mint", text: "text-primary-dark" },
   DISPUTED: { dot: "bg-[#E6513D]", bg: "bg-[#FFF0EE]", text: "text-[#E6513D]" },
+  UPCOMING: { dot: "bg-[#3BA3F7]", bg: "bg-[#EDF3FF]", text: "text-[#1D6FA8]" },
+  COMPLETED: { dot: "bg-primary", bg: "bg-status-mint", text: "text-primary-dark" },
+  CANCELLED: { dot: "bg-gray-400", bg: "bg-surface-muted", text: "text-ink-secondary" },
 };
 
 type ShareStatusPillProps = {

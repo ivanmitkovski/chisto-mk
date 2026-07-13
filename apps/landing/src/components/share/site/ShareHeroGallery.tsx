@@ -66,6 +66,7 @@ function GalleryImage({
       fetchPriority={priority ? "high" : "auto"}
       decoding="async"
       referrerPolicy="no-referrer"
+      draggable={false}
     />
   );
 }
@@ -83,13 +84,13 @@ export function ShareHeroGallery({
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [currentFailed, setCurrentFailed] = useState(false);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const touchStartX = useRef<number | null>(null);
   const titleId = useId();
 
   const count = urls.length;
   const safeIndex = count === 0 ? 0 : ((index % count) + count) % count;
-  const current = count > 0 ? urls[safeIndex] : null;
 
   const go = useCallback(
     (delta: number) => {
@@ -98,6 +99,23 @@ export function ShareHeroGallery({
     },
     [count],
   );
+
+  const goTo = useCallback(
+    (i: number) => {
+      if (count === 0) return;
+      setIndex(((i % count) + count) % count);
+    },
+    [count],
+  );
+
+  // Keep scroll-snap strip aligned with index (hero + dots + arrows).
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el || count < 2) return;
+    const child = el.children.item(safeIndex) as HTMLElement | null;
+    if (!child) return;
+    el.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
+  }, [safeIndex, count]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -119,9 +137,19 @@ export function ShareHeroGallery({
     return () => window.removeEventListener("keydown", onKey);
   }, [lightbox, go]);
 
+  const onScrollerScroll = () => {
+    const el = scrollerRef.current;
+    if (!el || count < 2) return;
+    const width = el.clientWidth || 1;
+    const next = Math.round(el.scrollLeft / width);
+    if (next !== safeIndex && next >= 0 && next < count) {
+      setIndex(next);
+    }
+  };
+
   if (count === 0) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-[22px] bg-surface-muted text-sm font-medium text-ink-muted">
+      <div className="flex aspect-[4/3] w-full items-center justify-center rounded-[22px] bg-surface-muted text-sm font-medium text-ink-muted sm:aspect-video">
         {emptyLabel}
       </div>
     );
@@ -129,59 +157,89 @@ export function ShareHeroGallery({
 
   return (
     <div className="relative">
-      <button
-        type="button"
-        className="group relative block w-full overflow-hidden rounded-[22px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-default"
-        onClick={() => {
-          if (!currentFailed) setLightbox(true);
-        }}
-        disabled={currentFailed}
-        aria-label={currentFailed ? (unavailableLabel ?? openPhotoLabel) : openPhotoLabel}
-        onTouchStart={(e) => {
-          touchStartX.current = e.changedTouches[0]?.clientX ?? null;
-        }}
-        onTouchEnd={(e) => {
-          const start = touchStartX.current;
-          touchStartX.current = null;
-          if (start == null || count < 2) return;
-          const end = e.changedTouches[0]?.clientX;
-          if (end == null) return;
-          const delta = end - start;
-          if (Math.abs(delta) < 40) return;
-          e.preventDefault();
-          go(delta < 0 ? 1 : -1);
-        }}
-      >
-        <div className="aspect-video w-full bg-surface-muted">
-          <GalleryImage
-            src={current!}
-            alt={`${alt} (${safeIndex + 1}/${count})`}
-            priority={safeIndex === 0}
-            {...(unavailableLabel != null ? { unavailableLabel } : {})}
-            onFailedChange={setCurrentFailed}
-          />
-        </div>
-        {!currentFailed ? (
-          <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/10 bg-black/22 px-3 py-1 text-xs font-medium text-white backdrop-blur-md motion-safe:transition-opacity group-hover:opacity-100">
-            {openPhotoLabel}
-            {count > 1 ? ` · ${safeIndex + 1}/${count}` : ""}
-          </span>
-        ) : null}
-      </button>
-
-      {count > 1 ? (
-        <div className="mt-3 flex items-center justify-center gap-2" role="group" aria-label={alt}>
+      <div className="relative overflow-hidden rounded-[22px] bg-surface-muted">
+        <div
+          ref={scrollerRef}
+          className="flex aspect-[4/3] snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] sm:aspect-video [&::-webkit-scrollbar]:hidden"
+          onScroll={onScrollerScroll}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label={alt}
+        >
           {urls.map((url, i) => (
             <button
               key={`${url}-${i}`}
               type="button"
-              aria-current={i === safeIndex ? "true" : undefined}
+              className="relative h-full w-full shrink-0 snap-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+              onClick={() => {
+                if (i === safeIndex && !currentFailed) setLightbox(true);
+                else goTo(i);
+              }}
+              aria-label={
+                currentFailed && i === safeIndex
+                  ? (unavailableLabel ?? openPhotoLabel)
+                  : `${openPhotoLabel} (${i + 1}/${count})`
+              }
+            >
+              <GalleryImage
+                src={url}
+                alt={`${alt} (${i + 1}/${count})`}
+                className="absolute inset-0"
+                priority={i === 0}
+                {...(unavailableLabel != null ? { unavailableLabel } : {})}
+                {...(i === safeIndex ? { onFailedChange: setCurrentFailed } : {})}
+              />
+            </button>
+          ))}
+        </div>
+
+        {count > 1 ? (
+          <>
+            <button
+              type="button"
+              className="absolute left-2 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-lg font-semibold text-white backdrop-blur-md hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:flex"
+              onClick={() => go(-1)}
+              aria-label={prevLabel}
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-lg font-semibold text-white backdrop-blur-md hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:flex"
+              onClick={() => go(1)}
+              aria-label={nextLabel}
+            >
+              ›
+            </button>
+          </>
+        ) : null}
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/45 via-black/10 to-transparent px-3 pb-3 pt-10">
+          <span className="rounded-full border border-white/15 bg-black/25 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-white backdrop-blur-md">
+            {safeIndex + 1}/{count}
+          </span>
+          {!currentFailed ? (
+            <span className="rounded-full border border-white/15 bg-black/25 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
+              {openPhotoLabel}
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      {count > 1 ? (
+        <div className="mt-3 flex items-center justify-center gap-2" role="tablist" aria-label={alt}>
+          {urls.map((url, i) => (
+            <button
+              key={`dot-${url}-${i}`}
+              type="button"
+              role="tab"
+              aria-selected={i === safeIndex}
               aria-label={`${i + 1} / ${count}`}
               className={cn(
-                "h-2 w-2 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                i === safeIndex ? "bg-primary" : "bg-gray-300 hover:bg-gray-400",
+                "h-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                i === safeIndex ? "w-5 bg-primary" : "w-2 bg-gray-300 hover:bg-gray-400",
               )}
-              onClick={() => setIndex(i)}
+              onClick={() => goTo(i)}
             />
           ))}
         </div>
@@ -209,7 +267,22 @@ export function ShareHeroGallery({
               {closeLabel}
             </button>
           </div>
-          <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-8">
+          <div
+            className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-8"
+            onTouchStart={(e) => {
+              touchStartX.current = e.changedTouches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(e) => {
+              const start = touchStartX.current;
+              touchStartX.current = null;
+              if (start == null || count < 2) return;
+              const end = e.changedTouches[0]?.clientX;
+              if (end == null) return;
+              const delta = end - start;
+              if (Math.abs(delta) < 40) return;
+              go(delta < 0 ? 1 : -1);
+            }}
+          >
             {count > 1 ? (
               <button
                 type="button"
@@ -221,7 +294,7 @@ export function ShareHeroGallery({
             ) : null}
             <div className="max-h-full max-w-5xl">
               <GalleryImage
-                src={current!}
+                src={urls[safeIndex]!}
                 alt={`${alt} (${safeIndex + 1}/${count})`}
                 className="max-h-[80dvh] w-auto rounded-lg object-contain"
                 priority

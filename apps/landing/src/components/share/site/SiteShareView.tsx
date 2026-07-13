@@ -3,6 +3,7 @@ import type { ShareLocale } from "@/i18n/config";
 import type { SiteShareCopy } from "@/app/sites/[id]/site-share-strings";
 import {
   formatCleanupEffort,
+  formatEventLifecycleStatus,
   formatEventSchedule,
   formatReportCategory,
   formatSeverity,
@@ -17,7 +18,7 @@ import { ShareStatsRow } from "./ShareStatsRow";
 import { ShareReporterRow } from "./ShareReporterRow";
 import { ShareEventsList } from "./ShareEventsList";
 import { ShareEvidenceSection } from "./ShareEvidenceSection";
-import { ShareStickyCta } from "./ShareStickyCta";
+import { ShareCardActions } from "./ShareCardActions";
 import type { SiteShareCard } from "./types";
 
 type SiteShareViewProps = {
@@ -49,6 +50,10 @@ export function SiteShareView({
     Number.isFinite(card.latitude) && Number.isFinite(card.longitude)
       ? mapsUrl(card.latitude, card.longitude)
       : undefined;
+  const showSiteLabel =
+    Boolean(card.siteLabel?.trim()) &&
+    card.siteLabel.trim().toLowerCase() !== card.title.trim().toLowerCase() &&
+    card.siteLabel.trim().toLowerCase() !== (card.address?.trim().toLowerCase() ?? "");
 
   const metaRows = [
     category ? { label: t.categoryLabel, value: category } : null,
@@ -73,8 +78,7 @@ export function SiteShareView({
 
   return (
     <div className="min-h-dvh bg-app-bg text-ink">
-      {/* Mobile sticky CTAs stack (~2×56 + explore + safe-area); keep content clear. */}
-      <div className="mx-auto max-w-2xl px-4 pb-[calc(12.5rem+env(safe-area-inset-bottom))] pt-8 sm:px-6 sm:pb-40 sm:pt-10">
+      <div className="mx-auto max-w-2xl px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-10">
         <header className="mb-6 flex items-center gap-2">
           <Image
             src="/brand/chisto-mark.svg"
@@ -104,6 +108,11 @@ export function SiteShareView({
 
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <ShareStatusPill status={card.status} label={statusLabel} />
+              {card.mediaUrls.length > 1 ? (
+                <span className="inline-flex items-center rounded-full bg-surface-muted px-3 py-1 text-[11px] font-semibold text-ink-secondary">
+                  {card.mediaUrls.length} {t.photoCount}
+                </span>
+              ) : null}
             </div>
 
             <div className="mt-4">
@@ -121,6 +130,9 @@ export function SiteShareView({
             <h1 className="mt-5 text-2xl font-bold tracking-tight text-ink sm:text-[1.65rem]">
               {card.title}
             </h1>
+            {showSiteLabel ? (
+              <p className="mt-1.5 text-sm font-medium text-ink-muted">{card.siteLabel}</p>
+            ) : null}
             {card.description && card.description.trim() !== card.title.trim() ? (
               <p className="mt-3 text-base leading-[1.45] text-ink-secondary">{card.description}</p>
             ) : null}
@@ -128,6 +140,19 @@ export function SiteShareView({
             <div className="mt-5">
               <ShareMetaRows rows={metaRows} />
             </div>
+
+            {mapHref ? (
+              <p className="mt-4">
+                <a
+                  href={mapHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center rounded-full border border-divider bg-surface-muted px-4 text-sm font-semibold text-ink transition-colors hover:bg-[#E8EAEF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  {t.viewOnMap}
+                </a>
+              </p>
+            ) : null}
 
             {card.reporter || card.reportedAt ? (
               <div className="mt-6 border-t border-divider pt-5">
@@ -147,6 +172,7 @@ export function SiteShareView({
                   participantsLabel={t.participants}
                   events={card.events}
                   formatSchedule={(iso) => formatEventSchedule(iso, locale)}
+                  formatStatus={(status) => formatEventLifecycleStatus(status, locale)}
                   eventHref={(id) => `${siteBase}/events/${encodeURIComponent(id)}`}
                 />
               </div>
@@ -186,18 +212,20 @@ export function SiteShareView({
                 </p>
               </div>
             ) : null}
+
+            <div className="mt-6">
+              <ShareCardActions
+                openInAppHref={openInAppHref}
+                openInAppLabel={t.openInApp}
+                getAppHref={getAppHref}
+                getAppLabel={t.getTheApp}
+                exploreHref={exploreHref}
+                exploreLabel={t.exploreCta}
+              />
+            </div>
           </div>
         </article>
       </div>
-
-      <ShareStickyCta
-        openInAppHref={openInAppHref}
-        openInAppLabel={t.openInApp}
-        getAppHref={getAppHref}
-        getAppLabel={t.getTheApp}
-        exploreHref={exploreHref}
-        exploreLabel={t.exploreCta}
-      />
     </div>
   );
 }
