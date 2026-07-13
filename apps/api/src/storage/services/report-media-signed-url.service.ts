@@ -69,6 +69,10 @@ export class ReportMediaSignedUrlService implements OnModuleDestroy {
         : DEFAULT_REPORT_MEDIA_SIGNED_URL_TTL_SECONDS;
   }
 
+  getSignedUrlTtlSeconds(): number {
+    return this.ttlSeconds;
+  }
+
   async onModuleDestroy(): Promise<void> {
     if (this.redis) {
       await this.redis.quit().catch(() => undefined);

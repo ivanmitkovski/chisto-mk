@@ -1,22 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  CleanupEventStatus,
-  EcoEventLifecycleStatus,
-  EventEvidenceKind,
-  ReportStatus,
-  SiteResolutionStatus,
-  SiteStatus,
-} from '../../prisma-client';
+import { ConfigService } from '@nestjs/config';
+import { SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
-import {
-  signPrivateObjectKeysDeduped,
-  signPublicMediaUrlsDeduped,
-} from '../../storage/util/batch-private-object-sign';
 import type { SitePublicShareCardResponseDto } from '../dto/site-public-share-card.dto';
 import {
-  SHARE_CARD_EVIDENCE_CAP,
-  SHARE_CARD_EVENTS_CAP,
   buildShareEvents,
   buildShareReporter,
   collectShareMediaUrls,
@@ -24,114 +12,39 @@ import {
   publicShareDescription,
   publicShareSiteLabel,
   publicShareTitle,
-  pushUniqueUrls,
 } from '../util/sites-share-card.helpers';
+import {
+  collectCleanupEvidenceUrls,
+  findPublicShareSiteRow,
+} from '../util/sites-share-card-query.loader';
+import {
+  publicShareAvatarUrl,
+  publicShareEvidenceUrl,
+  publicShareMediaUrl,
+  resolvePublicApiV1Base,
+  shareMediaRedirectMaxAgeSeconds,
+} from '../util/sites-share-public-media-url';
 
 @Injectable()
 export class SitesShareCardQueryService {
+  private readonly publicApiV1Base: string;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly reportsUpload: ReportsUploadService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.publicApiV1Base = resolvePublicApiV1Base(
+      configService.get<string>('EMAIL_PUBLIC_API_BASE_URL'),
+    );
+  }
 
   /**
    * Public fields for HTTPS share landing (`GET /sites/:id/share-card`).
-   * Public map visibility only (non-REPORTED, not admin-archived; no reporter ids/emails).
+   * Media URLs are stable API redirects (never embed expiring S3 signatures in ISR HTML).
    */
   async findPublicShareCard(id: string): Promise<SitePublicShareCardResponseDto> {
-    const row = await this.prisma.site.findFirst({
-      where: {
-        id,
-        status: { not: SiteStatus.REPORTED },
-        isArchivedByAdmin: false,
-      },
-      select: {
-        id: true,
-        address: true,
-        description: true,
-        status: true,
-        latitude: true,
-        longitude: true,
-        upvotesCount: true,
-        commentsCount: true,
-        sharesCount: true,
-        savesCount: true,
-        heroReport: {
-          select: {
-            title: true,
-            description: true,
-            mediaUrls: true,
-            category: true,
-            severity: true,
-            cleanupEffort: true,
-            createdAt: true,
-            reporterId: true,
-            reporter: {
-              select: {
-                firstName: true,
-                lastName: true,
-                avatarObjectKey: true,
-                status: true,
-              },
-            },
-          },
-        },
-        reports: {
-          where: { status: ReportStatus.APPROVED },
-          orderBy: { createdAt: 'asc' },
-          take: 8,
-          select: {
-            title: true,
-            description: true,
-            mediaUrls: true,
-            category: true,
-            severity: true,
-            cleanupEffort: true,
-            createdAt: true,
-            reporterId: true,
-            reporter: {
-              select: {
-                firstName: true,
-                lastName: true,
-                avatarObjectKey: true,
-                status: true,
-              },
-            },
-          },
-        },
-        events: {
-          where: {
-            status: CleanupEventStatus.APPROVED,
-            lifecycleStatus: {
-              in: [EcoEventLifecycleStatus.UPCOMING, EcoEventLifecycleStatus.IN_PROGRESS],
-            },
-          },
-          orderBy: { scheduledAt: 'asc' },
-          take: SHARE_CARD_EVENTS_CAP,
-          select: {
-            id: true,
-            title: true,
-            scheduledAt: true,
-            participantCount: true,
-            maxParticipants: true,
-            lifecycleStatus: true,
-          },
-        },
-        resolutions: {
-          where: { status: SiteResolutionStatus.APPROVED },
-          orderBy: { createdAt: 'asc' },
-          take: 6,
-          select: { mediaUrls: true },
-        },
-      },
-    });
-    if (row == null) {
-      throw new NotFoundException({
-        code: 'SITE_NOT_FOUND',
-        message: 'Site not found',
-      });
-    }
-
+    const row = await this.requirePublicShareSite(id);
     const primaryReport = pickPrimaryShareReport(row.heroReport, row.reports);
     const title = publicShareTitle(row.heroReport, row.reports, row.description);
     const siteLabel = publicShareSiteLabel(row);
@@ -139,19 +52,20 @@ export class SitesShareCardQueryService {
     const rawMedia = collectShareMediaUrls(row.heroReport, row.reports);
     const evidenceRaw =
       row.status === SiteStatus.CLEANED
-        ? await this.collectCleanupEvidenceUrls(id, row.resolutions)
+        ? await collectCleanupEvidenceUrls(this.prisma, this.reportsUpload, id, row.resolutions)
         : [];
 
-    const avatarKey = primaryReport?.reporter?.avatarObjectKey ?? null;
-    const [mediaByUrl, avatarByKey] = await Promise.all([
-      signPublicMediaUrlsDeduped([...rawMedia, ...evidenceRaw], (urls) =>
-        this.reportsUpload.signUrls(urls),
-      ),
-      signPrivateObjectKeysDeduped([avatarKey], (k) => this.reportsUpload.signPrivateObjectKey(k)),
-    ]);
-
-    const mediaUrls = rawMedia.map((u) => mediaByUrl.get(u) ?? u);
-    const cleanupEvidenceUrls = evidenceRaw.map((u) => mediaByUrl.get(u) ?? u);
+    const mediaUrls = rawMedia.map((_, index) =>
+      publicShareMediaUrl(this.publicApiV1Base, row.id, index),
+    );
+    const cleanupEvidenceUrls = evidenceRaw.map((_, index) =>
+      publicShareEvidenceUrl(this.publicApiV1Base, row.id, index),
+    );
+    const hasAvatar = Boolean(primaryReport?.reporter?.avatarObjectKey?.trim());
+    const reporter = buildShareReporter(primaryReport, new Map());
+    if (reporter != null && hasAvatar) {
+      reporter.avatarUrl = publicShareAvatarUrl(this.publicApiV1Base, row.id);
+    }
 
     return {
       id: row.id,
@@ -171,53 +85,93 @@ export class SitesShareCardQueryService {
       sharesCount: row.sharesCount,
       savesCount: row.savesCount,
       reportedAt: primaryReport?.createdAt?.toISOString() ?? null,
-      reporter: buildShareReporter(primaryReport, avatarByKey),
+      reporter,
       events: buildShareEvents(row.events, siteLabel),
       cleanupEvidenceUrls,
       ogImageUrl: mediaUrls[0] ?? cleanupEvidenceUrls[0] ?? null,
     };
   }
 
-  /** Resolution + event after-photos, aligned with SiteCleanupEvidenceService sources. */
-  private async collectCleanupEvidenceUrls(
-    siteId: string,
-    resolutions: { mediaUrls: string[] }[],
-  ): Promise<string[]> {
-    const seen = new Set<string>();
-    const out: string[] = [];
-    for (const resolution of resolutions) {
-      pushUniqueUrls(out, seen, resolution.mediaUrls ?? [], SHARE_CARD_EVIDENCE_CAP);
-      if (out.length >= SHARE_CARD_EVIDENCE_CAP) return out;
+  /** Fresh signed GET for share gallery slot — used by public media redirect. */
+  async getShareMediaSignedUrl(siteId: string, index: number): Promise<string> {
+    const row = await this.requirePublicShareSite(siteId);
+    const rawMedia = collectShareMediaUrls(row.heroReport, row.reports);
+    return this.signRawUrlAtIndex(rawMedia, index, 'SITE_SHARE_MEDIA_NOT_FOUND');
+  }
+
+  /** Fresh signed GET for cleanup evidence slot. */
+  async getShareEvidenceSignedUrl(siteId: string, index: number): Promise<string> {
+    const row = await this.requirePublicShareSite(siteId);
+    if (row.status !== SiteStatus.CLEANED) {
+      throw new NotFoundException({
+        code: 'SITE_SHARE_EVIDENCE_NOT_FOUND',
+        message: 'Cleanup evidence not found',
+      });
     }
+    const evidenceRaw = await collectCleanupEvidenceUrls(
+      this.prisma,
+      this.reportsUpload,
+      siteId,
+      row.resolutions,
+    );
+    return this.signRawUrlAtIndex(evidenceRaw, index, 'SITE_SHARE_EVIDENCE_NOT_FOUND');
+  }
 
-    const events = await this.prisma.cleanupEvent.findMany({
-      where: { siteId },
-      select: {
-        afterImageKeys: true,
-        evidencePhotos: {
-          where: { kind: EventEvidenceKind.AFTER },
-          select: { objectKey: true },
-          take: SHARE_CARD_EVIDENCE_CAP,
-        },
-      },
-      take: 20,
-    });
-
-    for (const event of events) {
-      const fromKeys = event.afterImageKeys.map(
-        (key) => this.reportsUpload.getPublicUrlsForKeys([key])[0] ?? key,
-      );
-      pushUniqueUrls(out, seen, fromKeys, SHARE_CARD_EVIDENCE_CAP);
-      if (out.length >= SHARE_CARD_EVIDENCE_CAP) return out;
-
-      const fromPhotos = event.evidencePhotos.map(
-        (photo) =>
-          this.reportsUpload.getPublicUrlsForKeys([photo.objectKey])[0] ?? photo.objectKey,
-      );
-      pushUniqueUrls(out, seen, fromPhotos, SHARE_CARD_EVIDENCE_CAP);
-      if (out.length >= SHARE_CARD_EVIDENCE_CAP) return out;
+  /** Fresh signed GET for the primary reporter avatar on a public share card. */
+  async getShareAvatarSignedUrl(siteId: string): Promise<string> {
+    const row = await this.requirePublicShareSite(siteId);
+    const primary = pickPrimaryShareReport(row.heroReport, row.reports);
+    const key = primary?.reporter?.avatarObjectKey?.trim() ?? null;
+    if (key == null || key.length === 0) {
+      throw new NotFoundException({
+        code: 'SITE_SHARE_AVATAR_NOT_FOUND',
+        message: 'Share avatar not found',
+      });
     }
+    const signed = await this.reportsUpload.signPrivateObjectKey(key);
+    if (signed == null || signed.length === 0) {
+      throw new NotFoundException({
+        code: 'SITE_SHARE_AVATAR_NOT_FOUND',
+        message: 'Share avatar not available',
+      });
+    }
+    return signed;
+  }
 
-    return out;
+  getMediaRedirectMaxAgeSeconds(): number {
+    return shareMediaRedirectMaxAgeSeconds(this.reportsUpload.getSignedUrlTtlSeconds());
+  }
+
+  private async signRawUrlAtIndex(
+    rawUrls: string[],
+    index: number,
+    notFoundCode: string,
+  ): Promise<string> {
+    if (!Number.isInteger(index) || index < 0 || index >= rawUrls.length) {
+      throw new NotFoundException({
+        code: notFoundCode,
+        message: 'Media not found',
+      });
+    }
+    const signed = await this.reportsUpload.signUrls([rawUrls[index]!]);
+    const url = signed[0];
+    if (url == null || url.length === 0) {
+      throw new NotFoundException({
+        code: notFoundCode,
+        message: 'Media not available',
+      });
+    }
+    return url;
+  }
+
+  private async requirePublicShareSite(id: string) {
+    const row = await findPublicShareSiteRow(this.prisma, id);
+    if (row == null) {
+      throw new NotFoundException({
+        code: 'SITE_NOT_FOUND',
+        message: 'Site not found',
+      });
+    }
+    return row;
   }
 }

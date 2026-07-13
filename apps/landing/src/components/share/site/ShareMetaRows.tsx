@@ -20,16 +20,16 @@ export function ShareMetaRows({ rows }: ShareMetaRowsProps) {
             href={row.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-[#121212] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="font-semibold text-ink underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             {row.value}
           </a>
         ) : (
-          <span className="font-semibold text-[#121212]">{row.value}</span>
+          <span className="font-semibold text-ink">{row.value}</span>
         );
         return (
           <div key={row.label} className="flex gap-3 text-sm leading-snug sm:items-baseline">
-            <dt className="w-[7rem] shrink-0 text-sm font-semibold text-[#7A7A7A]">{row.label}</dt>
+            <dt className="w-[7rem] shrink-0 text-sm font-semibold text-ink-muted">{row.label}</dt>
             <dd className={cn("min-w-0 flex-1 text-base")}>{valueNode}</dd>
           </div>
         );

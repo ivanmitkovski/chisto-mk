@@ -11,6 +11,7 @@ type ShareHeroGalleryProps = {
   closeLabel: string;
   prevLabel: string;
   nextLabel: string;
+  unavailableLabel?: string;
 };
 
 function GalleryImage({
@@ -18,33 +19,53 @@ function GalleryImage({
   alt,
   className,
   priority = false,
+  unavailableLabel,
+  onFailedChange,
 }: {
   src: string;
   alt: string;
   className?: string;
   priority?: boolean;
+  unavailableLabel?: string;
+  onFailedChange?: (failed: boolean) => void;
 }) {
   const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+    onFailedChange?.(false);
+  }, [src, onFailedChange]);
+
   if (failed) {
     return (
       <div
-        className={cn("flex items-center justify-center bg-[#F0F1F7] text-sm text-[#7A7A7A]", className)}
+        className={cn(
+          "flex items-center justify-center bg-surface-muted px-4 text-center text-sm font-medium text-ink-muted",
+          className,
+        )}
         role="img"
         aria-label={alt}
-      />
+      >
+        {unavailableLabel ?? alt}
+      </div>
     );
   }
+
   return (
-    // Signed CDN hosts vary; next/image remotePatterns cannot cover all.
+    // Stable API redirects + signed hosts vary; next/image cannot follow share 302s reliably.
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt}
       className={cn("h-full w-full object-cover", className)}
-      onError={() => setFailed(true)}
+      onError={() => {
+        setFailed(true);
+        onFailedChange?.(true);
+      }}
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : "auto"}
       decoding="async"
+      referrerPolicy="no-referrer"
     />
   );
 }
@@ -57,9 +78,11 @@ export function ShareHeroGallery({
   closeLabel,
   prevLabel,
   nextLabel,
+  unavailableLabel,
 }: ShareHeroGalleryProps) {
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [currentFailed, setCurrentFailed] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const touchStartX = useRef<number | null>(null);
   const titleId = useId();
@@ -98,7 +121,7 @@ export function ShareHeroGallery({
 
   if (count === 0) {
     return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-[22px] bg-[#F0F1F7] text-sm font-medium text-[#7A7A7A]">
+      <div className="flex aspect-video w-full items-center justify-center rounded-[22px] bg-surface-muted text-sm font-medium text-ink-muted">
         {emptyLabel}
       </div>
     );
@@ -108,9 +131,12 @@ export function ShareHeroGallery({
     <div className="relative">
       <button
         type="button"
-        className="group relative block w-full overflow-hidden rounded-[22px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        onClick={() => setLightbox(true)}
-        aria-label={openPhotoLabel}
+        className="group relative block w-full overflow-hidden rounded-[22px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-default"
+        onClick={() => {
+          if (!currentFailed) setLightbox(true);
+        }}
+        disabled={currentFailed}
+        aria-label={currentFailed ? (unavailableLabel ?? openPhotoLabel) : openPhotoLabel}
         onTouchStart={(e) => {
           touchStartX.current = e.changedTouches[0]?.clientX ?? null;
         }}
@@ -126,17 +152,21 @@ export function ShareHeroGallery({
           go(delta < 0 ? 1 : -1);
         }}
       >
-        <div className="aspect-video w-full bg-[#F0F1F7]">
+        <div className="aspect-video w-full bg-surface-muted">
           <GalleryImage
             src={current!}
             alt={`${alt} (${safeIndex + 1}/${count})`}
             priority={safeIndex === 0}
+            {...(unavailableLabel != null ? { unavailableLabel } : {})}
+            onFailedChange={setCurrentFailed}
           />
         </div>
-        <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/10 bg-black/22 px-3 py-1 text-xs font-medium text-white backdrop-blur-md motion-safe:transition-opacity group-hover:opacity-100">
-          {openPhotoLabel}
-          {count > 1 ? ` · ${safeIndex + 1}/${count}` : ""}
-        </span>
+        {!currentFailed ? (
+          <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/10 bg-black/22 px-3 py-1 text-xs font-medium text-white backdrop-blur-md motion-safe:transition-opacity group-hover:opacity-100">
+            {openPhotoLabel}
+            {count > 1 ? ` · ${safeIndex + 1}/${count}` : ""}
+          </span>
+        ) : null}
       </button>
 
       {count > 1 ? (
@@ -195,6 +225,7 @@ export function ShareHeroGallery({
                 alt={`${alt} (${safeIndex + 1}/${count})`}
                 className="max-h-[80dvh] w-auto rounded-lg object-contain"
                 priority
+                {...(unavailableLabel != null ? { unavailableLabel } : {})}
               />
             </div>
             {count > 1 ? (

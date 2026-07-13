@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils/cn";
 
 const STATUS_STYLES: Record<string, { dot: string; bg: string; text: string }> = {
-  VERIFIED: { dot: "bg-primary", bg: "bg-[#EDFFF6]", text: "text-primary-dark" },
+  VERIFIED: { dot: "bg-primary", bg: "bg-status-mint", text: "text-primary-dark" },
   CLEANUP_SCHEDULED: { dot: "bg-[#3BA3F7]", bg: "bg-[#EDF3FF]", text: "text-[#1D6FA8]" },
   IN_PROGRESS: { dot: "bg-[#F5A623]", bg: "bg-[#FFF8EC]", text: "text-[#D4910C]" },
-  CLEANED: { dot: "bg-primary", bg: "bg-[#EDFFF6]", text: "text-primary-dark" },
+  CLEANED: { dot: "bg-primary", bg: "bg-status-mint", text: "text-primary-dark" },
   DISPUTED: { dot: "bg-[#E6513D]", bg: "bg-[#FFF0EE]", text: "text-[#E6513D]" },
 };
 
@@ -17,8 +17,8 @@ type ShareStatusPillProps = {
 export function ShareStatusPill({ status, label, className }: ShareStatusPillProps) {
   const style = STATUS_STYLES[status] ?? {
     dot: "bg-gray-400",
-    bg: "bg-[#F0F1F7]",
-    text: "text-[#4C4C4C]",
+    bg: "bg-surface-muted",
+    text: "text-ink-secondary",
   };
   return (
     <span

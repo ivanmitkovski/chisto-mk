@@ -7,7 +7,7 @@ export class SitePublicShareReporterDto {
   @ApiProperty({ nullable: true, description: 'Public display name (no email/phone/user id)' })
   displayLabel!: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, description: 'Stable redirect URL for reporter avatar (`/sites/:id/share-avatar`)' })
   avatarUrl!: string | null;
 
   @ApiProperty()
@@ -66,7 +66,11 @@ export class SitePublicShareCardResponseDto {
   @ApiProperty()
   longitude!: number;
 
-  @ApiProperty({ type: [String], description: 'Signed media URLs (hero + approved reports), capped' })
+  @ApiProperty({
+    type: [String],
+    description:
+      'Stable share-media redirect URLs (`/sites/:id/share-media/:index`); each request 302s to a fresh signed GET',
+  })
   mediaUrls!: string[];
 
   @ApiPropertyOptional({ nullable: true, description: 'Report category code' })
@@ -99,13 +103,17 @@ export class SitePublicShareCardResponseDto {
   @ApiProperty({ type: [SitePublicShareEventDto] })
   events!: SitePublicShareEventDto[];
 
-  @ApiProperty({ type: [String], description: 'Signed cleanup evidence URLs when cleaned' })
+  @ApiProperty({
+    type: [String],
+    description:
+      'Stable share-evidence redirect URLs when cleaned (`/sites/:id/share-evidence/:index`)',
+  })
   cleanupEvidenceUrls!: string[];
 
   @ApiPropertyOptional({
     nullable: true,
     description:
-      'First signed media URL for in-page use only; do not use for OG (short-lived signed URLs)',
+      'First stable media/evidence redirect URL for in-page use; OG tags use opengraph-image.tsx instead',
   })
   ogImageUrl!: string | null;
 }
