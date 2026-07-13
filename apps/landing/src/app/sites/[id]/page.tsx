@@ -21,8 +21,10 @@ class ShareCardUpstreamError extends Error {
 }
 
 async function loadShareCard(id: string): Promise<SiteShareCard | null> {
+  // Share payloads include media/avatar URLs that must stay current with the API
+  // (stable redirects). Avoid long-lived Next fetch cache serving pre-redirect signed URLs.
   const res = await fetch(`${chistoApiBase()}/sites/${encodeURIComponent(id)}/share-card`, {
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
   if (res.status === 404) {
     return null;
