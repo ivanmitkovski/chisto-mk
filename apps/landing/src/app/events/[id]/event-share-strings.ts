@@ -5,7 +5,7 @@ const TABLE: Record<
   {
     openInApp: string;
     getTheApp: string;
-    signInCta: string;
+    exploreCta: string;
     schedulePrefix: string;
     loadingLabel: string;
     errorTitle: string;
@@ -16,7 +16,7 @@ const TABLE: Record<
   mk: {
     openInApp: "Отвори во апликација",
     getTheApp: "Преземи Chisto.mk",
-    signInCta: "Најави се на платформата",
+    exploreCta: "Истражи Chisto.mk",
     schedulePrefix: "Термин",
     loadingLabel: "Се вчитува прегледот…",
     errorTitle: "Привремено недостапно",
@@ -26,7 +26,7 @@ const TABLE: Record<
   en: {
     openInApp: "Open in app",
     getTheApp: "Get Chisto.mk",
-    signInCta: "Sign in on the web",
+    exploreCta: "Explore Chisto.mk",
     schedulePrefix: "When",
     loadingLabel: "Loading preview…",
     errorTitle: "Temporarily unavailable",
@@ -36,7 +36,7 @@ const TABLE: Record<
   sq: {
     openInApp: "Hap në aplikacion",
     getTheApp: "Merr Chisto.mk",
-    signInCta: "Hyr në platformë",
+    exploreCta: "Eksploro Chisto.mk",
     schedulePrefix: "Orari",
     loadingLabel: "Duke ngarkuar pamjen…",
     errorTitle: "Përkohësisht i padisponueshëm",
@@ -46,17 +46,17 @@ const TABLE: Record<
   sr: {
     openInApp: "Отвори у апликацији",
     getTheApp: "Преузми Chisto.mk",
-    signInCta: "Пријава на платформи",
+    exploreCta: "Истражи Chisto.mk",
     schedulePrefix: "Термин",
-    loadingLabel: "Loading preview…",
-    errorTitle: "Temporarily unavailable",
-    errorBody: "We could not load this preview. Please try again in a moment.",
-    retry: "Retry",
+    loadingLabel: "Учитавање прегледа…",
+    errorTitle: "Привремено недоступно",
+    errorBody: "Нисмо могли да учитамо преглед. Покушајте поново за тренутак.",
+    retry: "Покушај поново",
   },
   rom: {
     openInApp: "Open in app",
     getTheApp: "Get Chisto.mk",
-    signInCta: "Sign in on the web",
+    exploreCta: "Explore Chisto.mk",
     schedulePrefix: "When",
     loadingLabel: "Loading preview…",
     errorTitle: "Temporarily unavailable",

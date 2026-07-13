@@ -22438,6 +22438,72 @@
           "feedbackType"
         ]
       },
+      "SitePublicShareReporterDto": {
+        "type": "object",
+        "properties": {
+          "displayLabel": {
+            "type": "object",
+            "nullable": true,
+            "description": "Public display name (no email/phone/user id)"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "isAnonymous": {
+            "type": "boolean",
+            "description": "True when identity should be shown as localized Anonymous"
+          }
+        },
+        "required": [
+          "displayLabel",
+          "avatarUrl",
+          "isDeleted",
+          "isAnonymous"
+        ]
+      },
+      "SitePublicShareEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "description": "ISO-8601 scheduled start"
+          },
+          "city": {
+            "type": "string",
+            "description": "Location line derived from site address"
+          },
+          "participantCount": {
+            "type": "number"
+          },
+          "maxParticipants": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "EcoEventLifecycleStatus"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "scheduledAt",
+          "city",
+          "participantCount",
+          "maxParticipants",
+          "status"
+        ]
+      },
       "SitePublicShareCardResponseDto": {
         "type": "object",
         "properties": {
@@ -22463,13 +22529,101 @@
               "CLEANED",
               "DISPUTED"
             ]
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "mediaUrls": {
+            "description": "Signed media URLs (hero + approved reports), capped",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "type": "object",
+            "nullable": true,
+            "description": "Report category code"
+          },
+          "severity": {
+            "type": "object",
+            "nullable": true,
+            "description": "Severity 1–5"
+          },
+          "cleanupEffort": {
+            "type": "object",
+            "nullable": true,
+            "description": "ReportCleanupEffort enum value"
+          },
+          "upvotesCount": {
+            "type": "number"
+          },
+          "commentsCount": {
+            "type": "number"
+          },
+          "sharesCount": {
+            "type": "number"
+          },
+          "savesCount": {
+            "type": "number"
+          },
+          "reportedAt": {
+            "type": "object",
+            "nullable": true,
+            "description": "ISO-8601 primary report createdAt"
+          },
+          "reporter": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SitePublicShareReporterDto"
+              }
+            ]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SitePublicShareEventDto"
+            }
+          },
+          "cleanupEvidenceUrls": {
+            "description": "Signed cleanup evidence URLs when cleaned",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ogImageUrl": {
+            "type": "object",
+            "nullable": true,
+            "description": "First signed media URL for in-page use only; do not use for OG (short-lived signed URLs)"
           }
         },
         "required": [
           "id",
           "title",
           "siteLabel",
-          "status"
+          "status",
+          "latitude",
+          "longitude",
+          "mediaUrls",
+          "upvotesCount",
+          "commentsCount",
+          "sharesCount",
+          "savesCount",
+          "events",
+          "cleanupEvidenceUrls"
         ]
       },
       "CleanupEvidenceSubmitterDto": {

@@ -1,7 +1,44 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Matches } from 'class-validator';
 import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 import { SiteStatus } from '../../prisma-client';
+
+export class SitePublicShareReporterDto {
+  @ApiProperty({ nullable: true, description: 'Public display name (no email/phone/user id)' })
+  displayLabel!: string | null;
+
+  @ApiProperty({ nullable: true })
+  avatarUrl!: string | null;
+
+  @ApiProperty()
+  isDeleted!: boolean;
+
+  @ApiProperty({ description: 'True when identity should be shown as localized Anonymous' })
+  isAnonymous!: boolean;
+}
+
+export class SitePublicShareEventDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty({ description: 'ISO-8601 scheduled start' })
+  scheduledAt!: string;
+
+  @ApiProperty({ description: 'Location line derived from site address' })
+  city!: string;
+
+  @ApiProperty()
+  participantCount!: number;
+
+  @ApiProperty({ nullable: true })
+  maxParticipants!: number | null;
+
+  @ApiProperty({ description: 'EcoEventLifecycleStatus' })
+  status!: string;
+}
 
 export class SitePublicShareCardResponseDto {
   @ApiProperty({ description: 'Site id (Prisma cuid)' })
@@ -16,4 +53,59 @@ export class SitePublicShareCardResponseDto {
 
   @ApiProperty({ enum: SiteStatus })
   status!: SiteStatus;
+
+  @ApiPropertyOptional({ nullable: true })
+  description!: string | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  address!: string | null;
+
+  @ApiProperty()
+  latitude!: number;
+
+  @ApiProperty()
+  longitude!: number;
+
+  @ApiProperty({ type: [String], description: 'Signed media URLs (hero + approved reports), capped' })
+  mediaUrls!: string[];
+
+  @ApiPropertyOptional({ nullable: true, description: 'Report category code' })
+  category!: string | null;
+
+  @ApiPropertyOptional({ nullable: true, description: 'Severity 1–5' })
+  severity!: number | null;
+
+  @ApiPropertyOptional({ nullable: true, description: 'ReportCleanupEffort enum value' })
+  cleanupEffort!: string | null;
+
+  @ApiProperty()
+  upvotesCount!: number;
+
+  @ApiProperty()
+  commentsCount!: number;
+
+  @ApiProperty()
+  sharesCount!: number;
+
+  @ApiProperty()
+  savesCount!: number;
+
+  @ApiPropertyOptional({ nullable: true, description: 'ISO-8601 primary report createdAt' })
+  reportedAt!: string | null;
+
+  @ApiPropertyOptional({ type: () => SitePublicShareReporterDto, nullable: true })
+  reporter!: SitePublicShareReporterDto | null;
+
+  @ApiProperty({ type: [SitePublicShareEventDto] })
+  events!: SitePublicShareEventDto[];
+
+  @ApiProperty({ type: [String], description: 'Signed cleanup evidence URLs when cleaned' })
+  cleanupEvidenceUrls!: string[];
+
+  @ApiPropertyOptional({
+    nullable: true,
+    description:
+      'First signed media URL for in-page use only; do not use for OG (short-lived signed URLs)',
+  })
+  ogImageUrl!: string | null;
 }
