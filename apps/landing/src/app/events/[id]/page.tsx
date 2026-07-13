@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { defaultLocale, resolveShareLocale, type ShareLocale } from "@/i18n/config";
 import { SharePageShell } from "@/components/layout/SharePageLayout/SharePageShell";
 import { chistoApiBase, chistoPublicSiteBase } from "@/lib/share-api";
-import { homeDownloadSectionUrl } from "@/lib/store-links";
+import { APP_STORE_APP_ID, homeDownloadSectionUrl } from "@/lib/store-links";
 import { eventShareStrings } from "./event-share-strings";
 
 type Props = { params: Promise<{ id: string }> };
@@ -71,11 +71,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = resolveShareLocale(h.get("x-locale"));
   const description = `${card.siteLabel} · ${card.title}`;
   const canonical = `${chistoPublicSiteBase()}/events/${encodeURIComponent(id)}`;
+  const appArgument = `${chistoPublicSiteBase()}/app/events/detail/${encodeURIComponent(id)}`;
   return {
     title: `${card.title} · Chisto.mk`,
     description,
     alternates: { canonical },
     robots: { index: false, follow: true },
+    other: {
+      "apple-itunes-app": `app-id=${APP_STORE_APP_ID}, app-argument=${appArgument}`,
+    },
     openGraph: {
       type: "website",
       url: canonical,
