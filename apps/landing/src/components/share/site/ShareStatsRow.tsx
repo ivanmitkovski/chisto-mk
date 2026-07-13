@@ -11,9 +11,9 @@ export function ShareStatsRow({ stats, ariaLabel }: ShareStatsRowProps) {
       {stats.map((stat) => (
         <li
           key={stat.label}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#F0F1F7] px-3 py-1 text-[11px] font-semibold text-[#4C4C4C]"
+          className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1 text-[11px] font-semibold text-ink-secondary"
         >
-          <span className="tabular-nums text-[#121212]">{stat.value}</span>
+          <span className="tabular-nums text-ink">{stat.value}</span>
           <span>{stat.label}</span>
         </li>
       ))}

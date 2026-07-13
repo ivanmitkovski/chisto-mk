@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -6,11 +16,13 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import type { Response } from 'express';
 import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
@@ -35,6 +47,7 @@ import { SitesMediaService } from '../services/sites-media.service';
 import { SitesShareCardQueryService } from '../services/sites-share-card-query.service';
 import { SiteCoReportersListService } from '../services/site-co-reporters-list.service';
 import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
+import { sendPublicMediaRedirect } from '../../common/http/public-media-redirect';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('sites')
@@ -65,6 +78,56 @@ export class SitesDetailController {
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   getPublicShareCard(@Param('id', ParseCuidPipe) id: string) {
     return this.shareCard.findPublicShareCard(id);
+  }
+
+  /**
+   * Stable media URL for share landing ISR HTML. Redirects to a freshly signed S3 GET URL.
+   */
+  @Get(':id/share-media/:index')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 300 } })
+  @ApiOperation({ summary: 'Redirect to a freshly signed URL for public site share media' })
+  @ApiResponse({ status: 302, description: 'Redirect to a short-lived signed S3 GET URL' })
+  @ApiNotFoundResponse({ description: 'Site or media slot not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  async redirectShareMedia(
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('index', ParseIntPipe) index: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    const signed = await this.shareCard.getShareMediaSignedUrl(id, index);
+    sendPublicMediaRedirect(res, signed, this.shareCard.getMediaRedirectMaxAgeSeconds());
+  }
+
+  @Get(':id/share-evidence/:index')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 300 } })
+  @ApiOperation({ summary: 'Redirect to a freshly signed URL for public site cleanup evidence' })
+  @ApiResponse({ status: 302, description: 'Redirect to a short-lived signed S3 GET URL' })
+  @ApiNotFoundResponse({ description: 'Site or evidence slot not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  async redirectShareEvidence(
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('index', ParseIntPipe) index: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    const signed = await this.shareCard.getShareEvidenceSignedUrl(id, index);
+    sendPublicMediaRedirect(res, signed, this.shareCard.getMediaRedirectMaxAgeSeconds());
+  }
+
+  @Get(':id/share-avatar')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 300 } })
+  @ApiOperation({ summary: 'Redirect to a freshly signed URL for the public share reporter avatar' })
+  @ApiResponse({ status: 302, description: 'Redirect to a short-lived signed S3 GET URL' })
+  @ApiNotFoundResponse({ description: 'Site or avatar not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  async redirectShareAvatar(
+    @Param('id', ParseCuidPipe) id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const signed = await this.shareCard.getShareAvatarSignedUrl(id);
+    sendPublicMediaRedirect(res, signed, this.shareCard.getMediaRedirectMaxAgeSeconds());
   }
 
   @Get(':id/cleanup-evidence')

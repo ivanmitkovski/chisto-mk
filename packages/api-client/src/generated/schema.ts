@@ -1999,6 +1999,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sites/{id}/share-media/{index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect to a freshly signed URL for public site share media */
+        get: operations["SitesDetailController_redirectShareMedia"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/{id}/share-evidence/{index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect to a freshly signed URL for public site cleanup evidence */
+        get: operations["SitesDetailController_redirectShareEvidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/{id}/share-avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redirect to a freshly signed URL for the public share reporter avatar */
+        get: operations["SitesDetailController_redirectShareAvatar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sites/{id}/cleanup-evidence": {
         parameters: {
             query?: never;
@@ -5517,6 +5568,7 @@ export interface components {
         SitePublicShareReporterDto: {
             /** @description Public display name (no email/phone/user id) */
             displayLabel: Record<string, never> | null;
+            /** @description Stable redirect URL for reporter avatar (`/sites/:id/share-avatar`) */
             avatarUrl: Record<string, never> | null;
             isDeleted: boolean;
             /** @description True when identity should be shown as localized Anonymous */
@@ -5547,7 +5599,7 @@ export interface components {
             address?: Record<string, never> | null;
             latitude: number;
             longitude: number;
-            /** @description Signed media URLs (hero + approved reports), capped */
+            /** @description Stable share-media redirect URLs (`/sites/:id/share-media/:index`); each request 302s to a fresh signed GET */
             mediaUrls: string[];
             /** @description Report category code */
             category?: Record<string, never> | null;
@@ -5563,9 +5615,9 @@ export interface components {
             reportedAt?: Record<string, never> | null;
             reporter?: components["schemas"]["SitePublicShareReporterDto"] | null;
             events: components["schemas"]["SitePublicShareEventDto"][];
-            /** @description Signed cleanup evidence URLs when cleaned */
+            /** @description Stable share-evidence redirect URLs when cleaned (`/sites/:id/share-evidence/:index`) */
             cleanupEvidenceUrls: string[];
-            /** @description First signed media URL for in-page use only; do not use for OG (short-lived signed URLs) */
+            /** @description First stable media/evidence redirect URL for in-page use; OG tags use opengraph-image.tsx instead */
             ogImageUrl?: Record<string, never> | null;
         };
         CleanupEvidenceSubmitterDto: {
@@ -14508,6 +14560,173 @@ export interface operations {
                 content?: never;
             };
             /** @description Site not found or not publicly visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesDetailController_redirectShareMedia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to a short-lived signed S3 GET URL */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Site or media slot not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesDetailController_redirectShareEvidence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to a short-lived signed S3 GET URL */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Site or evidence slot not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesDetailController_redirectShareAvatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to a short-lived signed S3 GET URL */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Site or avatar not found */
             404: {
                 headers: {
                     [name: string]: unknown;

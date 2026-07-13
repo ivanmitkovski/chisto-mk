@@ -31,6 +31,12 @@ describe("shouldUseUnoptimizedNewsImage", () => {
     expect(
       shouldUseUnoptimizedNewsImage("https://api.chisto.mk/v1/news/media/media-1"),
     ).toBe(true);
+    expect(
+      shouldUseUnoptimizedNewsImage("https://api.chisto.mk/v1/sites/site1/share-media/0"),
+    ).toBe(true);
+    expect(
+      shouldUseUnoptimizedNewsImage("https://api.chisto.mk/v1/sites/site1/share-avatar"),
+    ).toBe(true);
   });
 
   it("skips optimizer for unknown remote hosts", () => {

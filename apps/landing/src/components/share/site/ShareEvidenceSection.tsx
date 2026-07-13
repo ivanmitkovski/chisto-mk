@@ -10,6 +10,7 @@ type ShareEvidenceSectionProps = {
   closeLabel: string;
   prevLabel: string;
   nextLabel: string;
+  unavailableLabel?: string;
 };
 
 export function ShareEvidenceSection({
@@ -20,11 +21,12 @@ export function ShareEvidenceSection({
   closeLabel,
   prevLabel,
   nextLabel,
+  unavailableLabel,
 }: ShareEvidenceSectionProps) {
   if (urls.length === 0) return null;
   return (
     <section aria-labelledby="share-evidence-heading">
-      <h2 id="share-evidence-heading" className="mb-3 text-base font-semibold text-[#121212]">
+      <h2 id="share-evidence-heading" className="mb-3 text-base font-semibold text-ink">
         {title}
       </h2>
       <ShareHeroGallery
@@ -35,6 +37,7 @@ export function ShareEvidenceSection({
         closeLabel={closeLabel}
         prevLabel={prevLabel}
         nextLabel={nextLabel}
+        {...(unavailableLabel != null ? { unavailableLabel } : {})}
       />
     </section>
   );
