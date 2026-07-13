@@ -86,10 +86,12 @@ export default async function SiteSharePage({ params, searchParams }: Props) {
 
   const siteBase = chistoPublicSiteBase();
   const deepLinkQuery = new URLSearchParams();
+  deepLinkQuery.set("siteId", id);
   if (st) deepLinkQuery.set("st", st);
   if (cid) deepLinkQuery.set("cid", cid);
-  const deepLinkQs = deepLinkQuery.toString();
-  const appDeepLink = `${siteBase}/sites/${encodeURIComponent(id)}${deepLinkQs ? `?${deepLinkQs}` : ""}`;
+  // Use `/app/...` so Universal Links hand off to the installed app (same-path
+  // `/sites/:id` would stay in the browser because the user is already there).
+  const appDeepLink = `${siteBase}/app/home/map-focus?${deepLinkQuery.toString()}`;
   const marketingLocale = uiLocale === "sr" || uiLocale === "rom" ? defaultLocale : uiLocale;
   const webHome = `${siteBase}/${marketingLocale}`;
   const downloadUrl = homeDownloadSectionUrl(siteBase, marketingLocale);
