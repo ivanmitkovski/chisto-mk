@@ -11,7 +11,7 @@ type Props = { params: Promise<{ id: string }> };
 async function loadTitle(id: string): Promise<{ title: string; status: string } | null> {
   try {
     const res = await fetch(`${chistoApiBase()}/sites/${encodeURIComponent(id)}/share-card`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { title?: string; status?: string };
