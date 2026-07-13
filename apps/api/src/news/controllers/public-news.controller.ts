@@ -35,6 +35,10 @@ export class PublicNewsController {
         ? `public, max-age=${maxAge}, stale-while-revalidate=${Math.min(60, maxAge)}`
         : 'private, no-store',
     );
+    // Helmet defaults CORP to same-origin, which blocks chisto.mk <img> from loading
+    // api.chisto.mk (ERR_BLOCKED_BY_RESPONSE.NotSameOrigin). Public news media must be
+    // embeddable cross-origin (landing, Vercel previews, OG scrapers).
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.redirect(302, signed);
   }
 
