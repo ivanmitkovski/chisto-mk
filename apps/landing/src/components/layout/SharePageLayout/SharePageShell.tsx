@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { OpenInAppLink } from "@/components/app-handoff/OpenInAppLink";
 import { SharePageLayout } from "@/components/layout/SharePageLayout";
 import { ShareActionLink } from "@/components/layout/SharePageLayout/ShareActionLink";
 import { buttonVariants } from "@/components/atoms/Button";
@@ -43,12 +43,12 @@ export function SharePageShell({
         ))}
       </div>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link
+        <OpenInAppLink
           href={primary.href}
           className={cn(buttonVariants({ variant: "primary", size: "md" }), "min-h-14 text-[17px] font-semibold")}
         >
           {primary.label}
-        </Link>
+        </OpenInAppLink>
         {secondary ? (
           <ShareActionLink
             href={secondary.href}

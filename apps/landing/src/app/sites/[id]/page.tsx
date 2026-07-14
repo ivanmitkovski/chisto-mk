@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { defaultLocale, resolveShareLocale, type ShareLocale } from "@/i18n/config";
 import { SiteShareView, type SiteShareCard } from "@/components/share/site";
 import { chistoApiBase, chistoPublicSiteBase } from "@/lib/share-api";
-import { homeDownloadSectionUrl } from "@/lib/store-links";
+import { APP_STORE_APP_ID, homeDownloadSectionUrl } from "@/lib/store-links";
 import { SiteShareAttribution } from "./SiteShareAttribution";
 import { formatSiteStatus, siteShareStrings } from "./site-share-strings";
 
@@ -53,11 +53,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     `${card.siteLabel} · ${statusLabel}`;
   const canonical = `${chistoPublicSiteBase()}/sites/${encodeURIComponent(id)}`;
   // Prefer stable opengraph-image.tsx — signed CDN URLs expire (~15m) and break social previews.
+  const appArgument = `${chistoPublicSiteBase()}/app/home/map-focus?siteId=${encodeURIComponent(id)}`;
   return {
     title: `${card.title} · Chisto.mk`,
     description,
     alternates: { canonical },
     robots: { index: false, follow: true },
+    other: {
+      "apple-itunes-app": `app-id=${APP_STORE_APP_ID}, app-argument=${appArgument}`,
+    },
     openGraph: {
       type: "website",
       url: canonical,
