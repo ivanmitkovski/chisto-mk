@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { defaultLocale, resolveShareLocale, type ShareLocale } from "@/i18n/config";
 import { SiteShareView, type SiteShareCard } from "@/components/share/site";
 import { chistoApiBase, chistoPublicSiteBase } from "@/lib/share-api";
-import { homeDownloadSectionUrl } from "@/lib/store-links";
+import { APP_STORE_APP_ID, homeDownloadSectionUrl } from "@/lib/store-links";
 import { SiteShareAttribution } from "./SiteShareAttribution";
 import { formatSiteStatus, siteShareStrings } from "./site-share-strings";
 
@@ -21,8 +21,10 @@ class ShareCardUpstreamError extends Error {
 }
 
 async function loadShareCard(id: string): Promise<SiteShareCard | null> {
+  // Share payloads include media/avatar URLs that must stay current with the API
+  // (stable redirects). Avoid long-lived Next fetch cache serving pre-redirect signed URLs.
   const res = await fetch(`${chistoApiBase()}/sites/${encodeURIComponent(id)}/share-card`, {
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
   if (res.status === 404) {
     return null;
@@ -51,11 +53,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     `${card.siteLabel} · ${statusLabel}`;
   const canonical = `${chistoPublicSiteBase()}/sites/${encodeURIComponent(id)}`;
   // Prefer stable opengraph-image.tsx — signed CDN URLs expire (~15m) and break social previews.
+  const appArgument = `${chistoPublicSiteBase()}/app/home/map-focus?siteId=${encodeURIComponent(id)}`;
   return {
     title: `${card.title} · Chisto.mk`,
     description,
     alternates: { canonical },
     robots: { index: false, follow: true },
+    other: {
+      "apple-itunes-app": `app-id=${APP_STORE_APP_ID}, app-argument=${appArgument}`,
+    },
     openGraph: {
       type: "website",
       url: canonical,
@@ -86,10 +92,12 @@ export default async function SiteSharePage({ params, searchParams }: Props) {
 
   const siteBase = chistoPublicSiteBase();
   const deepLinkQuery = new URLSearchParams();
+  deepLinkQuery.set("siteId", id);
   if (st) deepLinkQuery.set("st", st);
   if (cid) deepLinkQuery.set("cid", cid);
-  const deepLinkQs = deepLinkQuery.toString();
-  const appDeepLink = `${siteBase}/sites/${encodeURIComponent(id)}${deepLinkQs ? `?${deepLinkQs}` : ""}`;
+  // Use `/app/...` so Universal Links hand off to the installed app (same-path
+  // `/sites/:id` would stay in the browser because the user is already there).
+  const appDeepLink = `${siteBase}/app/home/map-focus?${deepLinkQuery.toString()}`;
   const marketingLocale = uiLocale === "sr" || uiLocale === "rom" ? defaultLocale : uiLocale;
   const webHome = `${siteBase}/${marketingLocale}`;
   const downloadUrl = homeDownloadSectionUrl(siteBase, marketingLocale);
