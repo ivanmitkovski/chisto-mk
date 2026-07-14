@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { OpenInAppLink } from "@/components/app-handoff/OpenInAppLink";
 import { buttonVariants } from "@/components/atoms/Button";
 import { trackMarketingEvent } from "@/lib/analytics/track-marketing";
 import { cn } from "@/lib/utils/cn";
@@ -26,7 +26,7 @@ export function ShareCardActions({
   return (
     <div className="border-t border-divider pt-5">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch">
-        <Link
+        <OpenInAppLink
           href={openInAppHref}
           className={cn(
             buttonVariants({ variant: "primary", size: "md" }),
@@ -34,7 +34,7 @@ export function ShareCardActions({
           )}
         >
           {openInAppLabel}
-        </Link>
+        </OpenInAppLink>
         <a
           href={getAppHref}
           onClick={() => {

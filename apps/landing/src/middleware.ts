@@ -7,6 +7,10 @@ import {
   type ShareLocale,
 } from "./i18n/config";
 import { routing } from "./i18n/routing";
+import {
+  isAppDeepLinkPath,
+  stripLocalePrefixedAppPath,
+} from "./lib/app-deep-link";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -20,6 +24,11 @@ function isPublicSharePath(pathname: string): boolean {
   const [kind, id] = segments;
   if (kind !== "events" && kind !== "sites") return false;
   return SHARE_RESOURCE_ID.test(id);
+}
+
+/** Share landings + `/app/*` handoff — never locale-prefix (breaks AASA / App Links). */
+function bypassesIntlLocale(pathname: string): boolean {
+  return isPublicSharePath(pathname) || isAppDeepLinkPath(pathname);
 }
 
 /** Cookie → Accept-Language → default (includes share-only sr/rom). */
@@ -56,7 +65,15 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isPublicSharePath(pathname)) {
+  // Heal `/mk/app/...` (locale middleware used to prefix these → 404 + AASA miss).
+  const strippedApp = stripLocalePrefixedAppPath(pathname);
+  if (strippedApp) {
+    const url = request.nextUrl.clone();
+    url.pathname = strippedApp;
+    return NextResponse.redirect(url);
+  }
+
+  if (bypassesIntlLocale(pathname)) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-locale", resolveShareRequestLocale(request));
     return NextResponse.next({
