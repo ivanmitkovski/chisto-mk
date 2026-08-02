@@ -96,6 +96,30 @@ pnpm dev
 | Admin | http://localhost:3001 |
 | Landing | http://localhost:3002 |
 
+### Full API stack in Docker
+
+Runs the API exactly as it ships — production image, Postgres + PostGIS, Redis and
+MinIO standing in for S3 — with no local Node or `.env` required:
+
+```bash
+docker compose up --build
+```
+
+Migrations run in a dedicated one-shot `migrate` service before the API starts, not
+at container boot. Readiness check:
+
+```bash
+curl localhost:3000/health/ready   # {"status":"ok","redis":"ok","s3":"ok"}
+```
+
+| Service | Local URL |
+|---------|-----------|
+| MinIO API | http://localhost:9000 |
+| MinIO console | http://localhost:9001 (`minioadmin` / `minioadmin`) |
+
+The API container holds port 3000, which the pre-push hook refuses to run against —
+stop it with `docker compose stop api` before pushing, or set `API_PORT` to move it.
+
 ### Scripts
 
 | Command | Description |

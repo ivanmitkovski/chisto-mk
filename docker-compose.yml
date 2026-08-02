@@ -1,20 +1,145 @@
+# Local full stack: API + Postgres/PostGIS + Redis + MinIO.
+#
+#   docker compose up --build          # whole stack
+#   docker compose up -d postgres      # just the database (e2e tests, host-run API)
+#
+# Runs with zero configuration. Every value below can be overridden from a root
+# .env file, which Compose loads automatically for ${VAR} interpolation.
+#
+# Hosting (Caddy, TLS, restart policies) is deliberately not modelled here — that
+# lands in a separate override file when the VPS exists.
+
+x-api-image: &api-image
+  build:
+    context: .
+    dockerfile: apps/api/Dockerfile.prod
+  image: chisto-api:local
+
+# Container-internal addressing: service names, not localhost. Do not reuse the
+# host .env values here — they point at localhost, which inside a container is
+# the container itself.
+x-api-env: &api-env
+  # Dockerfile.prod bakes NODE_ENV=production, which arms the full production
+  # guard set in apps/api/src/config/env.ts: SMS_PROVIDER must be twilio,
+  # ADMIN_APP_BASE_URL must not be localhost, plus CHAT_ENCRYPTION_KEY,
+  # METRICS_BEARER_TOKEN, CORS_ORIGINS and a 32-char JWT_SECRET. The local stack
+  # runs as development so it boots without production secrets.
+  NODE_ENV: development
+  DATABASE_URL: postgresql://chisto:chisto@postgres:5432/chisto
+  REDIS_URL: redis://redis:6379
+  JWT_SECRET: ${JWT_SECRET:-local_dev_jwt_secret_at_least_thirty_two_chars}
+  PORT: 3000
+  # MinIO stands in for S3. s3-storage.client.ts honours these directly.
+  S3_BUCKET_NAME: ${S3_BUCKET_NAME:-chisto-media}
+  S3_ENDPOINT_URL: http://minio:9000
+  S3_FORCE_PATH_STYLE: "true"
+  AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+  AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+  AWS_REGION: ${AWS_REGION:-us-east-1}
+  # No Twilio locally: OTP codes come back in the response instead of by SMS.
+  SMS_PROVIDER: none
+  OTP_DEV_RETURN_CODE: "true"
+  CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3001,http://localhost:3002}
+
 services:
   postgres:
-    image: postgis/postgis:16-3.5
+    # 17 to match production RDS (engine 17.9) so a pg_dump restores cleanly.
+    # platform pin: postgis publishes amd64 only, so ARM hosts need emulation.
+    image: postgis/postgis:17-3.5
     platform: linux/amd64
     environment:
       POSTGRES_USER: chisto
       POSTGRES_PASSWORD: chisto
       POSTGRES_DB: chisto
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U chisto"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  # One-shot: create the media bucket, then exit 0.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-chisto-media}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        mc mb --ignore-existing "local/$${S3_BUCKET_NAME}"
+        echo "bucket ready: $${S3_BUCKET_NAME}"
+
+  # One-shot: apply migrations before the API starts, keeping the production
+  # discipline of a dedicated migrate step rather than migrating at app boot.
+  migrate:
+    <<: *api-image
+    entrypoint: ["prisma", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: postgresql://chisto:chisto@postgres:5432/chisto
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *api-image
+    environment:
+      <<: *api-env
+      # migrate already ran; the entrypoint still verifies status and refuses to
+      # start on drift.
+      MIGRATE_DEPLOY_ON_START: "0"
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
+
 volumes:
-  postgres_data:
+  pgdata:
+  redisdata:
+  miniodata:
