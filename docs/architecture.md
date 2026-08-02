@@ -69,7 +69,7 @@ Flutter app (Melos workspace). Feature packages (`feature_reports`, `feature_eve
 
 | Branch | Typical deploy |
 |--------|----------------|
-| `develop` | Integration; API build on push; staging when gated |
-| `main` | Production promotion |
+| `develop` | Integration; API image build on push |
+| `main` | Production promotion; API image build on push |
 
 See [platform-baseline-ci-env.md](platform-baseline-ci-env.md) and [infra/README.md](../infra/README.md).

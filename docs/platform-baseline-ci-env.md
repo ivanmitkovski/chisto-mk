@@ -54,10 +54,9 @@ Path-filtered workflows: `mobile-pr.yml`, `mobile-e2e.yml`, `flutter-goldens.yml
 
 ## Deploy gating (API)
 
-- `main` → production ECS deploy via `api-deploy.yml`
-- `develop` → build only unless `API_STAGING_DEPLOY=true`
+- `api-deploy.yml` builds the production image and smoke-tests `/health` on both `develop` and `main`. It no longer deploys: the ECR, ECS migrate and ECS rollout jobs were removed with the AWS stack, along with the `API_AWS_DEPLOY` / `API_STAGING_DEPLOY` gates.
 
-Details: [infra/terraform/GITHUB_ACTIONS.md](../infra/terraform/GITHUB_ACTIONS.md).
+Details: [infra/README.md](../infra/README.md).
 
 ## Node toolchain
 

@@ -1,5 +1,7 @@
 # Phase 4: AWS production readiness
 
+> **Historical.** This records the AWS `eu-central-1` posture as audited. The platform is migrating to a single VPS running Docker Compose, and the Terraform described below no longer exists on this branch — it lives on `main` until `terraform destroy` runs. See [infra/README.md](../../infra/README.md).
+
 Production disaster-recovery targets and infrastructure posture for Chisto.mk on AWS `eu-central-1`.
 
 ## DR targets
@@ -21,15 +23,15 @@ Detailed restore procedure: [db-restore.md](../../apps/api/docs/runbooks/db-rest
 - **S3**: report media buckets
 - **WAF**: edge protection (multipart upload rules tuned for photo reports)
 
-Terraform: [`infra/terraform/envs/production/`](../../infra/terraform/envs/production/).
+Terraform: `infra/terraform/envs/production/` on `main`.
 
 ## Deploy pipeline
 
-GitHub Actions `api-deploy.yml` on `main`. See [GITHUB_ACTIONS.md](../../infra/terraform/GITHUB_ACTIONS.md).
+GitHub Actions `api-deploy.yml` on `main`, configured per `infra/terraform/GITHUB_ACTIONS.md` on that branch.
 
 Post-deploy: `GET https://api.chisto.mk/health/ready` returns `status: ok`, `redis: ok`, `s3: ok`.
 
-RDS master password rotation is automated: `chisto-prod-rds-password-sync` Lambda syncs `DATABASE_URL` on `RotationSucceeded` and reconciles every 15 minutes. Manual fallback: `infra/scripts/sync-production-database-url.sh`.
+RDS master password rotation is automated: `chisto-prod-rds-password-sync` Lambda syncs `DATABASE_URL` on `RotationSucceeded` and reconciles every 15 minutes. Manual fallback: `infra/scripts/sync-production-database-url.sh` on `main`.
 
 ## Session and realtime prerequisites
 

@@ -16,4 +16,4 @@
 
 Dependabot: [../dependabot.yml](../dependabot.yml) (npm, GitHub Actions, Docker).
 
-Deploy configuration: [infra/terraform/GITHUB_ACTIONS.md](../../infra/terraform/GITHUB_ACTIONS.md).
+Deploy configuration: none currently. `api-deploy.yml` builds and smoke-tests the API image; the AWS deploy jobs were removed with the Terraform stack. See [infra/README.md](../../infra/README.md).

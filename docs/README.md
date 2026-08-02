@@ -25,9 +25,8 @@ Central index for Chisto.mk platform documentation. Canonical source lives in th
 
 ## Infrastructure & deploy
 
-- [infra/README.md](../infra/README.md): Terraform layout
-- [GitHub Actions production deploy](../infra/terraform/GITHUB_ACTIONS.md)
-- [AWS production readiness](launch-readiness/phase-04-aws-production-readiness.md): DR targets
+- [infra/README.md](../infra/README.md): hosting target and migration state
+- [AWS production readiness](launch-readiness/phase-04-aws-production-readiness.md): DR targets for the AWS stack being retired
 
 ## Observability
 

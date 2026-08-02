@@ -40,4 +40,4 @@ Requires Postgres (`docker compose up -d postgres` from root) and `.env` with `D
 
 ## Production
 
-`https://api.chisto.mk`. Deployed via [GitHub Actions](../../infra/terraform/GITHUB_ACTIONS.md).
+`https://api.chisto.mk`. Hosting is migrating to a single VPS running Docker Compose; see [infra/README.md](../../infra/README.md). CI currently builds and smoke-tests the production image without deploying it.

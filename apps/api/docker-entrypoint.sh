@@ -31,8 +31,8 @@ if [ "${SKIP_MIGRATE_STATUS_CHECK:-}" != "1" ]; then
   if ! migrate_status_out=$(prisma migrate status 2>&1); then
     echo "$migrate_status_out"
     if echo "$migrate_status_out" | grep -qE 'P1000|28P01|Authentication failed|password authentication failed'; then
-      echo "ERROR: Database authentication failed during migrate status (check DATABASE_URL / RDS managed password sync)."
-      echo "  Run: bash infra/scripts/sync-production-database-url.sh && redeploy ECS"
+      echo "ERROR: Database authentication failed during migrate status (check DATABASE_URL)."
+      echo "  Verify the DATABASE_URL credentials in the environment, then restart the container."
     else
       echo "ERROR: Database migrations are pending or failed after migrate deploy."
       echo "  From a machine with RDS access: cd apps/api && bash scripts/run-migrate-deploy.sh"

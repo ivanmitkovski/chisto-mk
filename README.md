@@ -68,7 +68,7 @@ flowchart LR
 | Admin | Next.js 15 |
 | Landing | Next.js 15, next-intl (mk / en / sq) |
 | Mobile | Flutter 3.44, Melos workspace |
-| Infra | Terraform, ECS, RDS, ElastiCache. See [infra/README.md](infra/README.md) |
+| Infra | Docker Compose on a single VPS: Postgres + PostGIS, Redis, MinIO, Caddy. See [infra/README.md](infra/README.md) |
 
 ## Quick start
 
