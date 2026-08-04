@@ -109,11 +109,21 @@ Migrations run in a dedicated one-shot `migrate` service before the API starts, 
 at container boot. Readiness check:
 
 ```bash
-curl localhost:3000/health/ready   # {"status":"ok","redis":"ok","s3":"ok"}
+curl localhost/health/ready        # through the Caddy proxy
+curl localhost:3000/health/ready   # direct to the API container
 ```
+
+Caddy fronts the stack the same way it will in production: it serves
+`/chisto-media/*` from MinIO and everything else from the API, so one hostname
+covers both. Media URLs are signed against `chisto.localhost` rather than
+`minio:9000`, because a presigned URL is only valid for the host it was signed
+for — an internal Docker name would be unreachable from a phone. `curl` and
+browsers resolve `*.localhost` to 127.0.0.1 on their own, so no hosts-file entry
+is needed. Override with `PUBLIC_HOST` to use a different name.
 
 | Service | Local URL |
 |---------|-----------|
+| Proxy (API + media) | http://chisto.localhost |
 | MinIO API | http://localhost:9000 |
 | MinIO console | http://localhost:9001 (`minioadmin` / `minioadmin`) |
 

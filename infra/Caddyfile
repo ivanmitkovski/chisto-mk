@@ -1,0 +1,38 @@
+# Reverse proxy for the Chisto stack — the only container exposed to the network.
+#
+# Local: serves plain HTTP on :80, so `docker compose up` needs no certificates
+# and works offline. Production swaps the site address for the real hostname,
+# at which point Caddy provisions a Let's Encrypt certificate on its own.
+#
+# One hostname covers both the API and media, so there is one certificate and
+# no second domain to manage.
+
+{
+	# Local only. Removing this block is what turns on automatic HTTPS.
+	auto_https off
+}
+
+:80 {
+	# MinIO. S3_FORCE_PATH_STYLE=true puts the bucket name first in the path,
+	# so this prefix is the entire media surface. Keep in sync with
+	# S3_BUCKET_NAME if that ever changes.
+	handle /chisto-media/* {
+		reverse_proxy minio:9000
+	}
+
+	handle {
+		# flush_interval -1 disables response buffering: admin uses SSE and
+		# mobile uses Socket.IO, and both break if the proxy buffers them.
+		# Caddy upgrades WebSocket connections without extra configuration.
+		reverse_proxy api:3000 {
+			flush_interval -1
+		}
+	}
+
+	# The API sets `trust proxy`, so it reads the client IP from the
+	# X-Forwarded-For header Caddy sets here. Rate limiting depends on it.
+	log {
+		output stdout
+		format console
+	}
+}

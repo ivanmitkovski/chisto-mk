@@ -6,8 +6,9 @@
 # Runs with zero configuration. Every value below can be overridden from a root
 # .env file, which Compose loads automatically for ${VAR} interpolation.
 #
-# Hosting (Caddy, TLS, restart policies) is deliberately not modelled here — that
-# lands in a separate override file when the VPS exists.
+# Caddy fronts the stack here exactly as it will on the VPS, so the routing and
+# presigned-media path are exercised locally. Only TLS, real secrets and restart
+# policies are left out; those land in an override file when the VPS exists.
 
 x-api-image: &api-image
   build:
@@ -31,7 +32,11 @@ x-api-env: &api-env
   PORT: 3000
   # MinIO stands in for S3. s3-storage.client.ts honours these directly.
   S3_BUCKET_NAME: ${S3_BUCKET_NAME:-chisto-media}
-  S3_ENDPOINT_URL: http://minio:9000
+  # Points at Caddy, not minio:9000, because this one value is used both to sign
+  # presigned URLs and to make internal calls. A URL signed for `minio` is only
+  # resolvable inside the network, so phones could never fetch media. Signing
+  # against the public host costs one extra hop internally and nothing else.
+  S3_ENDPOINT_URL: http://${PUBLIC_HOST:-chisto.localhost}
   S3_FORCE_PATH_STYLE: "true"
   AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
   AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
@@ -139,7 +144,34 @@ services:
       migrate:
         condition: service_completed_successfully
 
+  # Single public entrypoint: terminates TLS in production and routes /chisto-media/*
+  # to MinIO, everything else to the API. Locally it serves plain HTTP on :80 so the
+  # same routing can be exercised without certificates.
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "${CADDY_HTTP_PORT:-80}:80"
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
+    networks:
+      default:
+        # Presigned S3 URLs are signed including the hostname, so the name the
+        # API signs with must resolve for the phone too. This alias makes
+        # PUBLIC_HOST resolve to Caddy inside the network, while curl and
+        # browsers resolve *.localhost to 127.0.0.1 on the host — same URL
+        # works from both sides, which is what production looks like.
+        aliases:
+          - ${PUBLIC_HOST:-chisto.localhost}
+    # No depends_on: Caddy retries its upstreams, and the API signs URLs
+    # against this hostname, so neither can be made to start strictly first.
+
 volumes:
   pgdata:
   redisdata:
   miniodata:
+  # Caddy stores issued certificates in /data — losing it means re-requesting
+  # them from Let's Encrypt, which is rate limited.
+  caddydata:
+  caddyconfig:
