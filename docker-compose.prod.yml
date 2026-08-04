@@ -1,0 +1,92 @@
+# Production overlay for the VPS. Layered on top of docker-compose.yml, which
+# keeps the topology; this file only supplies what must differ.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# On the box, put COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml in the
+# root .env so a plain `docker compose up -d` picks both up and nobody can start
+# the local-flavoured stack in production by accident.
+#
+# Values come from that same root .env (gitignored). Required ones use the
+# ${VAR:?...} form so Compose refuses to start when they are missing, rather
+# than silently falling back to the local defaults in the base file — the whole
+# point of keeping the two files apart.
+#
+# Template: infra/vps.env.example
+
+x-prod-api-env: &prod-api-env
+  # Arms the full guard set in apps/api/src/config/env.ts. validateEnv() exits
+  # on anything missing or malformed, so a bad deploy fails at boot rather than
+  # at the first request.
+  NODE_ENV: production
+
+  DATABASE_URL: postgresql://chisto:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/chisto
+  JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET (min 32 chars)}
+
+  # Signed into every media URL, so it must be the public hostname. See the
+  # media-URL section of infra_migration.md for why this cannot be minio:9000.
+  S3_ENDPOINT_URL: https://${PUBLIC_HOST:?set PUBLIC_HOST}
+  AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER}
+  AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}
+
+  # Unregenerable — exported from AWS Secrets Manager. A new value makes every
+  # stored event-chat message permanently undecryptable.
+  CHAT_ENCRYPTION_KEY: ${CHAT_ENCRYPTION_KEY:?set CHAT_ENCRYPTION_KEY (64 hex chars)}
+  CHECK_IN_QR_SECRET: ${CHECK_IN_QR_SECRET:?set CHECK_IN_QR_SECRET (min 24 chars)}
+  SITE_SHARE_TOKEN_SECRET: ${SITE_SHARE_TOKEN_SECRET:?set SITE_SHARE_TOKEN_SECRET (min 24 chars)}
+  METRICS_BEARER_TOKEN: ${METRICS_BEARER_TOKEN:?set METRICS_BEARER_TOKEN}
+
+  CORS_ORIGINS: ${CORS_ORIGINS:?set CORS_ORIGINS}
+  ADMIN_APP_BASE_URL: ${ADMIN_APP_BASE_URL:?set ADMIN_APP_BASE_URL (must not be localhost)}
+
+  # Production refuses SMS_PROVIDER=none: phone OTP is the login path, so a
+  # missing Twilio config would lock every user out.
+  SMS_PROVIDER: twilio
+  OTP_DEV_RETURN_CODE: "false"
+
+services:
+  postgres:
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+
+  redis:
+    restart: unless-stopped
+
+  minio:
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}
+
+  migrate:
+    environment:
+      DATABASE_URL: postgresql://chisto:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/chisto
+
+  api:
+    restart: unless-stopped
+    environment:
+      <<: *prod-api-env
+    # Twilio, Postmark, Firebase and any other long-tail secrets — the ones with
+    # no compose-level guard, left to validateEnv() to catch at boot. Kept in a
+    # file so they are edited on the box rather than passed on the command line.
+    # Note `docker compose config` expands these inline, so its output is
+    # secret-bearing; do not paste it into issues or logs.
+    env_file:
+      - ./infra/vps.env
+
+  caddy:
+    restart: unless-stopped
+    ports:
+      # 443 for TLS, 443/udp for HTTP/3. Port 80 comes from the base file and
+      # must stay open: Let's Encrypt uses it for the ACME challenge and Caddy
+      # redirects it to HTTPS.
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      # A real hostname here is what turns on automatic HTTPS — see infra/Caddyfile.
+      CADDY_SITE_ADDRESS: ${PUBLIC_HOST:?set PUBLIC_HOST}
+    networks:
+      default:
+        aliases:
+          - ${PUBLIC_HOST:?set PUBLIC_HOST}

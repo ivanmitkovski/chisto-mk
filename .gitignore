@@ -17,6 +17,8 @@ out/
 .env.*.local
 .env.staging
 .env.production
+# Real VPS secrets; infra/vps.env.example is the committed template.
+infra/vps.env
 *.tfvars
 !*.tfvars.example
 
