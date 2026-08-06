@@ -10,11 +10,17 @@
 # presigned-media path are exercised locally. Only TLS, real secrets and restart
 # policies are left out; those land in an override file when the VPS exists.
 
+# api and migrate share one image by definition — migrations must be applied by the
+# same code that will run against them. API_IMAGE lets the VPS point both at a tag
+# pulled from GHCR instead of building; locally the default is what it always was,
+# and `docker compose up --build` still builds. The build: section cannot be removed
+# by an override file, so on a box with no source tree, pull the image before
+# `up -d` — Compose then uses what is already present and never tries to build.
 x-api-image: &api-image
+  image: ${API_IMAGE:-chisto-api:local}
   build:
     context: .
     dockerfile: apps/api/Dockerfile.prod
-  image: chisto-api:local
 
 # Container-internal addressing: service names, not localhost. Do not reuse the
 # host .env values here — they point at localhost, which inside a container is

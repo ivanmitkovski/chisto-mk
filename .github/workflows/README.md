@@ -3,7 +3,7 @@
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | [ci.yml](ci.yml) | PR; push to `main`, `develop` | Secret scan, build, API tests, contract checks |
-| [api-deploy.yml](api-deploy.yml) | Push to `main`/`develop`; `workflow_dispatch` | Build and deploy API to ECS |
+| [api-deploy.yml](api-deploy.yml) | Push to `main`/`develop`/`infra-migration`; `workflow_dispatch` | Build the production API image, push it to GHCR, smoke-test the pulled artifact |
 | [api-typecheck.yml](api-typecheck.yml) | PR (API paths) | Standalone API TypeScript check |
 | [api-security.yml](api-security.yml) | PR (API paths) | API security scans |
 | [api-migration-lint.yml](api-migration-lint.yml) | PR (migrations) | Prisma migration lint |
