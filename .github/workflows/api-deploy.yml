@@ -4,8 +4,12 @@ on:
   workflow_dispatch:
   push:
     # infra-migration is temporary, for the VPS bring-up: it lets an edit to this
-    # file be its own trigger (the path filter below already covers it). Remove
-    # the branch before merge.
+    # file be its own trigger (the path filter below already covers it).
+    #
+    # Remove it in the merge commit, not before — it is what lets that branch build
+    # and deploy at all. It also drives the deploy job's `if:` below, so leaving it
+    # behind means anyone who later creates a branch with this name gets an
+    # automatic deploy to the VPS.
     branches: [develop, main, infra-migration]
     paths:
       - 'apps/api/**'

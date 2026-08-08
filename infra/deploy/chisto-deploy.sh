@@ -4,9 +4,11 @@
 # runs this and nothing else, whatever it asks for. See README.md.
 #
 # Lives at /srv/chisto/chisto-deploy.sh, alongside the compose file and .env it
-# operates on. Installed root:root 0755 — the deploy user runs it but cannot edit
-# it. That is defence-in-depth rather than the load-bearing control: the CI key has
-# no shell and so cannot write files at all.
+# operates on. Installed root:root 0755, which stops the deploy user editing this
+# file's contents — but not replacing it, since the directory is deploy-owned and
+# that is what governs deletion. Moot either way: deploy is in the docker group,
+# which is root-equivalent. The boundary that holds is the forced command, which
+# gives the CI key no shell and therefore no way to write anything.
 #
 # Argument arrives as SSH_ORIGINAL_COMMAND, i.e. fully attacker-controlled if the
 # key ever leaks. Validated below before it touches anything.

@@ -34,11 +34,27 @@ scp infra/deploy/chisto-deploy.sh chisto:/tmp/
 ssh -t chisto 'sudo install -o root -g root -m 0755 /tmp/chisto-deploy.sh /srv/chisto/chisto-deploy.sh'
 ```
 
-**Scope of the restriction.** The deploy user needs the `docker` group, and the
-docker group is root-equivalent on any box. The forced command constrains what a
-*leaked CI key* can do — one script, no shell. It is not a sandbox around the
-script itself, which is why the script is owned by root and not writable by the
-deploy user.
+**Scope of the restriction — read this before trusting it further than it goes.**
+
+The restriction lives on the **key**, not on the account. `authorized_keys` carries one
+entry per key and each can pin its own `command=`, so `deploy` is a powerful account
+that nobody logs into, while GitHub authenticates *as* it and reaches only one script.
+
+| | |
+|---|---|
+| What the **CI key** can do | Run `chisto-deploy.sh` with one valid image digest. No shell, no file writes, no reading `.env` |
+| What the **account** can do | Own `/srv/chisto`, read `.env`, and — via the `docker` group — anything root can |
+
+Root-owning the script is thinner than it looks. It stops `deploy` editing the file's
+contents, but `/srv/chisto` is deploy-owned, and directory write permission is what
+governs deleting and replacing a file. So a shell as `deploy` can swap the script out.
+That changes nothing in practice, because the `docker` group is already
+root-equivalent — `docker run --privileged -v /:/host` ends the discussion. Anyone with
+code execution as `deploy` owns the box, and rewriting this script is the least
+interesting thing available to them.
+
+Which leaves exactly one boundary that carries weight: **the CI key can only ask for a
+deploy of a specific image.** That one holds.
 
 ## One-time setup on the box
 
@@ -48,7 +64,7 @@ Everything lives in one directory:
 /srv/chisto/
   docker-compose.yml
   .env                  600, deploy — written by the deploy script
-  chisto-deploy.sh      0755 root:root — deploy can run it, not edit it
+  chisto-deploy.sh      0755 root:root — deploy runs it; see the caveat above
   infra/Caddyfile
 ```
 
@@ -67,13 +83,10 @@ sudo usermod -aG docker deploy
 sudo chown -R deploy:deploy /srv/chisto
 sudo chmod 600 /srv/chisto/.env
 
-# 3. The script, root-owned so deploy cannot rewrite its own forced command.
+# 3. The script, root-owned. Costs nothing; see the caveat above about what it
+#    does and does not buy.
 sudo install -o root -g root -m 0755 chisto-deploy.sh /srv/chisto/chisto-deploy.sh
 ```
-
-Root ownership is defence-in-depth, not the load-bearing control. The CI key cannot
-write files under any circumstances — it has no shell, only the forced command. This
-guards against someone who already has code execution as `deploy`, and costs nothing.
 
 Generate the key **on your laptop**, not on the box — the private half goes to
 GitHub and the box never needs it:
@@ -133,6 +146,23 @@ ssh -i ~/.ssh/chisto_deploy deploy@<host> "ghcr.io/ivanmitkovski/chisto-api@sha2
 
 Then run the workflow from the Actions tab and check it reaches the same result.
 
+## A deploy starts the box, and leaves it started
+
+Worth stating because it is easy to forget between sessions: **a push that touches
+`apps/api/**` or the workflow brings the box up and leaves it up.** While the rehearsal
+stack runs the base compose file it is `NODE_ENV=development` with
+`OTP_DEV_RETURN_CODE=true`, so OTP codes come back in the HTTP response and anyone who
+finds the address can register.
+
+Take it down when you are not actively using it:
+
+```bash
+ssh chisto 'docker compose -p chisto down'     # never -v: the volumes are the data
+```
+
+Phase C removes the concern — the production overlay sets `NODE_ENV=production` and
+`OTP_DEV_RETURN_CODE=false`, at which point staying up is the desired behaviour.
+
 ## What a deploy actually costs
 
 Observed on run #108, both attempts:
@@ -179,6 +209,33 @@ run. That replays the workflow file from that commit and needs no push. Manual
 dispatch also works in principle, but while `main` still carries the old AWS workflow
 with its required `environment` input, the dispatch form renders from the default
 branch and can reject the call.
+
+## Residual risks
+
+Recorded because they are obvious now and invisible in six months. Ranked by how
+likely they are, not by how bad they sound.
+
+**1. Repo write access means production code execution.** Anyone who can push to a
+deploying branch gets their code built and shipped. Not a flaw in this design — it is
+what continuous deployment is — and by a wide margin the most realistic path in.
+
+**2. A leaked CI key can force a downgrade.** The regex accepts *any* digest under
+`ghcr.io/ivanmitkovski/chisto-api`, including old ones. An attacker with the key cannot
+run arbitrary code, but can choose which of your images runs — reintroducing a patched
+vulnerability, or deploying something broken to cause an outage. **Worth closing before
+the box holds production data**, and cheap when you do: have the script refuse a digest
+older than the one currently deployed, or check the ref against the branch's latest
+build before accepting it.
+
+**3. A shell as `deploy` is root.** Requires a separate vulnerability to get there. The
+`docker` group is the reason it escalates. Fixing it properly means rootless Docker,
+which is a larger change than this migration should absorb, and nearly every
+Compose-based deploy has the same property.
+
+**Not exposed:** GitHub cannot get a shell, read `.env`, or reach Postgres, Redis or
+MinIO — all three are bound to `127.0.0.1` in the base compose file. A leaked key
+cannot exfiltrate secrets. The common shape of this, a deploy key with a normal shell,
+is meaningfully worse.
 
 ## Rollback
 
