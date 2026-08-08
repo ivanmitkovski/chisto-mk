@@ -31,6 +31,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      # The deploy job pins to this, not to a tag.
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
 
@@ -114,4 +117,61 @@ jobs:
             echo "${{ steps.meta.outputs.tags }}"
             echo "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}"
             echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Auto-deploys on infra-migration only — that is the rehearsal box, and the
+  # branch is temporary anyway. develop and main deliberately do not deploy: after
+  # merge this condition is what you revisit, deciding then whether a push to main
+  # should reach production on its own.
+  deploy:
+    needs: build
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.ref == 'refs/heads/infra-migration'
+    runs-on: ubuntu-latest
+    # No `environment:` — creating one needs repo admin, which the person doing
+    # this migration does not have. The cost is that these secrets are repo-wide
+    # rather than scoped to this job, and there is no approval gate. Fork PRs
+    # still cannot read them: GitHub withholds secrets from fork-triggered runs,
+    # which is the exposure that would actually matter on a public repo.
+    # Worth revisiting as an environment if admin becomes available.
+    concurrency:
+      group: api-deploy-vps
+      cancel-in-progress: false
+    steps:
+      # The whole deploy is one ssh call. The box's authorized_keys pins this key
+      # to infra/deploy/chisto-deploy.sh as a forced command, so the ref below
+      # arrives as SSH_ORIGINAL_COMMAND and the script re-validates it — nothing
+      # here can ask the box to run anything else.
+      - name: Deploy to the VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          IMAGE_REF: ${{ env.IMAGE }}@${{ needs.build.outputs.digest }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          # Pinned host key rather than StrictHostKeyChecking=no: without it the
+          # first connection trusts whatever answers, which is the one moment a
+          # deploy key is worth stealing.
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_deploy \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=15 \
+            "${VPS_USER}@${VPS_HOST}" "$IMAGE_REF"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo '### VPS deploy'
+            echo
+            echo '`'"${{ env.IMAGE }}@${{ needs.build.outputs.digest }}"'`'
+            echo
+            echo "Result: ${{ job.status }}"
           } >> "$GITHUB_STEP_SUMMARY"
