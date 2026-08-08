@@ -133,6 +133,53 @@ ssh -i ~/.ssh/chisto_deploy deploy@<host> "ghcr.io/ivanmitkovski/chisto-api@sha2
 
 Then run the workflow from the Actions tab and check it reaches the same result.
 
+## What a deploy actually costs
+
+Observed on run #108, both attempts:
+
+| | |
+|---|---|
+| Build, cold cache | ~8m53s |
+| Build, warm cache | ~1m37s |
+| Deploy job | 26–56s, mostly the image pull |
+| Containers restarted | **`api` only** — postgres, redis, minio and caddy are untouched |
+
+`docker compose up -d` recreates just the services whose definition changed, so the
+data services stay up across a deploy. The one-shot `migrate` service re-runs each
+time and exits; `api` waits on it.
+
+## Digests are not stable across rebuilds
+
+Rebuilding the same commit produces a **different digest**, which looks alarming and
+is not. Two builds of the same tree:
+
+```
+b88c18b5  created 2026-08-08T09:35:39Z  revision b9d89aef
+886a35a7  created 2026-08-08T11:48:38Z  revision dbdb45b8
+```
+
+Identical layers — same count, same content hashes. Only the config differs, because
+`docker/metadata-action` stamps `created` and `revision` into it, and the config is
+part of the digest.
+
+This does not weaken digest pinning: the digest still names exactly the artifact that
+was smoke-tested in that run, which is the guarantee worth having. It does mean **a
+changed digest is not evidence that the code changed** — compare `revision`, or the
+layer hashes, if that is the question you are asking.
+
+## The workflow does not trigger on changes to this directory
+
+`api-deploy.yml` filters on `apps/api/**` and itself, not `infra/deploy/**`. Editing
+`chisto-deploy.sh` therefore builds and deploys nothing — correct, because CI cannot
+ship this script anyway; the forced command blocks the scp that would. Adding the path
+would only produce builds that change nothing on the box.
+
+To exercise the pipeline without a code change, use **Re-run all jobs** on a previous
+run. That replays the workflow file from that commit and needs no push. Manual
+dispatch also works in principle, but while `main` still carries the old AWS workflow
+with its required `environment` input, the dispatch form renders from the default
+branch and can reject the call.
+
 ## Rollback
 
 The script rolls the **image** back on its own if `/health/ready` does not come up,
