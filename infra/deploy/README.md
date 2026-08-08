@@ -24,8 +24,15 @@ credential-shaped `ENV` in `Dockerfile.prod` is a dummy Prisma build URL — and
 repo is public, so there is nothing the image discloses that the source does not.
 
 **What this does not do.** The forced command blocks `scp`, so `docker-compose.yml`,
-`infra/Caddyfile` and `.env` are still copied by hand. That is a deliberate
-consequence of the design, not an oversight: only the image is automated.
+`infra/Caddyfile`, `.env` — and this script itself — are still copied by hand. That is
+a deliberate consequence of the design, not an oversight: only the image is automated.
+
+The copy on the box does not track the repo. After editing `chisto-deploy.sh` here:
+
+```bash
+scp infra/deploy/chisto-deploy.sh chisto:/tmp/
+ssh -t chisto 'sudo install -o root -g root -m 0755 /tmp/chisto-deploy.sh /srv/chisto/chisto-deploy.sh'
+```
 
 **Scope of the restriction.** The deploy user needs the `docker` group, and the
 docker group is root-equivalent on any box. The forced command constrains what a
@@ -35,21 +42,38 @@ deploy user.
 
 ## One-time setup on the box
 
-```bash
-# 1. The stack moves out of a personal home directory so a service user owns it.
-sudo mkdir -p /srv/chisto
-sudo mv ~/chisto/docker-compose.yml ~/chisto/.env /srv/chisto/
-sudo mkdir -p /srv/chisto/infra && sudo mv ~/chisto/infra/Caddyfile /srv/chisto/infra/
+Everything lives in one directory:
 
-# 2. Service user: no sudo, no login shell of its own worth having, docker group.
+```
+/srv/chisto/
+  docker-compose.yml
+  .env                  600, deploy — written by the deploy script
+  chisto-deploy.sh      0755 root:root — deploy can run it, not edit it
+  infra/Caddyfile
+```
+
+`/srv` rather than a home directory is not tidiness. `/home/<user>` is mode `700`, so
+a service user cannot traverse into it at all; keeping the stack there would mean
+loosening someone's home to `711` and giving `deploy` write access inside it.
+
+```bash
+# 1. Stack directory, out of any personal home.
+sudo mkdir -p /srv/chisto/infra
+# scp docker-compose.yml -> /srv/chisto/ and infra/Caddyfile -> /srv/chisto/infra/
+
+# 2. Service user: no sudo, docker group.
 sudo useradd --system --create-home --shell /bin/bash deploy
 sudo usermod -aG docker deploy
 sudo chown -R deploy:deploy /srv/chisto
 sudo chmod 600 /srv/chisto/.env
 
-# 3. The script, owned by root so deploy cannot rewrite its own forced command.
-sudo install -o root -g root -m 0755 chisto-deploy.sh /usr/local/bin/chisto-deploy.sh
+# 3. The script, root-owned so deploy cannot rewrite its own forced command.
+sudo install -o root -g root -m 0755 chisto-deploy.sh /srv/chisto/chisto-deploy.sh
 ```
+
+Root ownership is defence-in-depth, not the load-bearing control. The CI key cannot
+write files under any circumstances — it has no shell, only the forced command. This
+guards against someone who already has code execution as `deploy`, and costs nothing.
 
 Generate the key **on your laptop**, not on the box — the private half goes to
 GitHub and the box never needs it:
@@ -63,7 +87,7 @@ Install the public half with the forced command and every capability stripped:
 ```bash
 sudo -u deploy mkdir -p /home/deploy/.ssh
 sudo -u deploy tee /home/deploy/.ssh/authorized_keys >/dev/null <<'EOF'
-command="/usr/local/bin/chisto-deploy.sh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty,restrict ssh-ed25519 AAAA… github-actions-deploy
+command="/srv/chisto/chisto-deploy.sh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty,restrict ssh-ed25519 AAAA… github-actions-deploy
 EOF
 sudo -u deploy chmod 600 /home/deploy/.ssh/authorized_keys
 ```

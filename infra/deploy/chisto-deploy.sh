@@ -3,8 +3,10 @@
 # command in the deploy user's authorized_keys, so an ssh session with that key
 # runs this and nothing else, whatever it asks for. See README.md.
 #
-# Owned by root, mode 0755. The deploy user must not be able to edit it — a
-# writable script would make the forced command decorative.
+# Lives at /srv/chisto/chisto-deploy.sh, alongside the compose file and .env it
+# operates on. Installed root:root 0755 — the deploy user runs it but cannot edit
+# it. That is defence-in-depth rather than the load-bearing control: the CI key has
+# no shell and so cannot write files at all.
 #
 # Argument arrives as SSH_ORIGINAL_COMMAND, i.e. fully attacker-controlled if the
 # key ever leaks. Validated below before it touches anything.
