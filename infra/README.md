@@ -13,8 +13,11 @@ The platform is migrating off AWS onto a single VPS running Docker Compose (API 
 | TLS | Caddy in front of `api.chisto.mk` |
 | Backups | Provider snapshots for now; `pg_dump` routine deferred |
 
-**Deploying to the VPS: [`vps-deploy.md`](vps-deploy.md)** — step-by-step runbook covering
-the AWS data extraction, the rehearsal hostname, cutover and rollback.
+**Deploying to the VPS:** the step-by-step runbook — data extraction, the rehearsal
+hostname, cutover and rollback — is kept as an untracked working note at
+`infra/vps-deploy.md`, alongside `infra/phase3-bringup.md` and `infra_migration.md`.
+Deliberately not committed while the migration is in flight; ask whoever is running it
+for the current copy.
 
 **Automated deploys: [`deploy/README.md`](deploy/README.md)** — CI builds the image and
 ships it to the box over ssh, where a forced command restricts the CI key to one
