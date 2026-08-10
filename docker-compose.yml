@@ -167,6 +167,10 @@ services:
   # same routing can be exercised without certificates.
   caddy:
     image: caddy:2-alpine
+    environment:
+      # The Caddyfile routes the media prefix by bucket name; it must match what
+      # the API signs. See the comment on that route in infra/Caddyfile.
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-chisto-media}
     ports:
       - "${CADDY_HTTP_PORT:-80}:80"
     volumes:

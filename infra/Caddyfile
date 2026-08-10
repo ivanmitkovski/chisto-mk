@@ -14,13 +14,22 @@
 
 {$CADDY_SITE_ADDRESS::80} {
 	# MinIO. S3_FORCE_PATH_STYLE=true puts the bucket name first in the path,
-	# so this prefix is the entire media surface. Keep in sync with
-	# S3_BUCKET_NAME if that ever changes.
+	# so this prefix is the entire media surface.
+	#
+	# Parameterised rather than hardcoded because the bucket name is not a free
+	# choice on the VPS. s3-storage.client.ts builds its canonical media URL as
+	# https://${bucket}.s3.${region}.amazonaws.com/ — an AWS-shaped string used
+	# only as an internal encoding of bucket+key, never fetched. signUrls()
+	# strips that prefix to recover the key and presigns it against the real
+	# endpoint; anything not matching is passed through unsigned. Production
+	# rows already store that string with bucket chisto-prod-media, so the VPS
+	# keeps that name and no stored URL needs rewriting — which in turn means
+	# this route has to follow the bucket rather than the other way round.
 	#
 	# Caddy passes the original Host header through unchanged, which is what
 	# makes presigned URLs validate: the API signs for this hostname and MinIO
 	# verifies the signature against the same one.
-	handle /chisto-media/* {
+	handle /{$S3_BUCKET_NAME:chisto-media}/* {
 		reverse_proxy minio:9000
 	}
 

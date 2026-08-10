@@ -1,0 +1,44 @@
+# Rehearsal overlay: the production configuration, minus TLS and minus every
+# outbound side effect that would reach a real user.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#                  -f docker-compose.rehearsal.yml up -d
+#
+# Why this file exists. Until a DNS record points at the box, the production
+# overlay cannot run: it derives CADDY_SITE_ADDRESS from PUBLIC_HOST, and a
+# hostname is by itself what switches on Let's Encrypt — so starting it against
+# an unresolvable name burns ACME attempts against a rate limit. That coupled
+# two unrelated risks together, certificate issuance and production config. This
+# file separates them, so everything except the certificate can be proven first.
+#
+# Deleting this file from COMPOSE_FILE *is* the promotion to production. That is
+# deliberate: the unsafe-for-rehearsal settings live here and nowhere else, so
+# there is no checklist item to forget and no value to remember to flip back.
+
+services:
+  caddy:
+    environment:
+      # Pinned back to a bare :80. With no hostname Caddy cannot attempt
+      # automatic HTTPS, so no certificate is requested and no rate limit is
+      # spent while PUBLIC_HOST is still a raw IP.
+      CADDY_SITE_ADDRESS: ":80"
+
+  api:
+    environment:
+      # The production overlay signs presigned media URLs as https://. Nothing
+      # terminates TLS here, so they must be signed http:// or every media URL
+      # handed to a client is unfetchable. This is the one value that must track
+      # the Caddy site address above.
+      S3_ENDPOINT_URL: http://${PUBLIC_HOST:?set PUBLIC_HOST}
+
+      # Production runs PUSH_FCM_ENABLED=true and EMAIL_ENABLED=true against a
+      # live Postmark token and 67 real device tokens. The restored dump carries
+      # pending NotificationOutbox, AdminEmailOutbox and MapEventOutbox rows, so
+      # a production-configured API booting against it would push stale
+      # notifications to real phones and email real people — from a box that is
+      # not serving traffic yet. Both stay off for the whole rehearsal.
+      #
+      # `environment` takes precedence over `env_file`, so these win over
+      # infra/vps.env without having to edit it.
+      PUSH_FCM_ENABLED: "false"
+      EMAIL_ENABLED: "false"
